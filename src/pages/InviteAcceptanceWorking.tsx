@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
-const TestInvite = () => {
+const InviteAcceptanceWorking = () => {
   console.log('🧪 TestInvite component rendering');
   const { token } = useParams<{ token: string }>();
   const navigate = useNavigate();
@@ -114,4 +114,4 @@ const TestInvite = () => {
   );
 };
 
-export default TestInvite;
+export default InviteAcceptanceWorking;
