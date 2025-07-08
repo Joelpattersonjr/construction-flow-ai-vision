@@ -328,6 +328,10 @@ export type Database = {
         Args: { invitation_token: string }
         Returns: Json
       }
+      belongs_to_company: {
+        Args: { company_id_param: number }
+        Returns: boolean
+      }
       get_company_name: {
         Args: { company_id_param: number }
         Returns: string
@@ -335,6 +339,14 @@ export type Database = {
       get_my_company_id: {
         Args: Record<PropertyKey, never>
         Returns: number
+      }
+      is_company_admin: {
+        Args: { company_id_param: number }
+        Returns: boolean
+      }
+      is_company_owner: {
+        Args: { owner_id_param: string }
+        Returns: boolean
       }
     }
     Enums: {
