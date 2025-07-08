@@ -109,7 +109,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'ProjectPulse <noreply@projectpulse.app>',
+        from: 'ProjectPulse <onboarding@resend.dev>',
         to: [invitation.email],
         subject: `You're invited to join ${invitation.companies.name}`,
         html: emailHtml,
