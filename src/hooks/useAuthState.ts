@@ -78,7 +78,18 @@ export const useAuthState = () => {
               }
             } catch (error) {
               console.error('Error fetching profile in auth state change:', error);
-              if (mounted) {
+              // If user doesn't exist (403 error), clear auth state
+              if (error?.message?.includes('User from sub claim in JWT does not exist')) {
+                console.log('🔄 Clearing invalid auth state...');
+                await supabase.auth.signOut();
+                localStorage.clear();
+                sessionStorage.clear();
+                if (mounted) {
+                  setSession(null);
+                  setUser(null);
+                  setProfile(null);
+                }
+              } else if (mounted) {
                 setProfile(null);
               }
             }

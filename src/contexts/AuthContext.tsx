@@ -19,7 +19,7 @@ export const useAuth = () => {
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   console.log('AuthProvider rendering');
   const { user, session, profile, loading, setUser, setSession, setProfile } = useAuthState();
-  const { signIn, signUp, signOut: authSignOut } = useAuthActions();
+  const { signIn, signUp, signOut: authSignOut, clearAuthState } = useAuthActions();
 
   console.log('AuthProvider state:', { user: !!user, session: !!session, profile: !!profile, loading });
 
@@ -35,6 +35,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     signIn,
     signUp,
     signOut,
+    clearAuthState,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

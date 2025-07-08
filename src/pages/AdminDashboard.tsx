@@ -14,7 +14,7 @@ import { TeamMembersTable } from '@/components/admin/TeamMembersTable';
 import { PendingInvitationsTable } from '@/components/admin/PendingInvitationsTable';
 
 const AdminDashboard = () => {
-  const { user, profile, signOut } = useAuth();
+  const { user, profile, signOut, clearAuthState } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
@@ -145,6 +145,15 @@ const AdminDashboard = () => {
                       >
                         <LogOut className="h-4 w-4" />
                         <span>Sign Out</span>
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={clearAuthState}
+                        className="w-full flex items-center justify-center space-x-2 text-red-600 hover:text-red-700"
+                      >
+                        <LogOut className="h-4 w-4" />
+                        <span>Clear Auth State</span>
                       </Button>
                     </div>
                   </div>

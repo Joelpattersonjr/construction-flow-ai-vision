@@ -9,6 +9,7 @@ export interface AuthContextType {
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signUp: (email: string, password: string, fullName: string, companyName: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
+  clearAuthState: () => Promise<void>;
 }
 
 export interface Profile {

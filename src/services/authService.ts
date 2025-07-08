@@ -78,9 +78,21 @@ export const useAuthActions = () => {
     }
   };
 
+  const clearAuthState = async () => {
+    try {
+      await supabase.auth.signOut();
+      localStorage.clear();
+      sessionStorage.clear();
+      window.location.href = '/auth';
+    } catch (error) {
+      console.error('Clear auth state error:', error);
+    }
+  };
+
   return {
     signIn,
     signUp,
-    signOut
+    signOut,
+    clearAuthState
   };
 };
