@@ -3,7 +3,8 @@ import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { LogOut, User } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { LogOut, User, ChevronDown } from 'lucide-react';
 
 const Index = () => {
   const { user, profile, signOut } = useAuth();
@@ -17,22 +18,53 @@ const Index = () => {
               <h1 className="text-xl font-semibold text-gray-900">ProjectPulse</h1>
             </div>
             <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2 text-sm text-gray-600">
-                <User className="h-4 w-4" />
-                <span>{profile?.full_name || user?.email}</span>
-                {profile?.company_name && (
-                  <span className="text-gray-400">@ {profile.company_name}</span>
-                )}
-              </div>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={signOut}
-                className="flex items-center space-x-2"
-              >
-                <LogOut className="h-4 w-4" />
-                <span>Sign Out</span>
-              </Button>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="flex items-center space-x-2">
+                    <User className="h-4 w-4" />
+                    <span className="text-sm text-gray-600">
+                      {profile?.full_name || user?.email}
+                    </span>
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-80" align="end">
+                  <div className="space-y-3">
+                    <div className="border-b pb-3">
+                      <h3 className="font-semibold text-gray-900">Account Information</h3>
+                    </div>
+                    <div className="space-y-2 text-sm">
+                      <div>
+                        <span className="font-medium text-gray-700">Name:</span>
+                        <span className="ml-2 text-gray-600">{profile?.full_name || 'Not provided'}</span>
+                      </div>
+                      <div>
+                        <span className="font-medium text-gray-700">Email:</span>
+                        <span className="ml-2 text-gray-600">{user?.email}</span>
+                      </div>
+                      <div>
+                        <span className="font-medium text-gray-700">Company:</span>
+                        <span className="ml-2 text-gray-600">{profile?.company_name || 'Not provided'}</span>
+                      </div>
+                      <div>
+                        <span className="font-medium text-gray-700">Role:</span>
+                        <span className="ml-2 text-gray-600">{profile?.job_title || 'User'}</span>
+                      </div>
+                    </div>
+                    <div className="border-t pt-3">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={signOut}
+                        className="w-full flex items-center justify-center space-x-2"
+                      >
+                        <LogOut className="h-4 w-4" />
+                        <span>Sign Out</span>
+                      </Button>
+                    </div>
+                  </div>
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
         </div>
@@ -94,29 +126,6 @@ const Index = () => {
             </CardContent>
           </Card>
         </div>
-
-        {profile && (
-          <Card className="mt-8">
-            <CardHeader>
-              <CardTitle>Account Information</CardTitle>
-              <CardDescription>Your profile and company details</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              <div>
-                <span className="font-medium">Name:</span> {profile.full_name}
-              </div>
-              <div>
-                <span className="font-medium">Email:</span> {user?.email}
-              </div>
-              <div>
-                <span className="font-medium">Company:</span> {profile.company_name}
-              </div>
-              <div>
-                <span className="font-medium">Role:</span> {profile.job_title || 'User'}
-              </div>
-            </CardContent>
-          </Card>
-        )}
       </main>
     </div>
   );
