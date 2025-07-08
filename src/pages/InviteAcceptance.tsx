@@ -36,15 +36,18 @@ const InviteAcceptance = () => {
     try {
       setLoading(true);
       
+      console.log('Validating invitation token:', token);
+      
       const { data, error } = await supabase
         .from('user_invitations')
         .select('*')
         .eq('invitation_token', token)
-        .is('accepted_at', null)
-        .gt('expires_at', new Date().toISOString())
         .single();
 
-      if (error || !data) {
+      console.log('Invitation query result:', { data, error });
+
+      if (error) {
+        console.error('Database error:', error);
         toast({
           title: "Invalid Invitation",
           description: "This invitation link is invalid or has expired.",
@@ -54,6 +57,39 @@ const InviteAcceptance = () => {
         return;
       }
 
+      if (!data) {
+        toast({
+          title: "Invalid Invitation",
+          description: "This invitation link is invalid or has expired.",
+          variant: "destructive",
+        });
+        navigate('/auth');
+        return;
+      }
+
+      // Check if already accepted
+      if (data.accepted_at) {
+        toast({
+          title: "Invitation Already Used",
+          description: "This invitation has already been accepted.",
+          variant: "destructive",
+        });
+        navigate('/auth');
+        return;
+      }
+
+      // Check if expired
+      if (new Date(data.expires_at) < new Date()) {
+        toast({
+          title: "Invitation Expired",
+          description: "This invitation has expired. Please request a new one.",
+          variant: "destructive",
+        });
+        navigate('/auth');
+        return;
+      }
+
+      console.log('Invitation is valid:', data);
       setInvitation(data);
       setFormData(prev => ({ ...prev, email: data.email }));
     } catch (error) {
