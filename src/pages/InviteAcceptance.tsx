@@ -41,17 +41,10 @@ const InviteAcceptance = () => {
       if (error) {
         console.error('❌ Database error:', error);
         setInvitation(null);
-        return;
-      }
-
-      if (!data) {
+      } else if (!data) {
         console.log('❌ No invitation found');
         setInvitation(null);
-        return;
-      }
-
-      // Check if already accepted
-      if (data.accepted_at) {
+      } else if (data.accepted_at) {
         console.log('❌ Invitation already accepted');
         toast({
           title: "Invitation Already Used",
@@ -59,28 +52,26 @@ const InviteAcceptance = () => {
           variant: "destructive",
         });
         setInvitation(null);
-        return;
+      } else {
+        // Check if expired
+        const now = new Date();
+        const expiresAt = new Date(data.expires_at);
+        console.log('Checking expiration:', { now: now.toISOString(), expires_at: expiresAt.toISOString(), isExpired: expiresAt < now });
+        
+        if (expiresAt < now) {
+          console.log('❌ INVITATION EXPIRED');
+          toast({
+            title: "Invitation Expired",
+            description: "This invitation has expired. Please request a new one.",
+            variant: "destructive",
+          });
+          setInvitation(null);
+        } else {
+          console.log('✅ Invitation is valid:', data);
+          setInvitation(data);
+          setFormData(prev => ({ ...prev, email: data.email }));
+        }
       }
-
-      // Check if expired
-      const now = new Date();
-      const expiresAt = new Date(data.expires_at);
-      console.log('Checking expiration:', { now: now.toISOString(), expires_at: expiresAt.toISOString(), isExpired: expiresAt < now });
-      
-      if (expiresAt < now) {
-        console.log('❌ INVITATION EXPIRED - This would cause redirect!');
-        toast({
-          title: "Invitation Expired",
-          description: "This invitation has expired. Please request a new one.",
-          variant: "destructive",
-        });
-        setInvitation(null);
-        return;
-      }
-
-      console.log('✅ Invitation is valid:', data);
-      setInvitation(data);
-      setFormData(prev => ({ ...prev, email: data.email }));
     } catch (error) {
       console.error('💥 VALIDATION ERROR:', error);
       setInvitation(null);
