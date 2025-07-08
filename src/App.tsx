@@ -44,9 +44,9 @@ const App = () => {
               />
               <Route path="/test" element={<div>TEST ROUTE WORKS</div>} />
               <Route path="/invite/:token" element={
-                <div>
-                  <div style={{padding: '10px', background: 'green', color: 'white'}}>Route reached!</div>
-                  <InviteAcceptance />
+                <div style={{padding: '20px'}}>
+                  <h1>Invite Page</h1>
+                  <p>This should work without redirecting</p>
                 </div>
               } />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
