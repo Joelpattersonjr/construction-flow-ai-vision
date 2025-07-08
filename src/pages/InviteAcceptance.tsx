@@ -13,6 +13,8 @@ const InviteAcceptance = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   
+  console.log('InviteAcceptance component mounted with token:', token);
+  
   const [invitation, setInvitation] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -24,11 +26,14 @@ const InviteAcceptance = () => {
   });
 
   useEffect(() => {
+    console.log('InviteAcceptance useEffect triggered with token:', token);
     if (!token) {
+      console.log('No token found, redirecting to /auth');
       navigate('/auth');
       return;
     }
     
+    console.log('Token found, validating invitation...');
     validateInvitation();
   }, [token]);
 
