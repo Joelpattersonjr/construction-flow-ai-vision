@@ -108,6 +108,7 @@ const InviteAcceptance = () => {
       setFormData(prev => ({ ...prev, email: data.email }));
     } catch (error) {
       console.error('💥 VALIDATION ERROR - This is why we redirect!', error);
+      setInvitation(null);
       // TEMPORARY: Comment out redirect to see the error
       // navigate('/auth');
     } finally {
