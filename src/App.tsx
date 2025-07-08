@@ -10,8 +10,6 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import AdminDashboard from "./pages/AdminDashboard";
 import InviteAcceptance from "./pages/InviteAcceptance";
-import InviteAcceptanceWorking from "./pages/InviteAcceptanceWorking";
-import InviteAcceptanceSimple from "./pages/InviteAcceptanceSimple";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -45,7 +43,7 @@ const App = () => {
                 } 
               />
               <Route path="/test" element={<div>TEST ROUTE WORKS</div>} />
-              <Route path="/invite/:token" element={<InviteAcceptanceWorking />} />
+              <Route path="/invite/:token" element={<InviteAcceptance />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
