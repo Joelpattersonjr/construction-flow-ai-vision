@@ -87,13 +87,19 @@ const InviteAcceptance = () => {
       }
 
       // Check if expired
-      if (new Date(data.expires_at) < new Date()) {
+      const now = new Date();
+      const expiresAt = new Date(data.expires_at);
+      console.log('Checking expiration:', { now: now.toISOString(), expires_at: expiresAt.toISOString(), isExpired: expiresAt < now });
+      
+      if (expiresAt < now) {
+        console.log('❌ INVITATION EXPIRED - This is why we redirect!');
         toast({
           title: "Invitation Expired",
           description: "This invitation has expired. Please request a new one.",
           variant: "destructive",
         });
-        navigate('/auth');
+        // TEMPORARY: Comment out redirect to see the error
+        // navigate('/auth');
         return;
       }
 
@@ -101,8 +107,9 @@ const InviteAcceptance = () => {
       setInvitation(data);
       setFormData(prev => ({ ...prev, email: data.email }));
     } catch (error) {
-      console.error('Error validating invitation:', error);
-      navigate('/auth');
+      console.error('💥 VALIDATION ERROR - This is why we redirect!', error);
+      // TEMPORARY: Comment out redirect to see the error
+      // navigate('/auth');
     } finally {
       setLoading(false);
     }
