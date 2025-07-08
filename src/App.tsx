@@ -11,6 +11,7 @@ import Auth from "./pages/Auth";
 import AdminDashboard from "./pages/AdminDashboard";
 import InviteAcceptance from "./pages/InviteAcceptance";
 import TestInvite from "./components/TestInvite";
+import InviteAcceptanceSimple from "./pages/InviteAcceptanceSimple";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -44,7 +45,7 @@ const App = () => {
                 } 
               />
               <Route path="/test" element={<div>TEST ROUTE WORKS</div>} />
-              <Route path="/invite/:token" element={<TestInvite />} />
+              <Route path="/invite/:token" element={<InviteAcceptanceSimple />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
