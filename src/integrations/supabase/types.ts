@@ -324,6 +324,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      accept_invitation: {
+        Args: { invitation_token: string }
+        Returns: Json
+      }
       get_my_company_id: {
         Args: Record<PropertyKey, never>
         Returns: number
