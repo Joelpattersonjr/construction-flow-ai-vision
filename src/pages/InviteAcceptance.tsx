@@ -128,14 +128,22 @@ const InviteAcceptance = () => {
       if (authError) throw authError;
 
       if (authData.user) {
+        console.log('🔍 User created:', authData.user.email);
+        console.log('🔍 Invitation email:', formData.email);
+        console.log('🔍 Token:', token);
+        
         // Accept the invitation which creates the profile
         const { data: acceptResult, error: acceptError } = await supabase
           .rpc('accept_invitation', { invitation_token: token });
+
+        console.log('🔍 Accept result:', acceptResult);
+        console.log('🔍 Accept error:', acceptError);
 
         if (acceptError) throw acceptError;
 
         const result = acceptResult as any;
         if (result?.error) {
+          console.log('🔍 Database function returned error:', result.error);
           throw new Error(result.error);
         }
 
