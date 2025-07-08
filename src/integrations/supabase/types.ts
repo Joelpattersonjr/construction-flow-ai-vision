@@ -87,6 +87,7 @@ export type Database = {
         Row: {
           company_id: number | null
           company_name: string | null
+          company_role: string | null
           full_name: string | null
           id: string
           job_title: string | null
@@ -95,6 +96,7 @@ export type Database = {
         Insert: {
           company_id?: number | null
           company_name?: string | null
+          company_role?: string | null
           full_name?: string | null
           id?: string
           job_title?: string | null
@@ -103,6 +105,7 @@ export type Database = {
         Update: {
           company_id?: number | null
           company_name?: string | null
+          company_role?: string | null
           full_name?: string | null
           id?: string
           job_title?: string | null
@@ -255,6 +258,63 @@ export type Database = {
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_invitations: {
+        Row: {
+          accepted_at: string | null
+          company_id: number
+          company_role: string | null
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          invitation_token: string
+          invited_by: string
+          project_roles: Json | null
+          updated_at: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          company_id: number
+          company_role?: string | null
+          created_at?: string
+          email: string
+          expires_at?: string
+          id?: string
+          invitation_token?: string
+          invited_by: string
+          project_roles?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          company_id?: number
+          company_role?: string | null
+          created_at?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          invitation_token?: string
+          invited_by?: string
+          project_roles?: Json | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_invitations_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_invitations_invited_by_fkey"
+            columns: ["invited_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
