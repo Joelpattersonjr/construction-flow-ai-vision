@@ -125,9 +125,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     };
 
-    // Set up auth state listener
+    // Set up auth state listener - using non-async callback to prevent deadlocks
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
         console.log('Auth state changed:', event, session?.user?.id);
         
         if (!mounted) return;
@@ -135,19 +135,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setSession(session);
         setUser(session?.user ?? null);
         
-        // Handle profile fetching
+        // Handle profile fetching with setTimeout to prevent blocking
         if (session?.user) {
-          try {
-            const profileData = await fetchProfile(session.user.id);
-            if (mounted) {
-              setProfile(profileData);
+          setTimeout(async () => {
+            if (!mounted) return;
+            try {
+              const profileData = await fetchProfile(session.user.id);
+              if (mounted) {
+                setProfile(profileData);
+              }
+            } catch (error) {
+              console.error('Error fetching profile in auth state change:', error);
+              if (mounted) {
+                setProfile(null);
+              }
             }
-          } catch (error) {
-            console.error('Error fetching profile in auth state change:', error);
-            if (mounted) {
-              setProfile(null);
-            }
-          }
+          }, 0);
         } else {
           setProfile(null);
         }
