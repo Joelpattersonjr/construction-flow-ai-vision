@@ -6,7 +6,7 @@ import { useAuthActions } from '@/services/authService';
 
 console.log('AuthContext.tsx file loaded');
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const useAuth = () => {
   const context = useContext(AuthContext);

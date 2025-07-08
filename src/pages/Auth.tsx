@@ -1,6 +1,6 @@
 
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import React, { useState, useEffect, useContext } from 'react';
+import { AuthContext } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,7 +13,7 @@ const Auth = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   
-  const authContext = useAuth();
+  const authContext = useContext(AuthContext);
   const navigate = useNavigate();
 
   // Guard against context not being ready
