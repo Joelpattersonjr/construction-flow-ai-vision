@@ -18,7 +18,13 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const resendApiKey = Deno.env.get('RESEND_API_KEY');
 
+    console.log('Edge function called with:', { 
+      hasResendKey: !!resendApiKey,
+      resendKeyLength: resendApiKey?.length 
+    });
+
     if (!resendApiKey) {
+      console.error('RESEND_API_KEY is missing');
       throw new Error('RESEND_API_KEY environment variable is not set');
     }
 
@@ -102,23 +108,40 @@ serve(async (req) => {
     `;
 
     // Send email using Resend
+    console.log('Attempting to send email to:', invitation.email);
+    
+    const emailPayload = {
+      from: 'ProjectPulse <onboarding@resend.dev>',
+      to: [invitation.email],
+      subject: `You're invited to join ${invitation.companies.name}`,
+      html: emailHtml,
+    };
+    
+    console.log('Email payload:', {
+      from: emailPayload.from,
+      to: emailPayload.to,
+      subject: emailPayload.subject,
+      htmlLength: emailPayload.html.length
+    });
+
     const emailResponse = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${resendApiKey}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        from: 'ProjectPulse <onboarding@resend.dev>',
-        to: [invitation.email],
-        subject: `You're invited to join ${invitation.companies.name}`,
-        html: emailHtml,
-      }),
+      body: JSON.stringify(emailPayload),
     });
+
+    console.log('Resend API response status:', emailResponse.status);
 
     if (!emailResponse.ok) {
       const errorData = await emailResponse.text();
-      console.error('Resend API error:', errorData);
+      console.error('Resend API error:', {
+        status: emailResponse.status,
+        statusText: emailResponse.statusText,
+        error: errorData
+      });
       throw new Error(`Failed to send email: ${errorData}`);
     }
 
