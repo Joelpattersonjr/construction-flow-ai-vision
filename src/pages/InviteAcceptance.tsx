@@ -8,6 +8,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useToast } from '@/hooks/use-toast';
 import { Mail, Check, AlertCircle, Loader2 } from 'lucide-react';
 
+console.log('InviteAcceptance.tsx file loaded');
+
 const InviteAcceptance = () => {
   const { token } = useParams<{ token: string }>();
   const navigate = useNavigate();
