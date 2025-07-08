@@ -1,0 +1,203 @@
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
+import { useToast } from '@/hooks/use-toast';
+import { Users, UserPlus, Mail, Shield } from 'lucide-react';
+import { InviteUserDialog } from '@/components/admin/InviteUserDialog';
+import { TeamMembersTable } from '@/components/admin/TeamMembersTable';
+import { PendingInvitationsTable } from '@/components/admin/PendingInvitationsTable';
+
+const AdminDashboard = () => {
+  const { user, profile } = useAuth();
+  const { toast } = useToast();
+  const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
+  const [teamMembers, setTeamMembers] = useState([]);
+  const [pendingInvitations, setPendingInvitations] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Check if user is company admin
+  const isCompanyAdmin = profile?.company_role === 'company_admin';
+
+  useEffect(() => {
+    if (!isCompanyAdmin) return;
+    
+    fetchTeamData();
+  }, [isCompanyAdmin]);
+
+  const fetchTeamData = async () => {
+    if (!profile?.company_id) return;
+
+    try {
+      setLoading(true);
+
+      // Fetch team members
+      const { data: members, error: membersError } = await supabase
+        .from('profiles')
+        .select('id, full_name, job_title, company_role, updated_at')
+        .eq('company_id', profile.company_id);
+
+      if (membersError) throw membersError;
+
+      // Fetch pending invitations
+      const { data: invitations, error: invitationsError } = await supabase
+        .from('user_invitations')
+        .select('*')
+        .eq('company_id', profile.company_id)
+        .is('accepted_at', null)
+        .gt('expires_at', new Date().toISOString());
+
+      if (invitationsError) throw invitationsError;
+
+      setTeamMembers(members || []);
+      setPendingInvitations(invitations || []);
+    } catch (error) {
+      console.error('Error fetching team data:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load team data",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!isCompanyAdmin) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Card className="w-96">
+          <CardContent className="pt-6 text-center">
+            <Shield className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">Access Denied</h2>
+            <p className="text-gray-600">
+              You need company admin privileges to access this page.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <nav className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center">
+              <h1 className="text-xl font-semibold text-gray-900">Admin Dashboard</h1>
+            </div>
+            <Button 
+              onClick={() => setIsInviteDialogOpen(true)}
+              className="flex items-center space-x-2"
+            >
+              <UserPlus className="h-4 w-4" />
+              <span>Invite User</span>
+            </Button>
+          </div>
+        </div>
+      </nav>
+
+      <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        {/* Overview Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Team Members</CardTitle>
+              <Users className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{teamMembers.length}</div>
+              <p className="text-xs text-muted-foreground">
+                Active users in your company
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Pending Invitations</CardTitle>
+              <Mail className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{pendingInvitations.length}</div>
+              <p className="text-xs text-muted-foreground">
+                Invitations waiting for acceptance
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Company Admins</CardTitle>
+              <Shield className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {teamMembers.filter(m => m.company_role === 'company_admin').length}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Users with admin privileges
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Main Content Tabs */}
+        <Tabs defaultValue="team" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="team">Team Members</TabsTrigger>
+            <TabsTrigger value="invitations">Pending Invitations</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="team" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Team Members</CardTitle>
+                <CardDescription>
+                  Manage your company's team members and their roles
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <TeamMembersTable 
+                  members={teamMembers} 
+                  onRefresh={fetchTeamData}
+                  loading={loading}
+                />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="invitations" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Pending Invitations</CardTitle>
+                <CardDescription>
+                  View and manage pending user invitations
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <PendingInvitationsTable 
+                  invitations={pendingInvitations} 
+                  onRefresh={fetchTeamData}
+                  loading={loading}
+                />
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </main>
+
+      <InviteUserDialog
+        open={isInviteDialogOpen}
+        onOpenChange={setIsInviteDialogOpen}
+        onInviteSent={fetchTeamData}
+      />
+    </div>
+  );
+};
+
+export default AdminDashboard;

@@ -4,10 +4,12 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { LogOut, User, ChevronDown } from 'lucide-react';
+import { LogOut, User, ChevronDown, Settings } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const Index = () => {
   const { user, profile, signOut } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -51,7 +53,18 @@ const Index = () => {
                         <span className="ml-2 text-gray-600">{profile?.job_title || 'User'}</span>
                       </div>
                     </div>
-                    <div className="border-t pt-3">
+                    <div className="border-t pt-3 space-y-2">
+                      {profile?.company_role === 'company_admin' && (
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => navigate('/admin')}
+                          className="w-full flex items-center justify-center space-x-2"
+                        >
+                          <Settings className="h-4 w-4" />
+                          <span>Admin Dashboard</span>
+                        </Button>
+                      )}
                       <Button 
                         variant="outline" 
                         size="sm" 
