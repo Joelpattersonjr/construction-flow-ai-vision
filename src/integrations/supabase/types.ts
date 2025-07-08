@@ -332,6 +332,14 @@ export type Database = {
         Args: { company_id_param: number }
         Returns: boolean
       }
+      current_user_company_id: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
+      current_user_is_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
       get_company_name: {
         Args: { company_id_param: number }
         Returns: string
