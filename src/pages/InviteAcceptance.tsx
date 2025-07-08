@@ -21,6 +21,7 @@ const InviteAcceptance = () => {
     password: '',
     confirmPassword: '',
     fullName: '',
+    jobTitle: '',
   });
   
   console.log('🔍 Token from URL:', token);
@@ -125,6 +126,7 @@ const InviteAcceptance = () => {
         options: {
           data: {
             full_name: formData.fullName,
+            job_title: formData.jobTitle,
           },
           emailRedirectTo: `${window.location.origin}/`,
         },
@@ -229,6 +231,18 @@ const InviteAcceptance = () => {
                 placeholder="Enter your full name"
                 value={formData.fullName}
                 onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                required
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="jobTitle">Job Title</Label>
+              <Input
+                id="jobTitle"
+                type="text"
+                placeholder="Enter your job title"
+                value={formData.jobTitle}
+                onChange={(e) => setFormData({ ...formData, jobTitle: e.target.value })}
                 required
               />
             </div>
