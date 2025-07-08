@@ -88,6 +88,75 @@ const InviteAcceptance = () => {
       setLoading(false);
     }
   };
+
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (formData.password !== formData.confirmPassword) {
+      toast({
+        title: "Password Mismatch",
+        description: "Passwords do not match.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      toast({
+        title: "Password Too Short",
+        description: "Password must be at least 6 characters long.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+
+      // Sign up the user
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            full_name: formData.fullName,
+          },
+          emailRedirectTo: `${window.location.origin}/`,
+        },
+      });
+
+      if (authError) throw authError;
+
+      if (authData.user) {
+        // Accept the invitation which creates the profile
+        const { data: acceptResult, error: acceptError } = await supabase
+          .rpc('accept_invitation', { invitation_token: token });
+
+        if (acceptError) throw acceptError;
+
+        const result = acceptResult as any;
+        if (result?.error) {
+          throw new Error(result.error);
+        }
+
+        toast({
+          title: "Account Created!",
+          description: "Welcome to the team! You can now access the platform.",
+        });
+
+        navigate('/');
+      }
+    } catch (error: any) {
+      console.error('Error creating account:', error);
+      toast({
+        title: "Signup Failed",
+        description: error.message || "Failed to create account. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
   
   useEffect(() => {
     console.log('🔍 useEffect triggered with token:', token);
@@ -138,7 +207,7 @@ const InviteAcceptance = () => {
             </div>
           </div>
 
-          <div className="space-y-4">
+          <form onSubmit={handleSignUp} className="space-y-4">
             <div>
               <Label htmlFor="fullName">Full Name</Label>
               <Input
@@ -189,6 +258,7 @@ const InviteAcceptance = () => {
             </div>
 
             <Button 
+              type="submit"
               className="w-full" 
               disabled={submitting}
             >
@@ -201,7 +271,7 @@ const InviteAcceptance = () => {
                 'Accept Invitation & Create Account'
               )}
             </Button>
-          </div>
+          </form>
 
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
