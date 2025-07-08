@@ -4,6 +4,8 @@ import { AuthContextType } from '@/types/auth';
 import { useAuthState } from '@/hooks/useAuthState';
 import { useAuthActions } from '@/services/authService';
 
+console.log('AuthContext.tsx file loaded');
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const useAuth = () => {
@@ -15,8 +17,11 @@ export const useAuth = () => {
 };
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  console.log('AuthProvider rendering');
   const { user, session, profile, loading, setUser, setSession, setProfile } = useAuthState();
   const { signIn, signUp, signOut: authSignOut } = useAuthActions();
+
+  console.log('AuthProvider state:', { user: !!user, session: !!session, profile: !!profile, loading });
 
   const signOut = async () => {
     await authSignOut(setUser, setSession, setProfile);

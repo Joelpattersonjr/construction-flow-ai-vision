@@ -1,7 +1,9 @@
 
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
+
+console.log('ProtectedRoute.tsx file loaded');
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -9,8 +11,17 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { user, loading } = useAuth();
+  const location = useLocation();
+  
+  console.log('ProtectedRoute check:', { 
+    user: !!user, 
+    loading, 
+    pathname: location.pathname,
+    shouldRedirect: !loading && !user 
+  });
 
   if (loading) {
+    console.log('ProtectedRoute: showing loading state');
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -22,9 +33,11 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   }
 
   if (!user) {
+    console.log('ProtectedRoute: no user, redirecting to /auth');
     return <Navigate to="/auth" replace />;
   }
 
+  console.log('ProtectedRoute: user found, rendering children');
   return <>{children}</>;
 };
 

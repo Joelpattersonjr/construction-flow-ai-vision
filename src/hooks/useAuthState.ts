@@ -4,19 +4,31 @@ import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { fetchProfile } from '@/services/profileService';
 
+console.log('useAuthState.ts file loaded');
+
 export const useAuthState = () => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
 
+  console.log('useAuthState hook initialized');
+
   useEffect(() => {
     let mounted = true;
+    console.log('useAuthState useEffect triggered');
 
     const initializeAuth = async () => {
       try {
+        console.log('Getting initial session...');
         // Get initial session
         const { data: { session: initialSession } } = await supabase.auth.getSession();
+        
+        console.log('Initial session:', { 
+          hasSession: !!initialSession, 
+          hasUser: !!initialSession?.user,
+          userId: initialSession?.user?.id 
+        });
         
         if (!mounted) return;
         
@@ -25,13 +37,16 @@ export const useAuthState = () => {
         
         // Fetch profile if user exists
         if (initialSession?.user) {
+          console.log('Fetching profile for user:', initialSession.user.id);
           const profileData = await fetchProfile(initialSession.user.id);
           if (mounted) {
+            console.log('Profile fetched:', { hasProfile: !!profileData });
             setProfile(profileData);
           }
         }
         
         if (mounted) {
+          console.log('Setting loading to false');
           setLoading(false);
         }
       } catch (error) {
