@@ -70,17 +70,17 @@ const Index = () => {
                       </div>
                       
                       <div className="space-y-2 text-sm">
-                        <div className="flex items-start space-x-2">
-                          <span className="font-medium text-gray-700 min-w-[70px]">Company:</span>
-                          <span className="text-gray-600">{profile?.company_name || 'Not provided'}</span>
-                        </div>
+                      <div className="flex items-start space-x-2">
+                        <span className="font-medium text-gray-700 min-w-[70px]">Company:</span>
+                        <span className="text-gray-600">{profile?.company?.name || 'Not provided'}</span>
+                      </div>
                         
                         {profile?.company_role === 'company_member' && (
                           <div className="bg-blue-50 p-2 rounded-md">
                             <p className="text-xs text-blue-700">
                               <span className="font-medium">Welcome to the team!</span>
                               <br />
-                              You were invited to join {profile?.company_name || 'this company'} by a company administrator.
+                              You were invited to join {profile?.company?.name || 'this company'} by a company administrator.
                             </p>
                           </div>
                         )}

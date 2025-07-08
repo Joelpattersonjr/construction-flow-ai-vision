@@ -20,18 +20,21 @@ export type Database = {
           id: number
           name: string | null
           owner_id: string | null
+          updated_at: string | null
         }
         Insert: {
           created_at?: string
           id?: number
           name?: string | null
           owner_id?: string | null
+          updated_at?: string | null
         }
         Update: {
           created_at?: string
           id?: number
           name?: string | null
           owner_id?: string | null
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -86,7 +89,6 @@ export type Database = {
       profiles: {
         Row: {
           company_id: number | null
-          company_name: string | null
           company_role: string | null
           full_name: string | null
           id: string
@@ -95,7 +97,6 @@ export type Database = {
         }
         Insert: {
           company_id?: number | null
-          company_name?: string | null
           company_role?: string | null
           full_name?: string | null
           id?: string
@@ -104,7 +105,6 @@ export type Database = {
         }
         Update: {
           company_id?: number | null
-          company_name?: string | null
           company_role?: string | null
           full_name?: string | null
           id?: string
@@ -327,6 +327,10 @@ export type Database = {
       accept_invitation: {
         Args: { invitation_token: string }
         Returns: Json
+      }
+      get_company_name: {
+        Args: { company_id_param: number }
+        Returns: string
       }
       get_my_company_id: {
         Args: Record<PropertyKey, never>

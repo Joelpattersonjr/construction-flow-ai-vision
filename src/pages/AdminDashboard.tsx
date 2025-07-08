@@ -147,7 +147,7 @@ const AdminDashboard = () => {
                       <div className="space-y-2 text-sm">
                         <div className="flex items-start space-x-2">
                           <span className="font-medium text-gray-700 min-w-[70px]">Company:</span>
-                          <span className="text-gray-600">{profile?.company_name || 'Not provided'}</span>
+                          <span className="text-gray-600">{profile?.company?.name || 'Not provided'}</span>
                         </div>
                         
                         <div className="bg-green-50 p-2 rounded-md">

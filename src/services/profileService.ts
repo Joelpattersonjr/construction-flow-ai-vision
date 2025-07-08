@@ -6,7 +6,10 @@ export const fetchProfile = async (userId: string) => {
     console.log('Fetching profile for user:', userId);
     const { data: profileData, error } = await supabase
       .from('profiles')
-      .select('*')
+      .select(`
+        *,
+        company:companies(*)
+      `)
       .eq('id', userId)
       .single();
     
@@ -35,19 +38,20 @@ export const createProfileForExistingUser = async (userId: string) => {
     if (!user) return null;
 
     const fullName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'User';
-    const companyName = user.user_metadata?.company_name || 'Unknown Company';
 
-    console.log('Creating profile for existing user with metadata:', { fullName, companyName });
+    console.log('Creating profile for existing user with metadata:', { fullName });
 
     const { data: newProfile, error } = await supabase
       .from('profiles')
       .insert({
         id: userId,
         full_name: fullName,
-        company_name: companyName,
         updated_at: new Date().toISOString()
       })
-      .select()
+      .select(`
+        *,
+        company:companies(*)
+      `)
       .single();
 
     if (error) {

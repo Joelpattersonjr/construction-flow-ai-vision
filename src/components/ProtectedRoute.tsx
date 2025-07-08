@@ -2,6 +2,7 @@
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Navigate, useLocation } from 'react-router-dom';
+import CompanySetup from './CompanySetup';
 
 console.log('ProtectedRoute.tsx file loaded');
 
@@ -10,7 +11,7 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const { user, loading } = useAuth();
+  const { user, loading, profile } = useAuth();
   const location = useLocation();
   
   console.log('ProtectedRoute check:', { 
@@ -35,6 +36,12 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   if (!user) {
     console.log('ProtectedRoute: no user, redirecting to /auth');
     return <Navigate to="/auth" replace />;
+  }
+
+  // Check if user needs to set up their company (first-time admin users)
+  if (profile && !profile.company_id && location.pathname !== '/company-setup') {
+    console.log('ProtectedRoute: user needs company setup');
+    return <CompanySetup />;
   }
 
   console.log('ProtectedRoute: user found, rendering children');

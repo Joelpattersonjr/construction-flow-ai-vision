@@ -27,7 +27,7 @@ export const useAuthActions = () => {
     }
   };
 
-  const signUp = async (email: string, password: string, fullName: string, companyName: string) => {
+  const signUp = async (email: string, password: string, fullName: string) => {
     try {
       const redirectUrl = `${window.location.origin}/`;
       
@@ -38,7 +38,6 @@ export const useAuthActions = () => {
           emailRedirectTo: redirectUrl,
           data: {
             full_name: fullName,
-            company_name: companyName,
           }
         }
       });
