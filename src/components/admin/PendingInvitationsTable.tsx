@@ -56,7 +56,7 @@ export const PendingInvitationsTable: React.FC<PendingInvitationsTableProps> = (
   const handleResendInvitation = async (invitation: PendingInvitation) => {
     try {
       // Update the expiry date to extend the invitation
-      const { error } = await supabase
+      const { error: updateError } = await supabase
         .from('user_invitations')
         .update({
           expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days from now
@@ -64,12 +64,38 @@ export const PendingInvitationsTable: React.FC<PendingInvitationsTableProps> = (
         })
         .eq('id', invitation.id);
 
-      if (error) throw error;
+      if (updateError) throw updateError;
 
-      toast({
-        title: "Invitation Resent",
-        description: `Invitation resent to ${invitation.email}`,
-      });
+      // Send invitation email
+      try {
+        const { data: emailResult, error: emailError } = await supabase.functions.invoke(
+          'send-invitation',
+          {
+            body: { invitationId: invitation.id }
+          }
+        );
+
+        if (emailError) {
+          console.error('Email sending error:', emailError);
+          toast({
+            title: "Invitation Extended",
+            description: `Invitation expiry extended for ${invitation.email}, but email sending failed.`,
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Invitation Resent",
+            description: `Invitation email resent to ${invitation.email}`,
+          });
+        }
+      } catch (emailError) {
+        console.error('Email function error:', emailError);
+        toast({
+          title: "Invitation Extended",
+          description: `Invitation expiry extended for ${invitation.email}, but email sending failed.`,
+          variant: "destructive",
+        });
+      }
 
       onRefresh();
     } catch (error) {

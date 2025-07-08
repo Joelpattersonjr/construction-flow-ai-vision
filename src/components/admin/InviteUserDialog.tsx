@@ -54,21 +54,49 @@ export const InviteUserDialog: React.FC<InviteUserDialogProps> = ({
       }
 
       // Create invitation
-      const { error } = await supabase
+      const { data: newInvitation, error } = await supabase
         .from('user_invitations')
         .insert({
           email: formData.email,
           company_id: profile.company_id,
           invited_by: profile.id,
           company_role: formData.companyRole,
-        });
+        })
+        .select()
+        .single();
 
       if (error) throw error;
 
-      toast({
-        title: "Invitation Sent",
-        description: `Invitation sent to ${formData.email}`,
-      });
+      // Send invitation email
+      try {
+        const { data: emailResult, error: emailError } = await supabase.functions.invoke(
+          'send-invitation',
+          {
+            body: { invitationId: newInvitation.id }
+          }
+        );
+
+        if (emailError) {
+          console.error('Email sending error:', emailError);
+          toast({
+            title: "Invitation Created",
+            description: `Invitation created for ${formData.email}, but email sending failed. You can resend it from the pending invitations tab.`,
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Invitation Sent",
+            description: `Invitation email sent to ${formData.email}`,
+          });
+        }
+      } catch (emailError) {
+        console.error('Email function error:', emailError);
+        toast({
+          title: "Invitation Created",
+          description: `Invitation created for ${formData.email}, but email sending failed. You can resend it from the pending invitations tab.`,
+          variant: "destructive",
+        });
+      }
 
       // Reset form and close dialog
       setFormData({ email: '', companyRole: 'company_member' });
