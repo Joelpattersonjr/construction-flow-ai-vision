@@ -7,7 +7,7 @@ export interface AuthContextType {
   profile: any | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signUp: (email: string, password: string, fullName: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, fullName: string, jobTitle?: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   clearAuthState: () => Promise<void>;
 }

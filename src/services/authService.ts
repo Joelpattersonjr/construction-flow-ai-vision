@@ -27,18 +27,24 @@ export const useAuthActions = () => {
     }
   };
 
-  const signUp = async (email: string, password: string, fullName: string) => {
+  const signUp = async (email: string, password: string, fullName: string, jobTitle?: string) => {
     try {
       const redirectUrl = `${window.location.origin}/`;
+      
+      const userData: any = {
+        full_name: fullName,
+      };
+      
+      if (jobTitle) {
+        userData.job_title = jobTitle;
+      }
       
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           emailRedirectTo: redirectUrl,
-          data: {
-            full_name: fullName,
-          }
+          data: userData
         }
       });
 
