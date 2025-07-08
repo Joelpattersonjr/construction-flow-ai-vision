@@ -44,12 +44,7 @@ const App = () => {
                 } 
               />
               <Route path="/test" element={<div>TEST ROUTE WORKS</div>} />
-              <Route path="/invite/:token" element={
-                <div style={{padding: '20px'}}>
-                  <h1>Testing InviteAcceptance Step by Step</h1>
-                  <TestInvite />
-                </div>
-              } />
+              <Route path="/invite/:token" element={<InviteAcceptance />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
