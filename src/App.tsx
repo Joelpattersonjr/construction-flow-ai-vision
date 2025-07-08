@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import AdminDashboard from "./pages/AdminDashboard";
 import InviteAcceptance from "./pages/InviteAcceptance";
+import TestInvite from "./components/TestInvite";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -45,8 +46,8 @@ const App = () => {
               <Route path="/test" element={<div>TEST ROUTE WORKS</div>} />
               <Route path="/invite/:token" element={
                 <div style={{padding: '20px'}}>
-                  <h1>Invite Page</h1>
-                  <p>This should work without redirecting</p>
+                  <h1>Testing InviteAcceptance Step by Step</h1>
+                  <TestInvite />
                 </div>
               } />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
