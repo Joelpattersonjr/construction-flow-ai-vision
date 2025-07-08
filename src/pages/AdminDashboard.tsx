@@ -5,15 +5,18 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useToast } from '@/hooks/use-toast';
-import { Users, UserPlus, Mail, Shield } from 'lucide-react';
+import { Users, UserPlus, Mail, Shield, User, ChevronDown, LogOut, Settings } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { InviteUserDialog } from '@/components/admin/InviteUserDialog';
 import { TeamMembersTable } from '@/components/admin/TeamMembersTable';
 import { PendingInvitationsTable } from '@/components/admin/PendingInvitationsTable';
 
 const AdminDashboard = () => {
-  const { user, profile } = useAuth();
+  const { user, profile, signOut } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
   const [teamMembers, setTeamMembers] = useState([]);
   const [pendingInvitations, setPendingInvitations] = useState([]);
@@ -90,13 +93,71 @@ const AdminDashboard = () => {
             <div className="flex items-center">
               <h1 className="text-xl font-semibold text-gray-900">Admin Dashboard</h1>
             </div>
-            <Button 
-              onClick={() => setIsInviteDialogOpen(true)}
-              className="flex items-center space-x-2"
-            >
-              <UserPlus className="h-4 w-4" />
-              <span>Invite User</span>
-            </Button>
+            <div className="flex items-center space-x-4">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="flex items-center space-x-2">
+                    <User className="h-4 w-4" />
+                    <span className="text-sm text-gray-600">
+                      {profile?.full_name || user?.email}
+                    </span>
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-80" align="end">
+                  <div className="space-y-3">
+                    <div className="border-b pb-3">
+                      <h3 className="font-semibold text-gray-900">Account Information</h3>
+                    </div>
+                    <div className="space-y-2 text-sm">
+                      <div>
+                        <span className="font-medium text-gray-700">Name:</span>
+                        <span className="ml-2 text-gray-600">{profile?.full_name || 'Not provided'}</span>
+                      </div>
+                      <div>
+                        <span className="font-medium text-gray-700">Email:</span>
+                        <span className="ml-2 text-gray-600">{user?.email}</span>
+                      </div>
+                      <div>
+                        <span className="font-medium text-gray-700">Company:</span>
+                        <span className="ml-2 text-gray-600">{profile?.company_name || 'Not provided'}</span>
+                      </div>
+                      <div>
+                        <span className="font-medium text-gray-700">Role:</span>
+                        <span className="ml-2 text-gray-600">{profile?.job_title || 'User'}</span>
+                      </div>
+                    </div>
+                    <div className="border-t pt-3 space-y-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => navigate('/')}
+                        className="w-full flex items-center justify-center space-x-2"
+                      >
+                        <Settings className="h-4 w-4" />
+                        <span>Main Dashboard</span>
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={signOut}
+                        className="w-full flex items-center justify-center space-x-2"
+                      >
+                        <LogOut className="h-4 w-4" />
+                        <span>Sign Out</span>
+                      </Button>
+                    </div>
+                  </div>
+                </PopoverContent>
+              </Popover>
+              <Button 
+                onClick={() => setIsInviteDialogOpen(true)}
+                className="flex items-center space-x-2"
+              >
+                <UserPlus className="h-4 w-4" />
+                <span>Invite User</span>
+              </Button>
+            </div>
           </div>
         </div>
       </nav>
