@@ -11,6 +11,7 @@ import { Mail, Check, AlertCircle, Loader2 } from 'lucide-react';
 console.log('InviteAcceptance.tsx file loaded');
 
 const InviteAcceptance = () => {
+  console.log('🚀 InviteAcceptance component is rendering!');
   const { token } = useParams<{ token: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
