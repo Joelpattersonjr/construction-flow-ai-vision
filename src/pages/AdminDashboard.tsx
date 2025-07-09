@@ -199,7 +199,7 @@ const AdminDashboard = () => {
                 className="flex items-center space-x-2"
               >
                 <UserPlus className="h-4 w-4" />
-                <span>Invite User</span>
+                <span>Add Team Member</span>
               </Button>
             </div>
           </div>
