@@ -110,11 +110,11 @@ const AdminProjectsTable: React.FC<AdminProjectsTableProps> = ({ projects, loadi
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => navigate(`/projects/${project.id}`)}
+                        onClick={() => navigate('/projects')}
                         className="flex items-center space-x-1"
                       >
                         <ExternalLink className="h-3 w-3" />
-                        <span>View</span>
+                        <span>All Projects</span>
                       </Button>
                     </div>
                   </TableCell>
