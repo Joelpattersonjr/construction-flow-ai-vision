@@ -8,6 +8,7 @@ import FileUploadDropzone from './FileUploadDropzone';
 import FolderFileList from './FolderFileList';
 import { FileService, FileCategory, FolderItem, FileItem } from '@/services/fileService';
 import { useToast } from '@/hooks/use-toast';
+import { useProjectPermissions } from '@/hooks/useProjectPermissions';
 
 interface FileManagerProps {
   projectId: string;
@@ -30,6 +31,7 @@ const FileManager: React.FC<FileManagerProps> = ({ projectId }) => {
   const [selectedCategory, setSelectedCategory] = useState<FileCategory>('project-documents');
   const [currentPath, setCurrentPath] = useState<string>('');
   const { toast } = useToast();
+  const { hasWritePermission, loading: permissionsLoading } = useProjectPermissions(projectId);
 
   const loadFolderContents = async () => {
     try {
@@ -143,6 +145,7 @@ const FileManager: React.FC<FileManagerProps> = ({ projectId }) => {
               files={filteredFiles} 
               onNavigate={handleNavigate}
               onContentChanged={handleContentChanged}
+              hasWritePermission={hasWritePermission}
             />
           )}
         </TabsContent>

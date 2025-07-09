@@ -11,6 +11,7 @@ interface CreateFolderDialogProps {
   category: FileCategory;
   currentPath: string;
   onFolderCreated: () => void;
+  disabled?: boolean;
 }
 
 const CreateFolderDialog: React.FC<CreateFolderDialogProps> = ({
@@ -18,6 +19,7 @@ const CreateFolderDialog: React.FC<CreateFolderDialogProps> = ({
   category,
   currentPath,
   onFolderCreated,
+  disabled = false,
 }) => {
   const [open, setOpen] = useState(false);
   const [folderName, setFolderName] = useState('');
@@ -61,7 +63,7 @@ const CreateFolderDialog: React.FC<CreateFolderDialogProps> = ({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
+        <Button variant="outline" size="sm" disabled={disabled}>
           <FolderPlus className="h-4 w-4 mr-2" />
           New Folder
         </Button>

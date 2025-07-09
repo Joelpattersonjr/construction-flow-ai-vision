@@ -18,6 +18,7 @@ interface FolderFileListProps {
   files: FileItem[];
   onNavigate: (path: string) => void;
   onContentChanged: () => void;
+  hasWritePermission: boolean;
 }
 
 const getFileIcon = (fileType: string | null) => {
@@ -67,7 +68,8 @@ const FolderFileList: React.FC<FolderFileListProps> = ({
   folders, 
   files, 
   onNavigate, 
-  onContentChanged 
+  onContentChanged,
+  hasWritePermission,
 }) => {
   const [downloadingFiles, setDownloadingFiles] = useState<Set<number>>(new Set());
   const [deletingItems, setDeletingItems] = useState<Set<string>>(new Set());
@@ -182,7 +184,13 @@ const FolderFileList: React.FC<FolderFileListProps> = ({
               category={category}
               currentPath={currentPath}
               onFolderCreated={onContentChanged}
+              disabled={!hasWritePermission}
             />
+            {!hasWritePermission && (
+              <p className="text-xs text-gray-500 mt-2">
+                You need write permissions to create folders
+              </p>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -205,7 +213,13 @@ const FolderFileList: React.FC<FolderFileListProps> = ({
             category={category}
             currentPath={currentPath}
             onFolderCreated={onContentChanged}
+            disabled={!hasWritePermission}
           />
+          {!hasWritePermission && (
+            <p className="text-xs text-gray-500">
+              You need write permissions to manage folders
+            </p>
+          )}
         </div>
       </CardHeader>
       <CardContent>
@@ -230,16 +244,17 @@ const FolderFileList: React.FC<FolderFileListProps> = ({
               </div>
               
               <div className="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={(e) => e.stopPropagation()}
-                      disabled={deletingItems.has(`folder-${folder.path}`)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                {hasWritePermission && (
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={(e) => e.stopPropagation()}
+                        disabled={deletingItems.has(`folder-${folder.path}`)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
@@ -259,6 +274,7 @@ const FolderFileList: React.FC<FolderFileListProps> = ({
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>
+                )}
               </div>
             </div>
           ))}
