@@ -100,16 +100,23 @@ const handler = async (req: Request): Promise<Response> => {
       throw createError;
     }
 
-    // Create profile for the new user
+    console.log("User created successfully:", newUser.user.id);
+
+    // Update or create profile for the new user (user might already have a basic profile from trigger)
     const { error: profileInsertError } = await supabaseAdmin
       .from('profiles')
-      .insert({
+      .upsert({
         id: newUser.user.id,
         company_id: companyId,
         company_role: companyRole,
         full_name: fullName,
         job_title: jobTitle,
+        updated_at: new Date().toISOString(),
+      }, {
+        onConflict: 'id'
       });
+
+    console.log("Profile upsert result:", { profileInsertError });
 
     if (profileInsertError) {
       // If profile creation fails, delete the user
