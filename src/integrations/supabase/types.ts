@@ -397,6 +397,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
+      debug_policy_check: {
+        Args: { user_id: string; project_company_id: number }
+        Returns: boolean
+      }
       get_company_name: {
         Args: { company_id_param: number }
         Returns: string
