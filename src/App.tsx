@@ -11,6 +11,7 @@ import Auth from "./pages/Auth";
 import AdminDashboard from "./pages/AdminDashboard";
 import InviteAcceptance from "./pages/InviteAcceptance";
 import FileManagement from "./pages/FileManagement";
+import Projects from "./pages/Projects";
 import ProjectPermissions from "./pages/ProjectPermissions";
 import NotFound from "./pages/NotFound";
 
@@ -41,6 +42,14 @@ const App = () => {
                 element={
                   <ProtectedRoute>
                     <AdminDashboard />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/projects" 
+                element={
+                  <ProtectedRoute>
+                    <Projects />
                   </ProtectedRoute>
                 } 
               />

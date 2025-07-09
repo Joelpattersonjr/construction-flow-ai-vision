@@ -148,7 +148,11 @@ const Index = () => {
               <p className="text-sm text-gray-600">
                 Create and track your construction projects with timeline management.
               </p>
-              <Button className="mt-4" variant="outline">
+              <Button 
+                className="mt-4" 
+                variant="outline"
+                onClick={() => navigate('/projects')}
+              >
                 View Projects
               </Button>
             </CardContent>
