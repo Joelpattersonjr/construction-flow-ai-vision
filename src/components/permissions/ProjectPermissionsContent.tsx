@@ -4,11 +4,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Settings, Users, Search, Filter, SortAsc, Clock, Wifi, WifiOff, Layout } from 'lucide-react';
+import { Settings, Users, Search, Filter, SortAsc, Clock, Wifi, WifiOff, Layout, BarChart3, Download, Plus, Zap } from 'lucide-react';
 import ProjectMembersTable from './ProjectMembersTable';
 import AddMemberDialog from './AddMemberDialog';
 import AuditLogTable from './AuditLogTable';
 import PermissionTemplatesTable from './PermissionTemplatesTable';
+import ExportImportDialog from './ExportImportDialog';
+import CustomRoleBuilder from './CustomRoleBuilder';
+import BulkOperationsDialog from './BulkOperationsDialog';
+import RoleAnalytics from './RoleAnalytics';
 import { auditService, AuditLogEntry } from '@/services/auditService';
 import { useRealtimeUpdates } from '@/hooks/useRealtimeUpdates';
 import { Badge } from '@/components/ui/badge';
@@ -55,6 +59,9 @@ const ProjectPermissionsContent: React.FC<ProjectPermissionsContentProps> = ({
   const [lastUpdate, setLastUpdate] = useState<Date | undefined>();
   const [showNotification, setShowNotification] = useState(false);
   const [notificationType, setNotificationType] = useState<'member' | 'audit'>('audit');
+  const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
+  const [templates, setTemplates] = useState<any[]>([]);
+  const [customRoles, setCustomRoles] = useState<any[]>([]);
 
   // Load audit logs
   const loadAuditLogs = async () => {
@@ -69,8 +76,42 @@ const ProjectPermissionsContent: React.FC<ProjectPermissionsContentProps> = ({
     }
   };
 
+  // Load templates (placeholder - replace with actual implementation)
+  const loadTemplates = async () => {
+    try {
+      // TODO: Replace with actual template loading logic
+      setTemplates([]);
+    } catch (error) {
+      console.error('Failed to load templates:', error);
+    }
+  };
+
+  // Handle custom role operations
+  const handleRoleCreated = (role: any) => {
+    setCustomRoles(prev => [...prev, role]);
+  };
+
+  const handleRoleUpdated = (role: any) => {
+    setCustomRoles(prev => prev.map(r => r.id === role.id ? role : r));
+  };
+
+  // Handle bulk operations
+  const handleBulkOperationComplete = () => {
+    onMemberUpdated();
+    loadAuditLogs();
+    setSelectedMembers([]);
+  };
+
+  // Handle import completion
+  const handleImportComplete = () => {
+    onMemberUpdated();
+    loadAuditLogs();
+    loadTemplates();
+  };
+
   useEffect(() => {
     loadAuditLogs();
+    loadTemplates();
   }, [projectId]);
 
   // Set up real-time updates for audit logs
@@ -171,7 +212,7 @@ const ProjectPermissionsContent: React.FC<ProjectPermissionsContentProps> = ({
       </div>
 
       <Tabs defaultValue="members" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="members" className="flex items-center gap-2">
             <Users className="h-4 w-4" />
             Team Members ({filteredAndSortedMembers.length} of {members.length})
@@ -183,6 +224,10 @@ const ProjectPermissionsContent: React.FC<ProjectPermissionsContentProps> = ({
           <TabsTrigger value="activity" className="flex items-center gap-2">
             <Clock className="h-4 w-4" />
             Activity
+          </TabsTrigger>
+          <TabsTrigger value="analytics" className="flex items-center gap-2">
+            <BarChart3 className="h-4 w-4" />
+            Analytics
           </TabsTrigger>
         </TabsList>
         
@@ -237,6 +282,27 @@ const ProjectPermissionsContent: React.FC<ProjectPermissionsContentProps> = ({
                 </div>
               </div>
 
+              {/* Action Buttons */}
+              {canManage && (
+                <div className="flex gap-2 flex-wrap">
+                  <ExportImportDialog
+                    projectId={projectId}
+                    projectName={projectName}
+                    members={filteredAndSortedMembers}
+                    templates={templates}
+                    auditLogs={auditLogs}
+                    onImportComplete={handleImportComplete}
+                  />
+                  <BulkOperationsDialog
+                    projectId={projectId}
+                    members={filteredAndSortedMembers}
+                    templates={templates}
+                    selectedMembers={selectedMembers}
+                    onBulkOperationComplete={handleBulkOperationComplete}
+                  />
+                </div>
+              )}
+
               <ProjectMembersTable
                 projectId={projectId}
                 members={filteredAndSortedMembers}
@@ -248,6 +314,19 @@ const ProjectPermissionsContent: React.FC<ProjectPermissionsContentProps> = ({
         </TabsContent>
 
         <TabsContent value="templates" className="space-y-4">
+          <div className="flex justify-between items-center">
+            <div>
+              <h3 className="text-lg font-semibold">Permission Templates</h3>
+              <p className="text-sm text-gray-500">Create and manage permission templates for consistent role assignments</p>
+            </div>
+            {canManage && (
+              <CustomRoleBuilder
+                onRoleCreated={handleRoleCreated}
+                onRoleUpdated={handleRoleUpdated}
+                existingRoles={customRoles}
+              />
+            )}
+          </div>
           <PermissionTemplatesTable 
             canManage={canManage}
           />
@@ -257,6 +336,14 @@ const ProjectPermissionsContent: React.FC<ProjectPermissionsContentProps> = ({
           <AuditLogTable 
             auditLogs={auditLogs}
             loading={auditLoading}
+          />
+        </TabsContent>
+
+        <TabsContent value="analytics" className="space-y-4">
+          <RoleAnalytics
+            members={filteredAndSortedMembers}
+            templates={templates}
+            projectId={projectId}
           />
         </TabsContent>
       </Tabs>
