@@ -37,7 +37,11 @@ const Projects: React.FC = () => {
     address: '',
     start_date: '',
     end_date: '',
-    status: 'planning'
+    status: 'planning',
+    owner_name: '',
+    owner_company: '',
+    owner_email: '',
+    owner_phone: ''
   });
 
   const loadProjects = async () => {
@@ -114,7 +118,11 @@ const Projects: React.FC = () => {
         address: '',
         start_date: '',
         end_date: '',
-        status: 'planning'
+        status: 'planning',
+        owner_name: '',
+        owner_company: '',
+        owner_email: '',
+        owner_phone: ''
       });
       setOpen(false);
       loadProjects();
@@ -182,7 +190,7 @@ const Projects: React.FC = () => {
               New Project
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
+          <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Create New Project</DialogTitle>
               <DialogDescription>
@@ -190,57 +198,111 @@ const Projects: React.FC = () => {
               </DialogDescription>
             </DialogHeader>
             
-            <div className="grid gap-4 py-4">
-              <div className="grid gap-2">
-                <Label htmlFor="name">Project Name *</Label>
-                <Input
-                  id="name"
-                  value={newProject.name}
-                  onChange={(e) => setNewProject(prev => ({ ...prev, name: e.target.value }))}
-                  placeholder="Enter project name"
-                />
-              </div>
-              
-              <div className="grid gap-2">
-                <Label htmlFor="project_number">Project Number</Label>
-                <Input
-                  id="project_number"
-                  value={newProject.project_number}
-                  onChange={(e) => setNewProject(prev => ({ ...prev, project_number: e.target.value }))}
-                  placeholder="e.g., PRJ-2024-001"
-                />
-              </div>
-              
-              <div className="grid gap-2">
-                <Label htmlFor="address">Address</Label>
-                <Textarea
-                  id="address"
-                  value={newProject.address}
-                  onChange={(e) => setNewProject(prev => ({ ...prev, address: e.target.value }))}
-                  placeholder="Project location address"
-                  rows={2}
-                />
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-6 py-4">
+              {/* Project Information Section */}
+              <div className="space-y-4">
+                <h4 className="font-medium text-gray-900 border-b pb-2">Project Information</h4>
+                
                 <div className="grid gap-2">
-                  <Label htmlFor="start_date">Start Date</Label>
+                  <Label htmlFor="name">Project Name *</Label>
                   <Input
-                    id="start_date"
-                    type="date"
-                    value={newProject.start_date}
-                    onChange={(e) => setNewProject(prev => ({ ...prev, start_date: e.target.value }))}
+                    id="name"
+                    value={newProject.name}
+                    onChange={(e) => setNewProject(prev => ({ ...prev, name: e.target.value }))}
+                    placeholder="Enter project name"
                   />
                 </div>
                 
                 <div className="grid gap-2">
-                  <Label htmlFor="end_date">End Date</Label>
+                  <Label htmlFor="project_number">Project Number</Label>
                   <Input
-                    id="end_date"
-                    type="date"
-                    value={newProject.end_date}
-                    onChange={(e) => setNewProject(prev => ({ ...prev, end_date: e.target.value }))}
+                    id="project_number"
+                    value={newProject.project_number}
+                    onChange={(e) => setNewProject(prev => ({ ...prev, project_number: e.target.value }))}
+                    placeholder="e.g., PRJ-2024-001"
                   />
+                </div>
+                
+                <div className="grid gap-2">
+                  <Label htmlFor="address">Address</Label>
+                  <Textarea
+                    id="address"
+                    value={newProject.address}
+                    onChange={(e) => setNewProject(prev => ({ ...prev, address: e.target.value }))}
+                    placeholder="Project location address"
+                    rows={2}
+                  />
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="start_date">Start Date</Label>
+                    <Input
+                      id="start_date"
+                      type="date"
+                      value={newProject.start_date}
+                      onChange={(e) => setNewProject(prev => ({ ...prev, start_date: e.target.value }))}
+                    />
+                  </div>
+                  
+                  <div className="grid gap-2">
+                    <Label htmlFor="end_date">End Date</Label>
+                    <Input
+                      id="end_date"
+                      type="date"
+                      value={newProject.end_date}
+                      onChange={(e) => setNewProject(prev => ({ ...prev, end_date: e.target.value }))}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Owner Information Section */}
+              <div className="space-y-4">
+                <h4 className="font-medium text-gray-900 border-b pb-2">Owner Information</h4>
+                
+                <div className="grid gap-2">
+                  <Label htmlFor="owner_name">Owner Name</Label>
+                  <Input
+                    id="owner_name"
+                    value={newProject.owner_name}
+                    onChange={(e) => setNewProject(prev => ({ ...prev, owner_name: e.target.value }))}
+                    placeholder="Property/project owner name"
+                  />
+                </div>
+                
+                <div className="grid gap-2">
+                  <Label htmlFor="owner_company">Owner Company</Label>
+                  <Input
+                    id="owner_company"
+                    value={newProject.owner_company}
+                    onChange={(e) => setNewProject(prev => ({ ...prev, owner_company: e.target.value }))}
+                    placeholder="Owner company or organization"
+                  />
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="owner_email">Owner Email</Label>
+                    <Input
+                      id="owner_email"
+                      type="email"
+                      value={newProject.owner_email}
+                      onChange={(e) => setNewProject(prev => ({ ...prev, owner_email: e.target.value }))}
+                      placeholder="owner@example.com"
+                    />
+                  </div>
+                  
+                  <div className="grid gap-2">
+                    <Label htmlFor="owner_phone">Owner Phone</Label>
+                    <Input
+                      id="owner_phone"
+                      type="tel"
+                      value={newProject.owner_phone}
+                      onChange={(e) => setNewProject(prev => ({ ...prev, owner_phone: e.target.value }))}
+                      placeholder="(555) 123-4567"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
