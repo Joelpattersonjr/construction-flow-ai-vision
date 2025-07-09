@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import AdminDashboard from "./pages/AdminDashboard";
 import InviteAcceptance from "./pages/InviteAcceptance";
+import FileManagement from "./pages/FileManagement";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -39,6 +40,14 @@ const App = () => {
                 element={
                   <ProtectedRoute>
                     <AdminDashboard />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/files" 
+                element={
+                  <ProtectedRoute>
+                    <FileManagement />
                   </ProtectedRoute>
                 } 
               />

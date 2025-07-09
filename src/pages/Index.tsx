@@ -178,7 +178,11 @@ const Index = () => {
               <p className="text-sm text-gray-600">
                 Upload and analyze construction documents with AI insights.
               </p>
-              <Button className="mt-4" variant="outline">
+              <Button 
+                className="mt-4" 
+                variant="outline"
+                onClick={() => navigate('/files')}
+              >
                 View Documents
               </Button>
             </CardContent>
