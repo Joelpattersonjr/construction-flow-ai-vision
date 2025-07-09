@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import AppHeader from '@/components/navigation/AppHeader';
 import ProjectPermissionsContent from '@/components/permissions/ProjectPermissionsContent';
+import { useRealtimeUpdates } from '@/hooks/useRealtimeUpdates';
 
 interface Project {
   id: string;
@@ -111,13 +112,6 @@ const ProjectPermissions: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    if (projectId) {
-      loadProject();
-      loadMembers();
-    }
-  }, [projectId, user?.id]);
-
   const handleMemberUpdated = () => {
     loadMembers();
   };
@@ -125,6 +119,22 @@ const ProjectPermissions: React.FC = () => {
   const handleMemberAdded = () => {
     loadMembers();
   };
+
+  useEffect(() => {
+    if (projectId) {
+      loadProject();
+      loadMembers();
+    }
+  }, [projectId, user?.id]);
+
+  // Set up real-time updates
+  const { isConnected } = useRealtimeUpdates({
+    projectId: projectId || '',
+    onMembersChange: handleMemberUpdated,
+    onAuditLogChange: () => {
+      // This will be handled by the ProjectPermissionsContent component
+    }
+  });
 
   if (loading) {
     return (

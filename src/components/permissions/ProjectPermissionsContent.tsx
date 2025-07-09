@@ -4,11 +4,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Settings, Users, Search, Filter, SortAsc, Clock } from 'lucide-react';
+import { Settings, Users, Search, Filter, SortAsc, Clock, Wifi, WifiOff } from 'lucide-react';
 import ProjectMembersTable from './ProjectMembersTable';
 import AddMemberDialog from './AddMemberDialog';
 import AuditLogTable from './AuditLogTable';
 import { auditService, AuditLogEntry } from '@/services/auditService';
+import { useRealtimeUpdates } from '@/hooks/useRealtimeUpdates';
+import { Badge } from '@/components/ui/badge';
+import LiveUpdateNotification from './LiveUpdateNotification';
 
 interface ProjectMember {
   id: string;
@@ -48,6 +51,9 @@ const ProjectPermissionsContent: React.FC<ProjectPermissionsContentProps> = ({
   const [sortBy, setSortBy] = useState('name');
   const [auditLogs, setAuditLogs] = useState<AuditLogEntry[]>([]);
   const [auditLoading, setAuditLoading] = useState(false);
+  const [lastUpdate, setLastUpdate] = useState<Date | undefined>();
+  const [showNotification, setShowNotification] = useState(false);
+  const [notificationType, setNotificationType] = useState<'member' | 'audit'>('audit');
 
   // Load audit logs
   const loadAuditLogs = async () => {
@@ -65,6 +71,20 @@ const ProjectPermissionsContent: React.FC<ProjectPermissionsContentProps> = ({
   useEffect(() => {
     loadAuditLogs();
   }, [projectId]);
+
+  // Set up real-time updates for audit logs
+  const { isConnected } = useRealtimeUpdates({
+    projectId,
+    onMembersChange: () => {
+      // This will be handled by the parent component (ProjectPermissions)
+    },
+    onAuditLogChange: () => {
+      loadAuditLogs();
+      setLastUpdate(new Date());
+      setNotificationType('audit');
+      setShowNotification(true);
+    }
+  });
 
   // Refresh audit logs when members are updated
   const handleMemberUpdatedWithAudit = () => {
@@ -114,12 +134,30 @@ const ProjectPermissionsContent: React.FC<ProjectPermissionsContentProps> = ({
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
-            <Settings className="h-8 w-8" />
-            Project Permissions
-          </h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
+              <Settings className="h-8 w-8" />
+              Project Permissions
+            </h1>
+            <Badge 
+              variant={isConnected ? "default" : "secondary"}
+              className={`flex items-center gap-1 ${
+                isConnected 
+                  ? "bg-green-100 text-green-800 border-green-200" 
+                  : "bg-yellow-100 text-yellow-800 border-yellow-200"
+              }`}
+            >
+              {isConnected ? <Wifi className="h-3 w-3" /> : <WifiOff className="h-3 w-3" />}
+              {isConnected ? "Live" : "Offline"}
+            </Badge>
+          </div>
           <p className="text-gray-600 mt-2">
             Manage access and permissions for "{projectName}"
+            {isConnected && (
+              <span className="text-green-600 text-sm ml-2">
+                • Updates will appear in real-time
+              </span>
+            )}
           </p>
         </div>
         
@@ -211,6 +249,13 @@ const ProjectPermissionsContent: React.FC<ProjectPermissionsContentProps> = ({
           />
         </TabsContent>
       </Tabs>
+
+      <LiveUpdateNotification
+        show={showNotification}
+        updateType={notificationType}
+        lastUpdate={lastUpdate}
+        onDismiss={() => setShowNotification(false)}
+      />
     </div>
   );
 };
