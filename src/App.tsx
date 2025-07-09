@@ -11,6 +11,7 @@ import Auth from "./pages/Auth";
 import AdminDashboard from "./pages/AdminDashboard";
 import InviteAcceptance from "./pages/InviteAcceptance";
 import FileManagement from "./pages/FileManagement";
+import ProjectPermissions from "./pages/ProjectPermissions";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -48,6 +49,14 @@ const App = () => {
                 element={
                   <ProtectedRoute>
                     <FileManagement />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/projects/:projectId/permissions" 
+                element={
+                  <ProtectedRoute>
+                    <ProjectPermissions />
                   </ProtectedRoute>
                 } 
               />
