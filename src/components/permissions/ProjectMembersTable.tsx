@@ -150,6 +150,26 @@ const ProjectMembersTable: React.FC<ProjectMembersTableProps> = ({
         metadata: { memberName: member.profiles?.full_name }
       });
 
+      // Send notification email
+      try {
+        const { data: currentUser } = await supabase.auth.getUser();
+        if (currentUser?.user) {
+          await supabase.functions.invoke('send-permission-notification', {
+            body: {
+              type: 'role_changed',
+              projectId,
+              targetUserId: member.user_id,
+              actorUserId: currentUser.user.id,
+              newRole: newRole,
+              previousRole: member.role
+            }
+          });
+        }
+      } catch (emailError) {
+        console.error('Failed to send notification email:', emailError);
+        // Don't block the main operation if email fails
+      }
+
       toast({
         title: "Role updated",
         description: "Member role has been updated successfully",
@@ -239,6 +259,24 @@ const ProjectMembersTable: React.FC<ProjectMembersTableProps> = ({
         oldValue: { role: member.role, permissions: member.permissions },
         metadata: { memberName: member.profiles?.full_name }
       });
+
+      // Send notification email
+      try {
+        const { data: currentUser } = await supabase.auth.getUser();
+        if (currentUser?.user) {
+          await supabase.functions.invoke('send-permission-notification', {
+            body: {
+              type: 'member_removed',
+              projectId,
+              targetUserId: member.user_id,
+              actorUserId: currentUser.user.id
+            }
+          });
+        }
+      } catch (emailError) {
+        console.error('Failed to send notification email:', emailError);
+        // Don't block the main operation if email fails
+      }
 
       toast({
         title: "Member removed",

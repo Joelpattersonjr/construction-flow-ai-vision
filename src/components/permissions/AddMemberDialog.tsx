@@ -131,6 +131,25 @@ const AddMemberDialog: React.FC<AddMemberDialogProps> = ({
         metadata: { memberName: companyMembers.find(m => m.id === selectedUserId)?.full_name }
       });
 
+      // Send notification email
+      try {
+        const { data: currentUser } = await supabase.auth.getUser();
+        if (currentUser?.user) {
+          await supabase.functions.invoke('send-permission-notification', {
+            body: {
+              type: 'member_added',
+              projectId,
+              targetUserId: selectedUserId,
+              actorUserId: currentUser.user.id,
+              newRole: role
+            }
+          });
+        }
+      } catch (emailError) {
+        console.error('Failed to send notification email:', emailError);
+        // Don't block the main operation if email fails
+      }
+
       toast({
         title: "Member added",
         description: "Team member has been added to the project successfully",
