@@ -21,13 +21,29 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    console.log("Creating user - function started");
+    
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    
+    console.log("Environment check:", { 
+      hasUrl: !!supabaseUrl, 
+      hasServiceKey: !!supabaseServiceKey 
+    });
+    
+    if (!supabaseUrl || !supabaseServiceKey) {
+      console.error("Missing environment variables");
+      throw new Error("Missing required environment variables");
+    }
     
     // Create admin client with service role key
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+    console.log("Supabase admin client created");
 
-    const { email, password, companyId, companyRole, fullName, jobTitle }: CreateUserRequest = await req.json();
+    const requestBody = await req.json();
+    console.log("Request body received:", Object.keys(requestBody));
+    
+    const { email, password, companyId, companyRole, fullName, jobTitle }: CreateUserRequest = requestBody;
 
     // Check if requesting user is a company admin
     const authHeader = req.headers.get("Authorization");
