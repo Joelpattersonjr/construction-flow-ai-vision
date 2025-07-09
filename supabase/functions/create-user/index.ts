@@ -59,16 +59,27 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error("Invalid authentication");
     }
 
-    // Verify requesting user is admin of the company
-    const { data: profile, error: profileError } = await supabaseClient
+    console.log("Checking authorization for user:", requestingUser.id);
+
+    // Verify requesting user is admin of the company using service role
+    const { data: profile, error: profileError } = await supabaseAdmin
       .from('profiles')
       .select('company_id, company_role')
       .eq('id', requestingUser.id)
       .single();
 
+    console.log("Profile query result:", { profile, profileError });
+
     if (profileError || !profile) {
+      console.error("Profile not found or error:", profileError);
       throw new Error("Profile not found");
     }
+
+    console.log("Profile found:", { 
+      userRole: profile.company_role, 
+      userCompany: profile.company_id, 
+      requestedCompany: companyId 
+    });
 
     if (profile.company_role !== 'company_admin' || profile.company_id !== companyId) {
       throw new Error("Insufficient permissions");
