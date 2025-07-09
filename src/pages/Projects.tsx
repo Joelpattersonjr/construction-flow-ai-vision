@@ -90,7 +90,11 @@ const Projects: React.FC = () => {
           end_date: newProject.end_date || null,
           status: newProject.status,
           company_id: profile?.company_id,
-          owner_id: user?.id
+          owner_id: user?.id,
+          owner_name: newProject.owner_name,
+          owner_company: newProject.owner_company,
+          owner_email: newProject.owner_email,
+          owner_phone: newProject.owner_phone
         })
         .select()
         .single();

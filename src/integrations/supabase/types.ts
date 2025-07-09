@@ -213,7 +213,11 @@ export type Database = {
           end_date: string | null
           id: string
           name: string | null
+          owner_company: string | null
+          owner_email: string | null
           owner_id: string | null
+          owner_name: string | null
+          owner_phone: string | null
           project_number: string | null
           start_date: string | null
           status: string | null
@@ -225,7 +229,11 @@ export type Database = {
           end_date?: string | null
           id?: string
           name?: string | null
+          owner_company?: string | null
+          owner_email?: string | null
           owner_id?: string | null
+          owner_name?: string | null
+          owner_phone?: string | null
           project_number?: string | null
           start_date?: string | null
           status?: string | null
@@ -237,7 +245,11 @@ export type Database = {
           end_date?: string | null
           id?: string
           name?: string | null
+          owner_company?: string | null
+          owner_email?: string | null
           owner_id?: string | null
+          owner_name?: string | null
+          owner_phone?: string | null
           project_number?: string | null
           start_date?: string | null
           status?: string | null
