@@ -80,6 +80,12 @@ const Projects: React.FC = () => {
 
     setCreating(true);
     try {
+      console.log('Creating project with data:', {
+        name: newProject.name,
+        company_id: profile?.company_id,
+        owner_id: user?.id
+      });
+
       const { data, error } = await supabase
         .from('projects')
         .insert({
@@ -98,6 +104,8 @@ const Projects: React.FC = () => {
         })
         .select()
         .single();
+
+      console.log('Project creation result:', { data, error });
 
       if (error) throw error;
 
