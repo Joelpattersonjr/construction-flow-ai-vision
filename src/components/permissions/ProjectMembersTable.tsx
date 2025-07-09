@@ -141,9 +141,11 @@ const ProjectMembersTable: React.FC<ProjectMembersTableProps> = ({
 
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
-      case 'admin':
+      case 'owner':
+        return 'bg-purple-100 text-purple-800';
+      case 'manager':
         return 'bg-red-100 text-red-800';
-      case 'editor':
+      case 'member':
         return 'bg-blue-100 text-blue-800';
       case 'viewer':
         return 'bg-gray-100 text-gray-800';
@@ -244,8 +246,8 @@ const ProjectMembersTable: React.FC<ProjectMembersTableProps> = ({
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="viewer">Viewer</SelectItem>
-                      <SelectItem value="editor">Editor</SelectItem>
-                      <SelectItem value="admin">Admin</SelectItem>
+                      <SelectItem value="member">Member</SelectItem>
+                      <SelectItem value="manager">Manager</SelectItem>
                     </SelectContent>
                   </Select>
                 ) : (

@@ -179,9 +179,8 @@ const AddMemberDialog: React.FC<AddMemberDialogProps> = ({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="viewer">Viewer</SelectItem>
-                <SelectItem value="editor">Editor</SelectItem>
-                <SelectItem value="admin">Admin</SelectItem>
                 <SelectItem value="member">Member</SelectItem>
+                <SelectItem value="manager">Manager</SelectItem>
               </SelectContent>
             </Select>
           </div>
