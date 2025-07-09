@@ -5,16 +5,15 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, RefreshCw } from 'lucide-react';
 import FileUploadDropzone from './FileUploadDropzone';
-import FileList from './FileList';
-import { DocumentRecord, FileService, FileCategory } from '@/services/fileService';
+import FolderFileList from './FolderFileList';
+import { FileService, FileCategory, FolderItem, FileItem } from '@/services/fileService';
 import { useToast } from '@/hooks/use-toast';
 
 interface FileManagerProps {
   projectId: string;
 }
 
-const CATEGORY_OPTIONS: { value: FileCategory | 'all'; label: string }[] = [
-  { value: 'all', label: 'All Categories' },
+const CATEGORY_OPTIONS: { value: FileCategory; label: string }[] = [
   { value: 'project-documents', label: 'Project Documents' },
   { value: 'project-photos', label: 'Project Photos' },
   { value: 'blueprints', label: 'Blueprints' },
@@ -22,19 +21,28 @@ const CATEGORY_OPTIONS: { value: FileCategory | 'all'; label: string }[] = [
 ];
 
 const FileManager: React.FC<FileManagerProps> = ({ projectId }) => {
-  const [files, setFiles] = useState<DocumentRecord[]>([]);
-  const [filteredFiles, setFilteredFiles] = useState<DocumentRecord[]>([]);
+  const [folders, setFolders] = useState<FolderItem[]>([]);
+  const [files, setFiles] = useState<FileItem[]>([]);
+  const [filteredFolders, setFilteredFolders] = useState<FolderItem[]>([]);
+  const [filteredFiles, setFilteredFiles] = useState<FileItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<FileCategory | 'all'>('all');
+  const [selectedCategory, setSelectedCategory] = useState<FileCategory>('project-documents');
+  const [currentPath, setCurrentPath] = useState<string>('');
   const { toast } = useToast();
 
-  const loadFiles = async () => {
+  const loadFolderContents = async () => {
     try {
       setLoading(true);
-      const projectFiles = await FileService.getProjectFiles(projectId);
-      setFiles(projectFiles);
-      setFilteredFiles(projectFiles);
+      const { folders: folderList, files: fileList } = await FileService.getFolderContents(
+        projectId, 
+        selectedCategory, 
+        currentPath
+      );
+      setFolders(folderList);
+      setFiles(fileList);
+      setFilteredFolders(folderList);
+      setFilteredFiles(fileList);
     } catch (error) {
       toast({
         title: "Failed to load files",
@@ -46,34 +54,39 @@ const FileManager: React.FC<FileManagerProps> = ({ projectId }) => {
     }
   };
 
-  useEffect(() => {
-    loadFiles();
-  }, [projectId]);
+  const handleNavigate = (path: string) => {
+    setCurrentPath(path);
+    setSearchTerm(''); // Clear search when navigating
+  };
 
   useEffect(() => {
-    let filtered = files;
+    loadFolderContents();
+  }, [projectId, selectedCategory, currentPath]);
 
-    // Filter by category
-    if (selectedCategory !== 'all') {
-      filtered = filtered.filter(file => file.category === selectedCategory);
-    }
+  useEffect(() => {
+    let filteredFoldersList = folders;
+    let filteredFilesList = files;
 
     // Filter by search term
     if (searchTerm.trim()) {
-      filtered = filtered.filter(file =>
+      filteredFoldersList = folders.filter(folder =>
+        folder.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      filteredFilesList = files.filter(file =>
         file.file_name?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
-    setFilteredFiles(filtered);
-  }, [files, selectedCategory, searchTerm]);
+    setFilteredFolders(filteredFoldersList);
+    setFilteredFiles(filteredFilesList);
+  }, [folders, files, searchTerm]);
 
   const handleUploadComplete = () => {
-    loadFiles();
+    loadFolderContents();
   };
 
-  const handleFileDeleted = () => {
-    loadFiles();
+  const handleContentChanged = () => {
+    loadFolderContents();
   };
 
   return (
@@ -98,9 +111,9 @@ const FileManager: React.FC<FileManagerProps> = ({ projectId }) => {
               </div>
             </div>
             
-            <Select value={selectedCategory} onValueChange={(value: FileCategory | 'all') => setSelectedCategory(value)}>
+            <Select value={selectedCategory} onValueChange={(value: FileCategory) => setSelectedCategory(value)}>
               <SelectTrigger className="w-full sm:w-[200px]">
-                <SelectValue placeholder="All Categories" />
+                <SelectValue placeholder="Select Category" />
               </SelectTrigger>
               <SelectContent>
                 {CATEGORY_OPTIONS.map(option => (
@@ -111,7 +124,7 @@ const FileManager: React.FC<FileManagerProps> = ({ projectId }) => {
               </SelectContent>
             </Select>
             
-            <Button variant="outline" onClick={loadFiles} disabled={loading}>
+            <Button variant="outline" onClick={loadFolderContents} disabled={loading}>
               <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
             </Button>
           </div>
@@ -122,13 +135,23 @@ const FileManager: React.FC<FileManagerProps> = ({ projectId }) => {
               <p className="mt-2 text-gray-600">Loading files...</p>
             </div>
           ) : (
-            <FileList files={filteredFiles} onFileDeleted={handleFileDeleted} />
+            <FolderFileList 
+              projectId={projectId}
+              category={selectedCategory}
+              currentPath={currentPath}
+              folders={filteredFolders} 
+              files={filteredFiles} 
+              onNavigate={handleNavigate}
+              onContentChanged={handleContentChanged}
+            />
           )}
         </TabsContent>
         
         <TabsContent value="upload">
           <FileUploadDropzone
             projectId={projectId}
+            category={selectedCategory}
+            currentPath={currentPath}
             onUploadComplete={handleUploadComplete}
           />
         </TabsContent>

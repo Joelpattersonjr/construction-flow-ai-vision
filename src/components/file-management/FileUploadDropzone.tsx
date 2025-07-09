@@ -10,6 +10,8 @@ import { FileCategory } from '@/services/fileService';
 
 interface FileUploadDropzoneProps {
   projectId: string;
+  category: FileCategory;
+  currentPath: string;
   onUploadComplete: () => void;
 }
 
@@ -20,8 +22,12 @@ const CATEGORY_OPTIONS: { value: FileCategory; label: string }[] = [
   { value: 'site-photos', label: 'Site Photos' },
 ];
 
-const FileUploadDropzone: React.FC<FileUploadDropzoneProps> = ({ projectId, onUploadComplete }) => {
-  const [selectedCategory, setSelectedCategory] = useState<FileCategory>('project-documents');
+const FileUploadDropzone: React.FC<FileUploadDropzoneProps> = ({ 
+  projectId, 
+  category,
+  currentPath, 
+  onUploadComplete 
+}) => {
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   const { uploadFile, isUploading, uploadProgress } = useFileUpload();
 
@@ -55,7 +61,8 @@ const FileUploadDropzone: React.FC<FileUploadDropzoneProps> = ({ projectId, onUp
       const result = await uploadFile({
         file,
         projectId,
-        category: selectedCategory,
+        category,
+        folderPath: currentPath,
       });
       
       if (!result) break; // Stop if upload fails
@@ -67,26 +74,6 @@ const FileUploadDropzone: React.FC<FileUploadDropzoneProps> = ({ projectId, onUp
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center space-x-4">
-        <div className="flex-1">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            File Category
-          </label>
-          <Select value={selectedCategory} onValueChange={(value: FileCategory) => setSelectedCategory(value)}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select category" />
-            </SelectTrigger>
-            <SelectContent>
-              {CATEGORY_OPTIONS.map(option => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
       <Card>
         <CardContent className="p-6">
           <div
