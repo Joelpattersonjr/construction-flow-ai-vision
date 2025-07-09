@@ -9,6 +9,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { UserPlus, Loader2, Info } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { auditService } from '@/services/auditService';
 
 interface AddMemberDialogProps {
   projectId: string;
@@ -120,6 +121,15 @@ const AddMemberDialog: React.FC<AddMemberDialogProps> = ({
         });
 
       if (error) throw error;
+
+      // Log the audit activity
+      await auditService.logActivity({
+        projectId,
+        actionType: 'member_added',
+        targetUserId: selectedUserId,
+        newValue: { role, permissions },
+        metadata: { memberName: companyMembers.find(m => m.id === selectedUserId)?.full_name }
+      });
 
       toast({
         title: "Member added",

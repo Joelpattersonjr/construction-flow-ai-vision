@@ -1,12 +1,14 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Settings, Users, Search, Filter, SortAsc } from 'lucide-react';
+import { Settings, Users, Search, Filter, SortAsc, Clock } from 'lucide-react';
 import ProjectMembersTable from './ProjectMembersTable';
 import AddMemberDialog from './AddMemberDialog';
+import AuditLogTable from './AuditLogTable';
+import { auditService, AuditLogEntry } from '@/services/auditService';
 
 interface ProjectMember {
   id: string;
@@ -44,6 +46,36 @@ const ProjectPermissionsContent: React.FC<ProjectPermissionsContentProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
   const [sortBy, setSortBy] = useState('name');
+  const [auditLogs, setAuditLogs] = useState<AuditLogEntry[]>([]);
+  const [auditLoading, setAuditLoading] = useState(false);
+
+  // Load audit logs
+  const loadAuditLogs = async () => {
+    setAuditLoading(true);
+    try {
+      const logs = await auditService.getProjectAuditLog(projectId);
+      setAuditLogs(logs);
+    } catch (error) {
+      console.error('Failed to load audit logs:', error);
+    } finally {
+      setAuditLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadAuditLogs();
+  }, [projectId]);
+
+  // Refresh audit logs when members are updated
+  const handleMemberUpdatedWithAudit = () => {
+    onMemberUpdated();
+    loadAuditLogs();
+  };
+
+  const handleMemberAddedWithAudit = () => {
+    onMemberAdded();
+    loadAuditLogs();
+  };
 
   // Filter and sort members based on search, filter, and sort criteria
   const filteredAndSortedMembers = useMemo(() => {
@@ -94,16 +126,20 @@ const ProjectPermissionsContent: React.FC<ProjectPermissionsContentProps> = ({
         {canManage && (
           <AddMemberDialog 
             projectId={projectId}
-            onMemberAdded={onMemberAdded}
+            onMemberAdded={handleMemberAddedWithAudit}
           />
         )}
       </div>
 
       <Tabs defaultValue="members" className="w-full">
-        <TabsList className="grid w-full grid-cols-1">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="members" className="flex items-center gap-2">
             <Users className="h-4 w-4" />
             Team Members ({filteredAndSortedMembers.length} of {members.length})
+          </TabsTrigger>
+          <TabsTrigger value="activity" className="flex items-center gap-2">
+            <Clock className="h-4 w-4" />
+            Activity
           </TabsTrigger>
         </TabsList>
         
@@ -162,10 +198,17 @@ const ProjectPermissionsContent: React.FC<ProjectPermissionsContentProps> = ({
                 projectId={projectId}
                 members={filteredAndSortedMembers}
                 canManage={canManage}
-                onMemberUpdated={onMemberUpdated}
+                onMemberUpdated={handleMemberUpdatedWithAudit}
               />
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="activity" className="space-y-4">
+          <AuditLogTable 
+            auditLogs={auditLogs}
+            loading={auditLoading}
+          />
         </TabsContent>
       </Tabs>
     </div>

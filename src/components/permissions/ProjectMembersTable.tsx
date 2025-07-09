@@ -12,6 +12,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Trash2, Shield, Edit, Eye, FileEdit, Settings, Crown, UserCheck, Users2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { auditService } from '@/services/auditService';
 
 interface ProjectMember {
   id: string;
@@ -126,6 +127,9 @@ const ProjectMembersTable: React.FC<ProjectMembersTableProps> = ({
   };
 
   const updateMemberRole = async (memberId: string, newRole: string) => {
+    const member = members.find(m => m.id === memberId);
+    if (!member) return;
+    
     setUpdating(prev => new Set(prev).add(memberId));
     
     try {
@@ -135,6 +139,16 @@ const ProjectMembersTable: React.FC<ProjectMembersTableProps> = ({
         .eq('id', memberId);
 
       if (error) throw error;
+
+      // Log the audit activity
+      await auditService.logActivity({
+        projectId,
+        actionType: 'role_changed',
+        targetUserId: member.user_id,
+        oldValue: { role: member.role },
+        newValue: { role: newRole },
+        metadata: { memberName: member.profiles?.full_name }
+      });
 
       toast({
         title: "Role updated",
@@ -158,6 +172,9 @@ const ProjectMembersTable: React.FC<ProjectMembersTableProps> = ({
   };
 
   const updateMemberPermissions = async (memberId: string, permissions: { read: boolean; write: boolean; admin: boolean }) => {
+    const member = members.find(m => m.id === memberId);
+    if (!member) return;
+    
     setUpdating(prev => new Set(prev).add(memberId));
     
     try {
@@ -167,6 +184,16 @@ const ProjectMembersTable: React.FC<ProjectMembersTableProps> = ({
         .eq('id', memberId);
 
       if (error) throw error;
+
+      // Log the audit activity
+      await auditService.logActivity({
+        projectId,
+        actionType: 'permissions_updated',
+        targetUserId: member.user_id,
+        oldValue: { permissions: member.permissions },
+        newValue: { permissions },
+        metadata: { memberName: member.profiles?.full_name }
+      });
 
       toast({
         title: "Permissions updated",
@@ -191,6 +218,9 @@ const ProjectMembersTable: React.FC<ProjectMembersTableProps> = ({
   };
 
   const removeMember = async (memberId: string) => {
+    const member = members.find(m => m.id === memberId);
+    if (!member) return;
+    
     setUpdating(prev => new Set(prev).add(memberId));
     
     try {
@@ -200,6 +230,15 @@ const ProjectMembersTable: React.FC<ProjectMembersTableProps> = ({
         .eq('id', memberId);
 
       if (error) throw error;
+
+      // Log the audit activity
+      await auditService.logActivity({
+        projectId,
+        actionType: 'member_removed',
+        targetUserId: member.user_id,
+        oldValue: { role: member.role, permissions: member.permissions },
+        metadata: { memberName: member.profiles?.full_name }
+      });
 
       toast({
         title: "Member removed",
