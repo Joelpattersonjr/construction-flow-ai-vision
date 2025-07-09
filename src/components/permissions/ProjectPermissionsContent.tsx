@@ -4,10 +4,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Settings, Users, Search, Filter, SortAsc, Clock, Wifi, WifiOff } from 'lucide-react';
+import { Settings, Users, Search, Filter, SortAsc, Clock, Wifi, WifiOff, Layout } from 'lucide-react';
 import ProjectMembersTable from './ProjectMembersTable';
 import AddMemberDialog from './AddMemberDialog';
 import AuditLogTable from './AuditLogTable';
+import PermissionTemplatesTable from './PermissionTemplatesTable';
 import { auditService, AuditLogEntry } from '@/services/auditService';
 import { useRealtimeUpdates } from '@/hooks/useRealtimeUpdates';
 import { Badge } from '@/components/ui/badge';
@@ -170,10 +171,14 @@ const ProjectPermissionsContent: React.FC<ProjectPermissionsContentProps> = ({
       </div>
 
       <Tabs defaultValue="members" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="members" className="flex items-center gap-2">
             <Users className="h-4 w-4" />
             Team Members ({filteredAndSortedMembers.length} of {members.length})
+          </TabsTrigger>
+          <TabsTrigger value="templates" className="flex items-center gap-2">
+            <Layout className="h-4 w-4" />
+            Templates
           </TabsTrigger>
           <TabsTrigger value="activity" className="flex items-center gap-2">
             <Clock className="h-4 w-4" />
@@ -240,6 +245,12 @@ const ProjectPermissionsContent: React.FC<ProjectPermissionsContentProps> = ({
               />
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="templates" className="space-y-4">
+          <PermissionTemplatesTable 
+            canManage={canManage}
+          />
         </TabsContent>
 
         <TabsContent value="activity" className="space-y-4">

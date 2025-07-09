@@ -144,6 +144,60 @@ export type Database = {
           },
         ]
       }
+      permission_templates: {
+        Row: {
+          company_id: number
+          created_at: string
+          created_by: string
+          description: string | null
+          id: string
+          is_default: boolean | null
+          name: string
+          permissions: Json
+          role: string
+          updated_at: string
+        }
+        Insert: {
+          company_id: number
+          created_at?: string
+          created_by: string
+          description?: string | null
+          id?: string
+          is_default?: boolean | null
+          name: string
+          permissions?: Json
+          role?: string
+          updated_at?: string
+        }
+        Update: {
+          company_id?: number
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          id?: string
+          is_default?: boolean | null
+          name?: string
+          permissions?: Json
+          role?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_permission_templates_company"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_permission_templates_created_by"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           company_id: number | null

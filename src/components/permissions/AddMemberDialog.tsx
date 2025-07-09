@@ -10,6 +10,7 @@ import { UserPlus, Loader2, Info } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { auditService } from '@/services/auditService';
+import { permissionTemplateService, PermissionTemplate } from '@/services/permissionTemplateService';
 
 interface AddMemberDialogProps {
   projectId: string;
@@ -36,6 +37,8 @@ const AddMemberDialog: React.FC<AddMemberDialogProps> = ({
   });
   const [isAdding, setIsAdding] = useState(false);
   const [companyMembers, setCompanyMembers] = useState<CompanyMember[]>([]);
+  const [templates, setTemplates] = useState<PermissionTemplate[]>([]);
+  const [selectedTemplate, setSelectedTemplate] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
@@ -80,6 +83,21 @@ const AddMemberDialog: React.FC<AddMemberDialogProps> = ({
     }
   };
 
+  const loadTemplates = async () => {
+    try {
+      const data = await permissionTemplateService.getCompanyTemplates();
+      setTemplates(data);
+      
+      // Auto-select default template for current role if available
+      const defaultTemplate = data.find(t => t.role === role && t.is_default);
+      if (defaultTemplate) {
+        setSelectedTemplate(defaultTemplate.id);
+      }
+    } catch (error) {
+      console.error('Failed to load templates:', error);
+    }
+  };
+
   // Role-based permission templates
   const getPermissionsForRole = (roleType: string) => {
     switch (roleType) {
@@ -98,13 +116,45 @@ const AddMemberDialog: React.FC<AddMemberDialogProps> = ({
   const handleRoleChange = (newRole: string) => {
     setRole(newRole);
     setPermissions(getPermissionsForRole(newRole));
+    
+    // Auto-select default template for new role if available
+    const defaultTemplate = templates.find(t => t.role === newRole && t.is_default);
+    if (defaultTemplate) {
+      setSelectedTemplate(defaultTemplate.id);
+    } else {
+      setSelectedTemplate('');
+    }
+  };
+
+  // Handle template selection
+  const handleTemplateChange = (templateId: string) => {
+    setSelectedTemplate(templateId);
+    
+    if (templateId) {
+      const template = templates.find(t => t.id === templateId);
+      if (template) {
+        setRole(template.role);
+        setPermissions(template.permissions);
+      }
+    }
   };
 
   useEffect(() => {
     if (open) {
       loadCompanyMembers();
+      loadTemplates();
     }
   }, [open, projectId]);
+
+  useEffect(() => {
+    // Auto-select default template when templates are loaded
+    if (templates.length > 0) {
+      const defaultTemplate = templates.find(t => t.role === role && t.is_default);
+      if (defaultTemplate && !selectedTemplate) {
+        setSelectedTemplate(defaultTemplate.id);
+      }
+    }
+  }, [templates, role, selectedTemplate]);
 
   const handleAddMember = async () => {
     if (!selectedUserId) return;
@@ -157,6 +207,7 @@ const AddMemberDialog: React.FC<AddMemberDialogProps> = ({
 
       setOpen(false);
       setSelectedUserId('');
+      setSelectedTemplate('');
       setRole('member');
       setPermissions({ read: true, write: false, admin: false });
       onMemberAdded();
@@ -265,6 +316,38 @@ const AddMemberDialog: React.FC<AddMemberDialogProps> = ({
               </SelectContent>
             </Select>
           </div>
+
+          {templates.length > 0 && (
+            <div className="grid gap-2">
+              <Label htmlFor="template">Permission Template (Optional)</Label>
+              <Select value={selectedTemplate} onValueChange={handleTemplateChange}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Choose a template or set manually" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">
+                    <div>
+                      <div className="font-medium">Manual Setup</div>
+                      <div className="text-xs text-gray-500">Set permissions manually</div>
+                    </div>
+                  </SelectItem>
+                  {templates.map((template) => (
+                    <SelectItem key={template.id} value={template.id}>
+                      <div>
+                        <div className="font-medium flex items-center gap-2">
+                          {template.name}
+                          {template.is_default && <span className="text-xs bg-blue-100 text-blue-800 px-1 rounded">Default</span>}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {template.role} • {template.description || 'No description'}
+                        </div>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           <div className="grid gap-3">
             <div className="flex items-center gap-2">
