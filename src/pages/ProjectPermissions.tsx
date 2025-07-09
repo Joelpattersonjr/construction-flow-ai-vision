@@ -112,9 +112,11 @@ const ProjectPermissions: React.FC = () => {
   };
 
   useEffect(() => {
-    loadProject();
-    loadMembers();
-  }, [projectId]);
+    if (projectId) {
+      loadProject();
+      loadMembers();
+    }
+  }, [projectId, user?.id]);
 
   const handleMemberUpdated = () => {
     loadMembers();
