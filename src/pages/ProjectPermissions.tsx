@@ -41,6 +41,9 @@ const ProjectPermissions: React.FC = () => {
   const { toast } = useToast();
   const { user } = useAuth();
 
+  // Debug log to see what projectId we're getting
+  console.log('ProjectPermissions projectId:', projectId);
+
   const loadProject = async () => {
     if (!projectId) return;
 
