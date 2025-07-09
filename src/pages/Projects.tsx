@@ -167,11 +167,15 @@ const Projects: React.FC = () => {
             Projects
           </h1>
           <p className="text-gray-600 mt-2">
-            Manage your construction projects and track progress
+            {profile?.company_role === 'company_admin' 
+              ? 'Manage your construction projects and track progress'
+              : 'View and access your assigned projects'
+            }
           </p>
         </div>
         
-        <Dialog open={open} onOpenChange={setOpen}>
+        {profile?.company_role === 'company_admin' && (
+          <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button>
               <Plus className="h-4 w-4 mr-2" />
@@ -251,20 +255,28 @@ const Projects: React.FC = () => {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+        )}
       </div>
 
       {projects.length === 0 ? (
         <Card>
           <CardContent className="p-8 text-center">
             <Folder className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">No projects yet</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              {profile?.company_role === 'company_admin' ? 'No projects yet' : 'No projects assigned'}
+            </h3>
             <p className="text-gray-500 mb-4">
-              Create your first project to start managing construction workflows.
+              {profile?.company_role === 'company_admin' 
+                ? 'Create your first project to start managing construction workflows.'
+                : 'Contact your company administrator to be added to projects.'
+              }
             </p>
-            <Button onClick={() => setOpen(true)}>
-              <Plus className="h-4 w-4 mr-2" />
-              Create Your First Project
-            </Button>
+            {profile?.company_role === 'company_admin' && (
+              <Button onClick={() => setOpen(true)}>
+                <Plus className="h-4 w-4 mr-2" />
+                Create Your First Project
+              </Button>
+            )}
           </CardContent>
         </Card>
       ) : (
