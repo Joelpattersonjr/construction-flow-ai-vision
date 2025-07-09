@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Settings, Users } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import { Settings, Users, Search, Filter, SortAsc } from 'lucide-react';
 import ProjectMembersTable from './ProjectMembersTable';
 import AddMemberDialog from './AddMemberDialog';
 
@@ -18,6 +21,7 @@ interface ProjectMember {
     full_name: string;
     job_title: string;
   };
+  created_at?: string;
 }
 
 interface ProjectPermissionsContentProps {
@@ -37,6 +41,43 @@ const ProjectPermissionsContent: React.FC<ProjectPermissionsContentProps> = ({
   onMemberUpdated,
   onMemberAdded,
 }) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [roleFilter, setRoleFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('name');
+
+  // Filter and sort members based on search, filter, and sort criteria
+  const filteredAndSortedMembers = useMemo(() => {
+    let filtered = members.filter(member => {
+      const matchesSearch = member.profiles?.full_name
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+        member.profiles?.job_title
+          ?.toLowerCase()
+          .includes(searchTerm.toLowerCase());
+      
+      const matchesRole = roleFilter === 'all' || member.role === roleFilter;
+      
+      return matchesSearch && matchesRole;
+    });
+
+    // Sort members
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case 'name':
+          return (a.profiles?.full_name || '').localeCompare(b.profiles?.full_name || '');
+        case 'role':
+          const roleOrder = { owner: 0, manager: 1, member: 2, viewer: 3 };
+          return (roleOrder[a.role] || 4) - (roleOrder[b.role] || 4);
+        case 'recent':
+          return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
+        default:
+          return 0;
+      }
+    });
+
+    return filtered;
+  }, [members, searchTerm, roleFilter, sortBy]);
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -62,7 +103,7 @@ const ProjectPermissionsContent: React.FC<ProjectPermissionsContentProps> = ({
         <TabsList className="grid w-full grid-cols-1">
           <TabsTrigger value="members" className="flex items-center gap-2">
             <Users className="h-4 w-4" />
-            Team Members ({members.length})
+            Team Members ({filteredAndSortedMembers.length} of {members.length})
           </TabsTrigger>
         </TabsList>
         
@@ -75,10 +116,51 @@ const ProjectPermissionsContent: React.FC<ProjectPermissionsContentProps> = ({
                 {!canManage && " You need to be a project owner or company admin to manage permissions."}
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-4">
+              {/* Search and Filter Controls */}
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Input
+                    placeholder="Search team members..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+                
+                <div className="flex gap-2">
+                  <Select value={roleFilter} onValueChange={setRoleFilter}>
+                    <SelectTrigger className="w-[140px]">
+                      <Filter className="h-4 w-4 mr-2" />
+                      <SelectValue placeholder="Filter by role" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Roles</SelectItem>
+                      <SelectItem value="owner">Owner</SelectItem>
+                      <SelectItem value="manager">Manager</SelectItem>
+                      <SelectItem value="member">Member</SelectItem>
+                      <SelectItem value="viewer">Viewer</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  
+                  <Select value={sortBy} onValueChange={setSortBy}>
+                    <SelectTrigger className="w-[140px]">
+                      <SortAsc className="h-4 w-4 mr-2" />
+                      <SelectValue placeholder="Sort by" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="name">Name</SelectItem>
+                      <SelectItem value="role">Role</SelectItem>
+                      <SelectItem value="recent">Recently Added</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
               <ProjectMembersTable
                 projectId={projectId}
-                members={members}
+                members={filteredAndSortedMembers}
                 canManage={canManage}
                 onMemberUpdated={onMemberUpdated}
               />

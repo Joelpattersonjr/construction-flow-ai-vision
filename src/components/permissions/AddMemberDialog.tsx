@@ -5,7 +5,8 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { UserPlus, Loader2 } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { UserPlus, Loader2, Info } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -76,6 +77,26 @@ const AddMemberDialog: React.FC<AddMemberDialogProps> = ({
     } finally {
       setLoading(false);
     }
+  };
+
+  // Role-based permission templates
+  const getPermissionsForRole = (roleType: string) => {
+    switch (roleType) {
+      case 'viewer':
+        return { read: true, write: false, admin: false };
+      case 'member':
+        return { read: true, write: true, admin: false };
+      case 'manager':
+        return { read: true, write: true, admin: true };
+      default:
+        return { read: true, write: false, admin: false };
+    }
+  };
+
+  // Auto-update permissions when role changes
+  const handleRoleChange = (newRole: string) => {
+    setRole(newRole);
+    setPermissions(getPermissionsForRole(newRole));
   };
 
   useEffect(() => {
@@ -172,22 +193,56 @@ const AddMemberDialog: React.FC<AddMemberDialogProps> = ({
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="role">Role</Label>
-            <Select value={role} onValueChange={setRole}>
+            <div className="flex items-center gap-2">
+              <Label htmlFor="role">Role</Label>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Info className="h-4 w-4 text-gray-400" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <div className="text-sm">
+                      <div><strong>Viewer:</strong> Read access only</div>
+                      <div><strong>Member:</strong> Read + Write access</div>
+                      <div><strong>Manager:</strong> Full access including admin</div>
+                    </div>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+            <Select value={role} onValueChange={handleRoleChange}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="viewer">Viewer</SelectItem>
-                <SelectItem value="member">Member</SelectItem>
-                <SelectItem value="manager">Manager</SelectItem>
+                <SelectItem value="viewer">
+                  <div>
+                    <div className="font-medium">Viewer</div>
+                    <div className="text-xs text-gray-500">Read access only</div>
+                  </div>
+                </SelectItem>
+                <SelectItem value="member">
+                  <div>
+                    <div className="font-medium">Member</div>
+                    <div className="text-xs text-gray-500">Read + Write access</div>
+                  </div>
+                </SelectItem>
+                <SelectItem value="manager">
+                  <div>
+                    <div className="font-medium">Manager</div>
+                    <div className="text-xs text-gray-500">Full access including admin</div>
+                  </div>
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div className="grid gap-3">
-            <Label>Permissions</Label>
-            <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <Label>Permissions</Label>
+              <span className="text-xs text-gray-500">(Auto-set based on role)</span>
+            </div>
+            <div className="space-y-3 p-3 bg-gray-50 rounded-md">
               <div className="flex items-center space-x-2">
                 <Switch
                   id="read"
@@ -196,7 +251,10 @@ const AddMemberDialog: React.FC<AddMemberDialogProps> = ({
                     setPermissions(prev => ({ ...prev, read: checked }))
                   }
                 />
-                <Label htmlFor="read">Read Access</Label>
+                <Label htmlFor="read" className="flex items-center gap-2">
+                  Read Access
+                  <span className="text-xs text-gray-500">View project content</span>
+                </Label>
               </div>
               <div className="flex items-center space-x-2">
                 <Switch
@@ -206,7 +264,10 @@ const AddMemberDialog: React.FC<AddMemberDialogProps> = ({
                     setPermissions(prev => ({ ...prev, write: checked }))
                   }
                 />
-                <Label htmlFor="write">Write Access</Label>
+                <Label htmlFor="write" className="flex items-center gap-2">
+                  Write Access
+                  <span className="text-xs text-gray-500">Edit project content</span>
+                </Label>
               </div>
               <div className="flex items-center space-x-2">
                 <Switch
@@ -216,7 +277,10 @@ const AddMemberDialog: React.FC<AddMemberDialogProps> = ({
                     setPermissions(prev => ({ ...prev, admin: checked }))
                   }
                 />
-                <Label htmlFor="admin">Admin Access</Label>
+                <Label htmlFor="admin" className="flex items-center gap-2">
+                  Admin Access
+                  <span className="text-xs text-gray-500">Manage team & settings</span>
+                </Label>
               </div>
             </div>
           </div>
