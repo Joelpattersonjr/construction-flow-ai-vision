@@ -8,11 +8,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useToast } from '@/hooks/use-toast';
-import { Users, UserPlus, Mail, Shield, User, ChevronDown, LogOut, Settings, Building2, UserCheck } from 'lucide-react';
+import { Users, UserPlus, Mail, Shield, User, ChevronDown, LogOut, Settings, Building2, UserCheck, FolderOpen } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { InviteUserDialog } from '@/components/admin/InviteUserDialog';
 import { TeamMembersTable } from '@/components/admin/TeamMembersTable';
 import { PendingInvitationsTable } from '@/components/admin/PendingInvitationsTable';
+import AdminProjectsTable from '@/components/admin/AdminProjectsTable';
 
 const AdminDashboard = () => {
   const { user, profile, signOut, clearAuthState } = useAuth();
@@ -21,6 +22,7 @@ const AdminDashboard = () => {
   const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
   const [teamMembers, setTeamMembers] = useState([]);
   const [pendingInvitations, setPendingInvitations] = useState([]);
+  const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // Check if user is company admin
@@ -56,8 +58,17 @@ const AdminDashboard = () => {
 
       if (invitationsError) throw invitationsError;
 
+      // Fetch projects
+      const { data: projectsData, error: projectsError } = await supabase
+        .from('projects')
+        .select('id, name, status, created_at, owner_id')
+        .eq('company_id', profile.company_id);
+
+      if (projectsError) throw projectsError;
+
       setTeamMembers(members || []);
       setPendingInvitations(invitations || []);
+      setProjects(projectsData || []);
     } catch (error) {
       console.error('Error fetching team data:', error);
       toast({
@@ -208,7 +219,7 @@ const AdminDashboard = () => {
 
       <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
         {/* Overview Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Team Members</CardTitle>
@@ -249,13 +260,27 @@ const AdminDashboard = () => {
               </p>
             </CardContent>
           </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Projects</CardTitle>
+              <FolderOpen className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{projects.length}</div>
+              <p className="text-xs text-muted-foreground">
+                Total company projects
+              </p>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Main Content Tabs */}
         <Tabs defaultValue="team" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="team">Team Members</TabsTrigger>
             <TabsTrigger value="invitations">Pending Invitations</TabsTrigger>
+            <TabsTrigger value="projects">Projects</TabsTrigger>
           </TabsList>
 
           <TabsContent value="team" className="space-y-4">
@@ -288,6 +313,23 @@ const AdminDashboard = () => {
                 <PendingInvitationsTable 
                   invitations={pendingInvitations} 
                   onRefresh={fetchTeamData}
+                  loading={loading}
+                />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="projects" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Company Projects</CardTitle>
+                <CardDescription>
+                  Manage your company's projects and their permissions
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <AdminProjectsTable 
+                  projects={projects} 
                   loading={loading}
                 />
               </CardContent>
