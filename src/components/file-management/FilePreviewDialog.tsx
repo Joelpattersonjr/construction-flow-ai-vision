@@ -97,11 +97,8 @@ const FilePreviewDialog: React.FC<FilePreviewDialogProps> = ({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden">
         <DialogHeader>
-          <DialogTitle className="flex items-center justify-between">
-            <span>{file.file_name}</span>
-            <Button variant="ghost" size="sm" onClick={onClose}>
-              <X className="h-4 w-4" />
-            </Button>
+          <DialogTitle>
+            {file.file_name}
           </DialogTitle>
         </DialogHeader>
 
