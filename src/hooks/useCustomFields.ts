@@ -13,6 +13,28 @@ export const useCustomFields = () => {
   useEffect(() => {
     if (profile?.company_id) {
       fetchCustomFields();
+
+      // Set up real-time subscription for custom fields
+      const channel = supabase
+        .channel('custom-fields-manager-changes')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'company_custom_fields',
+            filter: `company_id=eq.${profile.company_id}`
+          },
+          () => {
+            // Refetch custom fields when they change
+            fetchCustomFields();
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
     }
   }, [profile?.company_id]);
 

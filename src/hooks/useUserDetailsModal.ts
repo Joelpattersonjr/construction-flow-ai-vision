@@ -27,6 +27,28 @@ export const useUserDetailsModal = (
       setEditingName(member.full_name || '');
       setEditingEmail(member.email || '');
       setEditingJobTitle(member.job_title || '');
+
+      // Set up real-time subscription for custom fields
+      const channel = supabase
+        .channel('custom-fields-changes')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'company_custom_fields',
+            filter: `company_id=eq.${profile.company_id}`
+          },
+          () => {
+            // Refetch custom fields when they change
+            fetchCustomFields();
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
     }
   }, [member, isOpen, profile?.company_id]);
 
