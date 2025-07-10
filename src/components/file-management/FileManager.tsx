@@ -12,6 +12,7 @@ import { useProjectPermissions } from '@/hooks/useProjectPermissions';
 
 interface FileManagerProps {
   projectId: string;
+  hasWritePermission?: boolean;
 }
 
 const CATEGORY_OPTIONS: { value: FileCategory; label: string }[] = [
@@ -21,7 +22,7 @@ const CATEGORY_OPTIONS: { value: FileCategory; label: string }[] = [
   { value: 'site-photos', label: 'Site Photos' },
 ];
 
-const FileManager: React.FC<FileManagerProps> = ({ projectId }) => {
+const FileManager: React.FC<FileManagerProps> = ({ projectId, hasWritePermission = false }) => {
   const [folders, setFolders] = useState<FolderItem[]>([]);
   const [files, setFiles] = useState<FileItem[]>([]);
   const [filteredFolders, setFilteredFolders] = useState<FolderItem[]>([]);
@@ -31,7 +32,9 @@ const FileManager: React.FC<FileManagerProps> = ({ projectId }) => {
   const [selectedCategory, setSelectedCategory] = useState<FileCategory>('project-documents');
   const [currentPath, setCurrentPath] = useState<string>('');
   const { toast } = useToast();
-  const { hasWritePermission, loading: permissionsLoading } = useProjectPermissions(projectId);
+  // Use passed permission or fall back to hook-based check
+  const { hasWritePermission: hookWritePermission, loading: permissionsLoading } = useProjectPermissions(projectId);
+  const effectiveWritePermission = hasWritePermission || hookWritePermission;
 
   const loadFolderContents = async () => {
     try {
@@ -94,9 +97,9 @@ const FileManager: React.FC<FileManagerProps> = ({ projectId }) => {
   return (
     <div className="space-y-6">
       <Tabs defaultValue="browse" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className={`grid w-full ${effectiveWritePermission ? 'grid-cols-2' : 'grid-cols-1'}`}>
           <TabsTrigger value="browse">Browse Files</TabsTrigger>
-          <TabsTrigger value="upload">Upload Files</TabsTrigger>
+          {effectiveWritePermission && <TabsTrigger value="upload">Upload Files</TabsTrigger>}
         </TabsList>
         
         <TabsContent value="browse" className="space-y-4">
@@ -145,19 +148,21 @@ const FileManager: React.FC<FileManagerProps> = ({ projectId }) => {
               files={filteredFiles} 
               onNavigate={handleNavigate}
               onContentChanged={handleContentChanged}
-              hasWritePermission={hasWritePermission}
+              hasWritePermission={effectiveWritePermission}
             />
           )}
         </TabsContent>
         
-        <TabsContent value="upload">
-          <FileUploadDropzone
-            projectId={projectId}
-            category={selectedCategory}
-            currentPath={currentPath}
-            onUploadComplete={handleUploadComplete}
-          />
-        </TabsContent>
+        {effectiveWritePermission && (
+          <TabsContent value="upload">
+            <FileUploadDropzone
+              projectId={projectId}
+              category={selectedCategory}
+              currentPath={currentPath}
+              onUploadComplete={handleUploadComplete}
+            />
+          </TabsContent>
+        )}
       </Tabs>
     </div>
   );

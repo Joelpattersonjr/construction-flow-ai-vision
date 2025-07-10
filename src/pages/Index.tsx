@@ -71,7 +71,7 @@ const Index = () => {
                 variant="outline"
                 onClick={() => navigate('/files')}
               >
-                View Documents
+                Manage Files
               </Button>
             </CardContent>
           </Card>
