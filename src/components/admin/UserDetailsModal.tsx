@@ -327,7 +327,7 @@ export const UserDetailsModal: React.FC<UserDetailsModalProps> = ({
           </div>
 
           {/* Custom Fields */}
-          {customFields.length > 0 && (
+          {(customFields.length > 0 || isEditing) && (
             <div className="border-t pt-4">
               <h4 className="text-sm font-medium text-muted-foreground mb-4">Additional Information</h4>
               <div className="space-y-4">
