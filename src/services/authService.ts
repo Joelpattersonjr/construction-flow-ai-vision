@@ -7,16 +7,85 @@ export const useAuthActions = () => {
 
   const signIn = async (email: string, password: string) => {
     try {
+      // First check if account is locked
+      const { data: isLocked } = await supabase.rpc('is_account_locked', { 
+        user_email: email 
+      });
+
+      if (isLocked) {
+        // Get lockout details
+        const { data: lockoutInfo } = await supabase
+          .from('account_lockouts')
+          .select('unlock_at, lockout_count')
+          .eq('email', email)
+          .single();
+
+        if (lockoutInfo) {
+          const unlockTime = new Date(lockoutInfo.unlock_at);
+          const now = new Date();
+          const timeRemaining = Math.ceil((unlockTime.getTime() - now.getTime()) / 1000);
+          
+          if (timeRemaining > 0) {
+            const minutes = Math.floor(timeRemaining / 60);
+            const seconds = timeRemaining % 60;
+            const timeString = minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`;
+            
+            toast({
+              title: "Account Locked",
+              description: `Too many failed attempts. Try again in ${timeString}.`,
+              variant: "destructive",
+            });
+            return { error: { message: 'Account locked' } };
+          }
+        }
+      }
+
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
       
       if (error) {
-        toast({
-          title: "Error signing in",
-          description: error.message,
-          variant: "destructive",
+        // Handle failed login attempt
+        const { data: lockoutResult } = await supabase.rpc('handle_failed_login', {
+          user_email: email,
+          user_ip: null, // Could be enhanced to capture real IP
+          user_agent_string: navigator.userAgent
+        });
+
+        const result = lockoutResult as any;
+        if (result?.locked) {
+          const unlockTime = new Date(result.unlock_at);
+          const now = new Date();
+          const timeRemaining = Math.ceil((unlockTime.getTime() - now.getTime()) / 1000);
+          const minutes = Math.floor(timeRemaining / 60);
+          const seconds = timeRemaining % 60;
+          const timeString = minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`;
+          
+          toast({
+            title: "Account Locked",
+            description: `Too many failed attempts. Account locked for ${timeString}.`,
+            variant: "destructive",
+          });
+        } else if (result?.remaining_attempts) {
+          toast({
+            title: "Invalid credentials",
+            description: `${result.remaining_attempts} attempts remaining before account lockout.`,
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Error signing in",
+            description: error.message,
+            variant: "destructive",
+          });
+        }
+      } else {
+        // Handle successful login
+        await supabase.rpc('handle_successful_login', {
+          user_email: email,
+          user_ip: null,
+          user_agent_string: navigator.userAgent
         });
       }
       

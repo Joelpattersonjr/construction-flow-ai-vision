@@ -1,12 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/contexts/AuthContext';
-import { User, Edit, Save, X } from 'lucide-react';
+import { User, Edit, Save, X, Shield } from 'lucide-react';
 import { UserDetailsBadge } from './user-details/UserDetailsBadge';
 import { UserDetailsForm } from './user-details/UserDetailsForm';
 import { CustomFieldRenderer } from './user-details/CustomFieldRenderer';
+import { PasswordResetDialog } from './PasswordResetDialog';
 import { useUserDetailsModal } from '@/hooks/useUserDetailsModal';
 import { TeamMember } from '@/types/admin';
 
@@ -39,6 +40,8 @@ export const UserDetailsModal: React.FC<UserDetailsModalProps> = ({
     handleSave,
     handleCustomFieldChange,
   } = useUserDetailsModal(member, isOpen, onRefresh);
+
+  const [passwordResetOpen, setPasswordResetOpen] = useState(false);
 
   if (!member) return null;
 
@@ -132,8 +135,40 @@ export const UserDetailsModal: React.FC<UserDetailsModalProps> = ({
               </p>
             </div>
           )}
+
+          {/* Security Actions - Only for admins */}
+          {profile?.company_role === 'company_admin' && !isEditing && (
+            <div className="border-t pt-4">
+              <h4 className="text-sm font-medium text-muted-foreground mb-4">Security Actions</h4>
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setPasswordResetOpen(true)}
+                  className="flex items-center gap-2"
+                >
+                  <Shield className="h-4 w-4" />
+                  Reset Password
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground mt-2">
+                Reset the user's password and unlock their account if locked
+              </p>
+            </div>
+          )}
         </div>
       </DialogContent>
+
+      <PasswordResetDialog
+        isOpen={passwordResetOpen}
+        onOpenChange={setPasswordResetOpen}
+        user={member && profile?.company_id ? {
+          id: member.id,
+          email: member.email || '',
+          full_name: member.full_name || '',
+          company_id: profile.company_id
+        } : null}
+      />
     </Dialog>
   );
 };

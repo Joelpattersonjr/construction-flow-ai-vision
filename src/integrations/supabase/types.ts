@@ -14,6 +14,66 @@ export type Database = {
   }
   public: {
     Tables: {
+      account_lockouts: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          locked_at: string
+          lockout_count: number
+          unlock_at: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          locked_at?: string
+          lockout_count?: number
+          unlock_at: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          locked_at?: string
+          lockout_count?: number
+          unlock_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      admin_password_resets: {
+        Row: {
+          created_at: string
+          created_by: string
+          expires_at: string
+          id: string
+          temporary_password: string
+          used_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          expires_at?: string
+          id?: string
+          temporary_password: string
+          used_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          expires_at?: string
+          id?: string
+          temporary_password?: string
+          used_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       audit_log: {
         Row: {
           action_type: string
@@ -379,6 +439,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      login_attempts: {
+        Row: {
+          attempted_at: string
+          email: string
+          id: string
+          ip_address: string | null
+          success: boolean
+          user_agent: string | null
+        }
+        Insert: {
+          attempted_at?: string
+          email: string
+          id?: string
+          ip_address?: string | null
+          success?: boolean
+          user_agent?: string | null
+        }
+        Update: {
+          attempted_at?: string
+          email?: string
+          id?: string
+          ip_address?: string | null
+          success?: boolean
+          user_agent?: string | null
+        }
+        Relationships: []
       }
       permission_templates: {
         Row: {
@@ -775,6 +862,10 @@ export type Database = {
         Args: { company_id_param: number }
         Returns: boolean
       }
+      calculate_lockout_duration: {
+        Args: { lockout_count: number }
+        Returns: unknown
+      }
       cleanup_expired_locks: {
         Args: Record<PropertyKey, never>
         Returns: undefined
@@ -804,6 +895,10 @@ export type Database = {
           access_granted: boolean
         }[]
       }
+      generate_temporary_password: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       get_company_name: {
         Args: { company_id_param: number }
         Returns: string
@@ -824,8 +919,28 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      handle_failed_login: {
+        Args: {
+          user_email: string
+          user_ip?: string
+          user_agent_string?: string
+        }
+        Returns: Json
+      }
+      handle_successful_login: {
+        Args: {
+          user_email: string
+          user_ip?: string
+          user_agent_string?: string
+        }
+        Returns: undefined
+      }
       has_subscription_feature: {
         Args: { feature_name: string }
+        Returns: boolean
+      }
+      is_account_locked: {
+        Args: { user_email: string }
         Returns: boolean
       }
       is_company_admin: {

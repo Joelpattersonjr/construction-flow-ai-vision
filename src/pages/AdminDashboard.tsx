@@ -15,6 +15,7 @@ import { TeamMembersTable } from '@/components/admin/TeamMembersTable';
 import { PendingInvitationsTable } from '@/components/admin/PendingInvitationsTable';
 import AdminProjectsTable from '@/components/admin/AdminProjectsTable';
 import { CustomFieldsManager } from '@/components/admin/CustomFieldsManager';
+import { LockedAccountsTable } from '@/components/admin/LockedAccountsTable';
 import { ArrowLeft } from 'lucide-react';
 
 const AdminDashboard = () => {
@@ -278,11 +279,12 @@ const AdminDashboard = () => {
 
         {/* Main Content Tabs */}
         <Tabs defaultValue="team" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="team">Team Members</TabsTrigger>
             <TabsTrigger value="invitations">Pending Invitations</TabsTrigger>
             <TabsTrigger value="projects">Projects</TabsTrigger>
             <TabsTrigger value="custom-fields">Custom Fields</TabsTrigger>
+            <TabsTrigger value="security">Security</TabsTrigger>
           </TabsList>
 
           <TabsContent value="team" className="space-y-4">
@@ -340,6 +342,10 @@ const AdminDashboard = () => {
 
           <TabsContent value="custom-fields" className="space-y-4">
             <CustomFieldsManager />
+          </TabsContent>
+
+          <TabsContent value="security" className="space-y-4">
+            <LockedAccountsTable />
           </TabsContent>
         </Tabs>
       </main>
