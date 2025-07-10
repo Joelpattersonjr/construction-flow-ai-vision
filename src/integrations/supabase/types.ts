@@ -108,6 +108,53 @@ export type Database = {
         }
         Relationships: []
       }
+      company_custom_fields: {
+        Row: {
+          company_id: number
+          created_at: string
+          display_order: number
+          field_label: string
+          field_name: string
+          field_options: Json | null
+          field_type: string
+          id: string
+          is_required: boolean
+          updated_at: string
+        }
+        Insert: {
+          company_id: number
+          created_at?: string
+          display_order?: number
+          field_label: string
+          field_name: string
+          field_options?: Json | null
+          field_type?: string
+          id?: string
+          is_required?: boolean
+          updated_at?: string
+        }
+        Update: {
+          company_id?: number
+          created_at?: string
+          display_order?: number
+          field_label?: string
+          field_name?: string
+          field_options?: Json | null
+          field_type?: string
+          id?: string
+          is_required?: boolean
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_custom_fields_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       documents: {
         Row: {
           category: string | null
@@ -391,6 +438,7 @@ export type Database = {
         Row: {
           company_id: number | null
           company_role: string | null
+          custom_fields: Json | null
           full_name: string | null
           id: string
           job_title: string | null
@@ -399,6 +447,7 @@ export type Database = {
         Insert: {
           company_id?: number | null
           company_role?: string | null
+          custom_fields?: Json | null
           full_name?: string | null
           id?: string
           job_title?: string | null
@@ -407,6 +456,7 @@ export type Database = {
         Update: {
           company_id?: number | null
           company_role?: string | null
+          custom_fields?: Json | null
           full_name?: string | null
           id?: string
           job_title?: string | null

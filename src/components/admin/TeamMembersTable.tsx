@@ -17,6 +17,7 @@ interface TeamMember {
   job_title: string;
   company_role: 'company_admin' | 'company_member';
   updated_at: string;
+  custom_fields?: Record<string, any>;
 }
 
 interface TeamMembersTableProps {
@@ -336,6 +337,7 @@ export const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
          isOpen={isDetailsModalOpen}
          onClose={() => setIsDetailsModalOpen(false)}
          userEmail="Email not available"
+         onRefresh={onRefresh}
        />
      </>
    );

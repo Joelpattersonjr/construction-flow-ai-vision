@@ -14,6 +14,7 @@ import { InviteUserDialog } from '@/components/admin/InviteUserDialog';
 import { TeamMembersTable } from '@/components/admin/TeamMembersTable';
 import { PendingInvitationsTable } from '@/components/admin/PendingInvitationsTable';
 import AdminProjectsTable from '@/components/admin/AdminProjectsTable';
+import { CustomFieldsManager } from '@/components/admin/CustomFieldsManager';
 import { ArrowLeft } from 'lucide-react';
 
 const AdminDashboard = () => {
@@ -41,10 +42,10 @@ const AdminDashboard = () => {
     try {
       setLoading(true);
 
-      // Fetch team members
+      // Fetch team members with custom fields
       const { data: members, error: membersError } = await supabase
         .from('profiles')
-        .select('id, full_name, job_title, company_role, updated_at')
+        .select('id, full_name, job_title, company_role, updated_at, custom_fields')
         .eq('company_id', profile.company_id);
 
       if (membersError) throw membersError;
@@ -277,10 +278,11 @@ const AdminDashboard = () => {
 
         {/* Main Content Tabs */}
         <Tabs defaultValue="team" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="team">Team Members</TabsTrigger>
             <TabsTrigger value="invitations">Pending Invitations</TabsTrigger>
             <TabsTrigger value="projects">Projects</TabsTrigger>
+            <TabsTrigger value="custom-fields">Custom Fields</TabsTrigger>
           </TabsList>
 
           <TabsContent value="team" className="space-y-4">
@@ -334,6 +336,10 @@ const AdminDashboard = () => {
                 />
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="custom-fields" className="space-y-4">
+            <CustomFieldsManager />
           </TabsContent>
         </Tabs>
       </main>
