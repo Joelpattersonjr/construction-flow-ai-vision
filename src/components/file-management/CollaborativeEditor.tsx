@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { useCollaborativeEditor } from '@/hooks/useCollaborativeEditor';
+import { useSubscription } from '@/hooks/useSubscription';
+import { FeatureGate } from '@/components/subscription/FeatureGate';
 import { 
   Save, 
   Users, 
@@ -11,7 +13,8 @@ import {
   Tag, 
   AlertCircle,
   Clock,
-  CheckCircle
+  CheckCircle,
+  Crown
 } from 'lucide-react';
 import {
   Dialog,
@@ -35,6 +38,7 @@ interface CollaborativeEditorProps {
 }
 
 export const CollaborativeEditor = ({ documentId, fileName, onClose }: CollaborativeEditorProps) => {
+  const { isFeatureEnabled, checkVersionLimit, checkCollaboratorLimit } = useSubscription();
   const {
     content,
     setContent,
@@ -50,6 +54,8 @@ export const CollaborativeEditor = ({ documentId, fileName, onClose }: Collabora
   const [showVersionHistory, setShowVersionHistory] = useState(false);
   const [showCreateVersion, setShowCreateVersion] = useState(false);
   const [versionDescription, setVersionDescription] = useState('');
+  const [versionLimitReached, setVersionLimitReached] = useState(false);
+  const [collaboratorLimitReached, setCollaboratorLimitReached] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -60,11 +66,31 @@ export const CollaborativeEditor = ({ documentId, fileName, onClose }: Collabora
 
   const handleCreateVersion = async () => {
     if (versionDescription.trim()) {
+      // Check version limit before creating
+      const versionCheck = await checkVersionLimit(documentId);
+      if (!versionCheck.allowed) {
+        setVersionLimitReached(true);
+        return;
+      }
+      
       await createManualVersion(versionDescription.trim());
       setVersionDescription('');
       setShowCreateVersion(false);
     }
   };
+
+  // Check limits on component mount
+  useEffect(() => {
+    const checkLimits = async () => {
+      const versionCheck = await checkVersionLimit(documentId);
+      const collaboratorCheck = await checkCollaboratorLimit(documentId);
+      
+      setVersionLimitReached(!versionCheck.allowed);
+      setCollaboratorLimitReached(!collaboratorCheck.allowed);
+    };
+    
+    checkLimits();
+  }, [documentId, checkVersionLimit, checkCollaboratorLimit]);
 
   const getUserInitials = (userName: string) => {
     return userName
@@ -74,6 +100,10 @@ export const CollaborativeEditor = ({ documentId, fileName, onClose }: Collabora
       .toUpperCase()
       .slice(0, 2);
   };
+
+  // Check if version control features are enabled
+  const hasVersionControl = isFeatureEnabled('version_control');
+  const hasCollaboration = isFeatureEnabled('collaboration');
 
   if (isLoading) {
     return (
@@ -85,6 +115,33 @@ export const CollaborativeEditor = ({ documentId, fileName, onClose }: Collabora
           </div>
         </CardContent>
       </Card>
+    );
+  }
+
+  // If collaboration is not enabled, show basic editor with upgrade prompt
+  if (!hasCollaboration) {
+    return (
+      <div className="h-full flex flex-col">
+        <Card className="mb-4">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-2">
+              <span>{fileName}</span>
+              <Badge variant="outline" className="text-orange-600 border-orange-600">
+                <Crown className="h-3 w-3 mr-1" />
+                Basic Mode
+              </Badge>
+            </CardTitle>
+          </CardHeader>
+        </Card>
+
+        <FeatureGate
+          feature="collaboration"
+          upgradeMessage="Real-time collaborative editing requires a Pro or Enterprise subscription. Upgrade to edit files with your team simultaneously."
+        >
+          {/* This won't be shown due to the gate */}
+          <div />
+        </FeatureGate>
+      </div>
     );
   }
 
@@ -131,9 +188,14 @@ export const CollaborativeEditor = ({ documentId, fileName, onClose }: Collabora
 
               <Dialog open={showCreateVersion} onOpenChange={setShowCreateVersion}>
                 <DialogTrigger asChild>
-                  <Button variant="outline" size="sm">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    disabled={!hasVersionControl || versionLimitReached}
+                  >
                     <Tag className="h-4 w-4 mr-1" />
                     Create Version
+                    {!hasVersionControl && <Crown className="h-3 w-3 ml-1" />}
                   </Button>
                 </DialogTrigger>
                 <DialogContent>
@@ -165,9 +227,15 @@ export const CollaborativeEditor = ({ documentId, fileName, onClose }: Collabora
                 </DialogContent>
               </Dialog>
 
-              <Button variant="outline" size="sm" onClick={() => setShowVersionHistory(true)}>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => setShowVersionHistory(true)}
+                disabled={!hasVersionControl}
+              >
                 <History className="h-4 w-4 mr-1" />
                 History
+                {!hasVersionControl && <Crown className="h-3 w-3 ml-1" />}
               </Button>
 
               {onClose && (
@@ -178,7 +246,7 @@ export const CollaborativeEditor = ({ documentId, fileName, onClose }: Collabora
             </div>
           </div>
 
-          {/* Active users */}
+          {/* Active users - show warning if collaboration limit reached */}
           {activeUsers.length > 0 && (
             <>
               <Separator />
@@ -186,6 +254,12 @@ export const CollaborativeEditor = ({ documentId, fileName, onClose }: Collabora
                 <div className="flex items-center gap-1 text-sm text-muted-foreground">
                   <Users className="h-4 w-4" />
                   <span>{activeUsers.length} active {activeUsers.length === 1 ? 'user' : 'users'}</span>
+                  {collaboratorLimitReached && (
+                    <Badge variant="outline" className="text-orange-600 border-orange-600 ml-2">
+                      <Crown className="h-3 w-3 mr-1" />
+                      Limit reached
+                    </Badge>
+                  )}
                 </div>
                 <div className="flex items-center gap-2">
                   {activeUsers.map((user) => (
@@ -222,17 +296,37 @@ export const CollaborativeEditor = ({ documentId, fileName, onClose }: Collabora
         </CardContent>
       </Card>
 
-      {/* Version History Dialog */}
-      <FileVersionHistory
-        documentId={documentId}
-        fileName={fileName}
-        isOpen={showVersionHistory}
-        onClose={() => setShowVersionHistory(false)}
-        onVersionRestore={() => {
-          // Refresh editor content after version restore
-          window.location.reload();
-        }}
-      />
+      {/* Version History Dialog - wrapped in feature gate */}
+      {hasVersionControl ? (
+        <FileVersionHistory
+          documentId={documentId}
+          fileName={fileName}
+          isOpen={showVersionHistory}
+          onClose={() => setShowVersionHistory(false)}
+          onVersionRestore={() => {
+            // Refresh editor content after version restore
+            window.location.reload();
+          }}
+        />
+      ) : (
+        showVersionHistory && (
+          <FeatureGate
+            feature="version_control"
+            upgradeMessage="Version history and rollback capabilities require a Pro or Enterprise subscription."
+          >
+            <div />
+          </FeatureGate>
+        )
+      )}
+      {/* Show upgrade prompts if limits are reached */}
+      {versionLimitReached && (
+        <FeatureGate
+          feature="version_control"
+          upgradeMessage="You've reached the version limit for your current plan. Upgrade to create more versions."
+        >
+          <div />
+        </FeatureGate>
+      )}
     </div>
   );
 };

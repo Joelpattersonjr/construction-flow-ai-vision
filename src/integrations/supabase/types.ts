@@ -78,6 +78,10 @@ export type Database = {
           id: number
           name: string | null
           owner_id: string | null
+          subscription_expires_at: string | null
+          subscription_features: Json | null
+          subscription_status: string | null
+          subscription_tier: string | null
           updated_at: string | null
         }
         Insert: {
@@ -85,6 +89,10 @@ export type Database = {
           id?: number
           name?: string | null
           owner_id?: string | null
+          subscription_expires_at?: string | null
+          subscription_features?: Json | null
+          subscription_status?: string | null
+          subscription_tier?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -92,6 +100,10 @@ export type Database = {
           id?: number
           name?: string | null
           owner_id?: string | null
+          subscription_expires_at?: string | null
+          subscription_features?: Json | null
+          subscription_status?: string | null
+          subscription_tier?: string | null
           updated_at?: string | null
         }
         Relationships: []
@@ -747,9 +759,21 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: number
       }
+      get_subscription_limits: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
       get_user_company_from_jwt: {
         Args: Record<PropertyKey, never>
         Returns: number
+      }
+      get_user_subscription_tier: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      has_subscription_feature: {
+        Args: { feature_name: string }
+        Returns: boolean
       }
       is_company_admin: {
         Args: { company_id_param: number }

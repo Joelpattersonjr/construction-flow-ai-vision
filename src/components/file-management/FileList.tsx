@@ -3,11 +3,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { File, Download, Trash2, Image, FileText, Archive } from 'lucide-react';
+import { File, Download, Trash2, Image, FileText, Archive, Crown } from 'lucide-react';
 import { DocumentRecord, FileService, FileCategory } from '@/services/file';
 import { useToast } from '@/hooks/use-toast';
 import { formatDistanceToNow } from 'date-fns';
 import { FileEditDialog } from './FileEditDialog';
+import { useSubscription } from '@/hooks/useSubscription';
+import { UpgradeDialog } from '@/components/subscription/UpgradeDialog';
 
 interface FileListProps {
   files: DocumentRecord[];
@@ -73,7 +75,9 @@ const isTextFile = (fileType: string | null): boolean => {
 const FileList: React.FC<FileListProps> = ({ files, onFileDeleted }) => {
   const [deletingFile, setDeletingFile] = useState<number | null>(null);
   const [editFile, setEditFile] = useState<DocumentRecord | null>(null);
+  const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
   const { toast } = useToast();
+  const { isFeatureEnabled } = useSubscription();
 
   const handleDownload = async (file: DocumentRecord) => {
     try {
@@ -95,6 +99,17 @@ const FileList: React.FC<FileListProps> = ({ files, onFileDeleted }) => {
         variant: "destructive",
       });
     }
+  };
+
+  const handleEdit = (file: DocumentRecord) => {
+    const hasCollaboration = isFeatureEnabled('collaboration');
+    
+    if (!hasCollaboration) {
+      setShowUpgradeDialog(true);
+      return;
+    }
+    
+    setEditFile(file);
   };
 
   const handleDelete = async (file: DocumentRecord) => {
@@ -183,9 +198,10 @@ const FileList: React.FC<FileListProps> = ({ files, onFileDeleted }) => {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => setEditFile(file)}
+                      onClick={() => handleEdit(file)}
                     >
                       Edit
+                      {!isFeatureEnabled('collaboration') && <Crown className="h-3 w-3 ml-1" />}
                     </Button>
                   )}
                   
@@ -234,6 +250,14 @@ const FileList: React.FC<FileListProps> = ({ files, onFileDeleted }) => {
         fileName={editFile?.file_name || ''}
         isOpen={!!editFile}
         onClose={() => setEditFile(null)}
+      />
+
+      <UpgradeDialog
+        isOpen={showUpgradeDialog}
+        onClose={() => setShowUpgradeDialog(false)}
+        feature="Real-time collaborative editing"
+        title="Upgrade to Edit Files"
+        description="File editing with real-time collaboration requires a Pro or Enterprise subscription."
       />
     </>
   );
