@@ -1,6 +1,7 @@
 export interface TeamMember {
   id: string;
   full_name: string;
+  email?: string;
   job_title: string;
   company_role: 'company_admin' | 'company_member';
   updated_at: string;

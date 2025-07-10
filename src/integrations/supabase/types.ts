@@ -439,6 +439,7 @@ export type Database = {
           company_id: number | null
           company_role: string | null
           custom_fields: Json | null
+          email: string | null
           full_name: string | null
           id: string
           job_title: string | null
@@ -448,6 +449,7 @@ export type Database = {
           company_id?: number | null
           company_role?: string | null
           custom_fields?: Json | null
+          email?: string | null
           full_name?: string | null
           id?: string
           job_title?: string | null
@@ -457,6 +459,7 @@ export type Database = {
           company_id?: number | null
           company_role?: string | null
           custom_fields?: Json | null
+          email?: string | null
           full_name?: string | null
           id?: string
           job_title?: string | null

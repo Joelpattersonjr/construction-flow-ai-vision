@@ -324,13 +324,12 @@ export const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
          </TableBody>
        </Table>
        
-       <UserDetailsModal
-         member={selectedMember}
-         isOpen={isDetailsModalOpen}
-         onClose={() => setIsDetailsModalOpen(false)}
-         userEmail="Email not available"
-         onRefresh={onRefresh}
-       />
+        <UserDetailsModal
+          member={selectedMember}
+          isOpen={isDetailsModalOpen}
+          onClose={() => setIsDetailsModalOpen(false)}
+          onRefresh={onRefresh}
+        />
      </>
    );
  };

@@ -17,6 +17,7 @@ export const useUserDetailsModal = (
   const [customFieldValues, setCustomFieldValues] = useState<Record<string, any>>({});
   const [loading, setLoading] = useState(false);
   const [editingName, setEditingName] = useState('');
+  const [editingEmail, setEditingEmail] = useState('');
   const [editingJobTitle, setEditingJobTitle] = useState('');
 
   useEffect(() => {
@@ -24,6 +25,7 @@ export const useUserDetailsModal = (
       fetchCustomFields();
       setCustomFieldValues(member.custom_fields || {});
       setEditingName(member.full_name || '');
+      setEditingEmail(member.email || '');
       setEditingJobTitle(member.job_title || '');
     }
   }, [member, isOpen, profile?.company_id]);
@@ -63,6 +65,10 @@ export const useUserDetailsModal = (
       
       if (editingName !== member.full_name) {
         updates.full_name = editingName;
+      }
+      
+      if (editingEmail !== member.email) {
+        updates.email = editingEmail;
       }
       
       if (editingJobTitle !== member.job_title) {
@@ -110,6 +116,8 @@ export const useUserDetailsModal = (
     loading,
     editingName,
     setEditingName,
+    editingEmail,
+    setEditingEmail,
     editingJobTitle,
     setEditingJobTitle,
     handleSave,

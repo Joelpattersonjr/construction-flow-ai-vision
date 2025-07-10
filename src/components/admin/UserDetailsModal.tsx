@@ -14,7 +14,6 @@ interface UserDetailsModalProps {
   member: TeamMember | null;
   isOpen: boolean;
   onClose: () => void;
-  userEmail?: string;
   onRefresh?: () => void;
 }
 
@@ -22,7 +21,6 @@ export const UserDetailsModal: React.FC<UserDetailsModalProps> = ({
   member,
   isOpen,
   onClose,
-  userEmail,
   onRefresh
 }) => {
   const { profile } = useAuth();
@@ -34,6 +32,8 @@ export const UserDetailsModal: React.FC<UserDetailsModalProps> = ({
     loading,
     editingName,
     setEditingName,
+    editingEmail,
+    setEditingEmail,
     editingJobTitle,
     setEditingJobTitle,
     handleSave,
@@ -98,11 +98,12 @@ export const UserDetailsModal: React.FC<UserDetailsModalProps> = ({
           {/* Standard Details */}
           <UserDetailsForm
             member={member}
-            userEmail={userEmail}
             isEditing={isEditing}
             editingName={editingName}
+            editingEmail={editingEmail}
             editingJobTitle={editingJobTitle}
             onNameChange={setEditingName}
+            onEmailChange={setEditingEmail}
             onJobTitleChange={setEditingJobTitle}
           />
 
