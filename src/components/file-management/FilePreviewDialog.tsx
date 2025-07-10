@@ -79,6 +79,15 @@ const FilePreviewDialog: React.FC<FilePreviewDialogProps> = ({
   const isImage = file?.file_type?.startsWith('image/');
   const isText = file?.file_type?.startsWith('text/') || file?.file_type === 'application/json';
   const isPdf = file?.file_type === 'application/pdf';
+  
+  // Check if file can be previewed with iframe (PDFs, Office docs, etc.)
+  const canPreviewWithIframe = isPdf || 
+    file?.file_type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
+    file?.file_type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
+    file?.file_type === 'application/vnd.openxmlformats-officedocument.presentationml.presentation' ||
+    file?.file_type === 'application/msword' ||
+    file?.file_type === 'application/vnd.ms-excel' ||
+    file?.file_type === 'application/vnd.ms-powerpoint';
 
   if (!file) return null;
 
@@ -117,12 +126,12 @@ const FilePreviewDialog: React.FC<FilePreviewDialogProps> = ({
                 </div>
               )}
 
-              {isPdf && (
+              {canPreviewWithIframe && !isImage && (
                 <div className="h-[60vh]">
                   <iframe
                     src={previewUrl}
                     className="w-full h-full border rounded"
-                    title="PDF Preview"
+                    title="Document Preview"
                   />
                 </div>
               )}
@@ -137,7 +146,7 @@ const FilePreviewDialog: React.FC<FilePreviewDialogProps> = ({
                 </div>
               )}
 
-              {!isImage && !isPdf && !isText && (
+              {!isImage && !canPreviewWithIframe && !isText && (
                 <div className="text-center py-8">
                   <FileText className="h-16 w-16 mx-auto text-gray-400 mb-4" />
                   <p className="text-gray-600">Preview not available for this file type</p>
