@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { File, Download, Trash2, Image, FileText, Archive, Edit2, FolderInput } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
@@ -191,15 +190,13 @@ const FileItemComponent: React.FC<FileItemProps> = ({
 
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <AlertDialogTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setIsDeleteOpen(true)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </AlertDialogTrigger>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsDeleteOpen(true)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>Delete file</p>

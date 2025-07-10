@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Folder, FolderOpen, Edit2, Trash2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
@@ -103,15 +102,13 @@ const FolderItemComponent: React.FC<FolderItemProps> = ({
 
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <AlertDialogTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setIsDeleteOpen(true)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </AlertDialogTrigger>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsDeleteOpen(true)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>Delete folder</p>
