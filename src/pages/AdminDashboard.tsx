@@ -45,7 +45,7 @@ const AdminDashboard = () => {
       // Fetch team members with custom fields
       const { data: members, error: membersError } = await supabase
         .from('profiles')
-        .select('id, full_name, job_title, company_role, updated_at, custom_fields')
+        .select('id, full_name, email, job_title, company_role, updated_at, custom_fields')
         .eq('company_id', profile.company_id);
 
       if (membersError) throw membersError;
