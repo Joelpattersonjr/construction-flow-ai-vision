@@ -80,14 +80,16 @@ const FilePreviewDialog: React.FC<FilePreviewDialogProps> = ({
   const isText = file?.file_type?.startsWith('text/') || file?.file_type === 'application/json';
   const isPdf = file?.file_type === 'application/pdf';
   
-  // Check if file can be previewed with iframe (PDFs, Office docs, etc.)
-  const canPreviewWithIframe = isPdf || 
-    file?.file_type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
+  // Office documents need special handling
+  const isOfficeDoc = file?.file_type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
     file?.file_type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
     file?.file_type === 'application/vnd.openxmlformats-officedocument.presentationml.presentation' ||
     file?.file_type === 'application/msword' ||
     file?.file_type === 'application/vnd.ms-excel' ||
     file?.file_type === 'application/vnd.ms-powerpoint';
+  
+  // Only PDFs can be reliably previewed in iframes
+  const canPreviewWithIframe = isPdf;
 
   if (!file) return null;
 
@@ -126,13 +128,30 @@ const FilePreviewDialog: React.FC<FilePreviewDialogProps> = ({
                 </div>
               )}
 
-              {canPreviewWithIframe && !isImage && (
+              {canPreviewWithIframe && (
                 <div className="h-[60vh]">
                   <iframe
                     src={previewUrl}
                     className="w-full h-full border rounded"
                     title="Document Preview"
                   />
+                </div>
+              )}
+
+              {isOfficeDoc && (
+                <div className="text-center py-8">
+                  <FileText className="h-16 w-16 mx-auto text-gray-400 mb-4" />
+                  <p className="text-gray-600 mb-4">Office Document Preview</p>
+                  <p className="text-sm text-gray-500 mb-4">
+                    {file.file_name}
+                  </p>
+                  <p className="text-xs text-gray-400 mb-4">
+                    Preview not available for Office documents. Use the download button to view the file.
+                  </p>
+                  <Button onClick={handleDownload} className="mt-2">
+                    <Download className="h-4 w-4 mr-2" />
+                    Download to View
+                  </Button>
                 </div>
               )}
 
@@ -146,7 +165,7 @@ const FilePreviewDialog: React.FC<FilePreviewDialogProps> = ({
                 </div>
               )}
 
-              {!isImage && !canPreviewWithIframe && !isText && (
+              {!isImage && !canPreviewWithIframe && !isText && !isOfficeDoc && (
                 <div className="text-center py-8">
                   <FileText className="h-16 w-16 mx-auto text-gray-400 mb-4" />
                   <p className="text-gray-600">Preview not available for this file type</p>
