@@ -1,17 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { File, Download, Trash2, Image, FileText, Archive, Folder, FolderOpen, Edit2, Check, X, FolderInput } from 'lucide-react';
-import { FileService, FileCategory, FolderItem, FileItem } from '@/services/file';
-import { useToast } from '@/hooks/use-toast';
-import { formatDistanceToNow } from 'date-fns';
+import { TooltipProvider } from '@/components/ui/tooltip';
+import { Folder, FolderOpen } from 'lucide-react';
+import { FileCategory, FolderItem, FileItem } from '@/services/file';
 import Breadcrumbs from './Breadcrumbs';
 import CreateFolderDialog from './CreateFolderDialog';
-import MoveFileDialog from './MoveFileDialog';
+import FolderItemComponent from './FolderItem';
+import FileItemComponent from './FileItem';
 
 interface FolderFileListProps {
   projectId: string;
@@ -20,49 +15,9 @@ interface FolderFileListProps {
   folders: FolderItem[];
   files: FileItem[];
   onNavigate: (path: string) => void;
-  onContentChanged: () => void;
+  onContentsChanged: () => void;
   hasWritePermission: boolean;
 }
-
-const getFileIcon = (fileType: string | null) => {
-  if (!fileType) return <File className="h-4 w-4" />;
-  
-  if (fileType.startsWith('image/')) {
-    return <Image className="h-4 w-4 text-blue-500" />;
-  }
-  
-  if (fileType === 'application/pdf' || fileType.includes('document')) {
-    return <FileText className="h-4 w-4 text-red-500" />;
-  }
-  
-  if (fileType.includes('zip') || fileType.includes('rar') || fileType.includes('archive')) {
-    return <Archive className="h-4 w-4 text-orange-500" />;
-  }
-  
-  return <File className="h-4 w-4 text-gray-500" />;
-};
-
-const getCategoryColor = (category: string | null) => {
-  switch (category) {
-    case 'project-documents':
-      return 'bg-blue-100 text-blue-800';
-    case 'project-photos':
-      return 'bg-green-100 text-green-800';
-    case 'blueprints':
-      return 'bg-purple-100 text-purple-800';
-    case 'site-photos':
-      return 'bg-orange-100 text-orange-800';
-    default:
-      return 'bg-gray-100 text-gray-800';
-  }
-};
-
-const formatCategoryName = (category: string | null) => {
-  if (!category) return 'Unknown';
-  return category.split('-').map(word => 
-    word.charAt(0).toUpperCase() + word.slice(1)
-  ).join(' ');
-};
 
 const FolderFileList: React.FC<FolderFileListProps> = ({ 
   projectId,
@@ -71,177 +26,20 @@ const FolderFileList: React.FC<FolderFileListProps> = ({
   folders, 
   files, 
   onNavigate, 
-  onContentChanged,
+  onContentsChanged,
   hasWritePermission,
 }) => {
-  const [downloadingFiles, setDownloadingFiles] = useState<Set<number>>(new Set());
-  const [deletingItems, setDeletingItems] = useState<Set<string>>(new Set());
-  const [editingFile, setEditingFile] = useState<number | null>(null);
-  const [editingFileName, setEditingFileName] = useState('');
-  const [renamingFiles, setRenamingFiles] = useState<Set<number>>(new Set());
-  const { toast } = useToast();
-
-  const handleDownload = async (file: FileItem) => {
-    if (!file.storage_path || !file.category) return;
-    
-    setDownloadingFiles(prev => new Set(prev).add(file.id));
-    
-    try {
-      const url = await FileService.getFileUrl(file.category as FileCategory, file.storage_path);
-      
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = file.file_name || 'download';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-      toast({
-        title: "Download started",
-        description: `${file.file_name} is downloading...`,
-      });
-    } catch (error) {
-      toast({
-        title: "Download failed",
-        description: error instanceof Error ? error.message : "Failed to download file",
-        variant: "destructive",
-      });
-    } finally {
-      setDownloadingFiles(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(file.id);
-        return newSet;
-      });
-    }
-  };
-
-  const handleDeleteFile = async (file: FileItem) => {
-    if (!file.storage_path || !file.category) return;
-    
-    setDeletingItems(prev => new Set(prev).add(`file-${file.id}`));
-    
-    try {
-      await FileService.deleteFile(file.id, file.category as FileCategory, file.storage_path);
-      
-      toast({
-        title: "File deleted",
-        description: `${file.file_name} has been deleted successfully`,
-      });
-      
-      onContentChanged();
-    } catch (error) {
-      toast({
-        title: "Delete failed",
-        description: error instanceof Error ? error.message : "Failed to delete file",
-        variant: "destructive",
-      });
-    } finally {
-      setDeletingItems(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(`file-${file.id}`);
-        return newSet;
-      });
-    }
-  };
-
-  const handleDeleteFolder = async (folder: FolderItem) => {
-    setDeletingItems(prev => new Set(prev).add(`folder-${folder.path}`));
-    
-    try {
-      await FileService.deleteFolder(projectId, category, folder.path);
-      
-      toast({
-        title: "Folder deleted",
-        description: `${folder.name} and all its contents have been deleted successfully`,
-      });
-      
-      onContentChanged();
-    } catch (error) {
-      toast({
-        title: "Delete failed", 
-        description: error instanceof Error ? error.message : "Failed to delete folder",
-        variant: "destructive",
-      });
-    } finally {
-      setDeletingItems(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(`folder-${folder.path}`);
-        return newSet;
-      });
-    }
-  };
-
-  const handleFolderClick = (folder: FolderItem) => {
-    onNavigate(folder.path);
-  };
-
-  const handleStartEdit = (file: FileItem) => {
-    setEditingFile(file.id);
-    setEditingFileName(file.file_name || '');
-  };
-
-  const handleCancelEdit = () => {
-    setEditingFile(null);
-    setEditingFileName('');
-  };
-
-  const handleSaveEdit = async (file: FileItem) => {
-    if (!editingFileName.trim()) {
-      toast({
-        title: "Invalid file name",
-        description: "File name cannot be empty",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (editingFileName.trim() === file.file_name) {
-      handleCancelEdit();
-      return;
-    }
-
-    setRenamingFiles(prev => new Set(prev).add(file.id));
-
-    try {
-      await FileService.renameFile(file.id, editingFileName.trim());
-      
-      toast({
-        title: "File renamed",
-        description: `File renamed to "${editingFileName.trim()}" successfully`,
-      });
-      
-      handleCancelEdit();
-      onContentChanged();
-    } catch (error) {
-      toast({
-        title: "Rename failed",
-        description: error instanceof Error ? error.message : "Failed to rename file",
-        variant: "destructive",
-      });
-    } finally {
-      setRenamingFiles(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(file.id);
-        return newSet;
-      });
-    }
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent, file: FileItem) => {
-    if (e.key === 'Enter') {
-      handleSaveEdit(file);
-    } else if (e.key === 'Escape') {
-      handleCancelEdit();
-    }
+  const handleFolderClick = (folderPath: string) => {
+    onNavigate(folderPath);
   };
 
   if (folders.length === 0 && files.length === 0) {
     return (
       <Card>
         <CardContent className="p-8 text-center">
-          <Folder className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-sm font-semibold text-gray-900">No files or folders</h3>
-          <p className="mt-1 text-sm text-gray-500">
+          <Folder className="mx-auto h-12 w-12 text-muted-foreground" />
+          <h3 className="mt-2 text-sm font-semibold text-foreground">No files or folders</h3>
+          <p className="mt-1 text-sm text-muted-foreground">
             Create a folder or upload files to get started.
           </p>
           <div className="mt-4">
@@ -249,11 +47,11 @@ const FolderFileList: React.FC<FolderFileListProps> = ({
               projectId={projectId}
               category={category}
               currentPath={currentPath}
-              onFolderCreated={onContentChanged}
+              onFolderCreated={onContentsChanged}
               disabled={!hasWritePermission}
             />
             {!hasWritePermission && (
-              <p className="text-xs text-gray-500 mt-2">
+              <p className="text-xs text-muted-foreground mt-2">
                 You need write permissions to create folders
               </p>
             )}
@@ -279,250 +77,41 @@ const FolderFileList: React.FC<FolderFileListProps> = ({
               projectId={projectId}
               category={category}
               currentPath={currentPath}
-              onFolderCreated={onContentChanged}
+              onFolderCreated={onContentsChanged}
               disabled={!hasWritePermission}
             />
-            {!hasWritePermission && (
-              <p className="text-xs text-gray-500">
-                You need write permissions to manage folders
-              </p>
-            )}
           </div>
         </CardHeader>
-      <CardContent>
-        <div className="space-y-2">
-          {/* Folders */}
-          {folders.map((folder) => (
-            <div
-              key={folder.path}
-              className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer group"
-              onClick={() => handleFolderClick(folder)}
-            >
-              <div className="flex items-center space-x-3 flex-1 min-w-0">
-                <Folder className="h-5 w-5 text-blue-500" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate">
-                    {folder.name}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    Folder • {formatDistanceToNow(new Date(folder.created_at), { addSuffix: true })}
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                {hasWritePermission && (
-                  <AlertDialog>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <AlertDialogTrigger asChild>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={(e) => e.stopPropagation()}
-                            disabled={deletingItems.has(`folder-${folder.path}`)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </AlertDialogTrigger>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Delete folder</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Delete Folder</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        Are you sure you want to delete "{folder.name}" and all its contents? This action cannot be undone.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction
-                        onClick={() => handleDeleteFolder(folder)}
-                        className="bg-red-600 hover:bg-red-700"
-                      >
-                        Delete Folder
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-                )}
-              </div>
-            </div>
-          ))}
+        <CardContent>
+          <div className="space-y-2">
+            {/* Folders */}
+            {folders.map((folder) => (
+              <FolderItemComponent
+                key={folder.path}
+                folder={folder}
+                projectId={projectId}
+                category={category}
+                hasWritePermission={hasWritePermission}
+                onFolderClick={handleFolderClick}
+                onFolderDeleted={onContentsChanged}
+              />
+            ))}
 
-          {/* Files */}
-          {files.map((file) => (
-            <div
-              key={file.id}
-              className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 group"
-            >
-              <div className="flex items-center space-x-3 flex-1 min-w-0">
-                <div className="text-gray-500">
-                  {getFileIcon(file.file_type)}
-                </div>
-                
-                <div className="flex-1 min-w-0">
-                  {editingFile === file.id ? (
-                    // Editing mode
-                    <div className="flex items-center space-x-2">
-                      <Input
-                        value={editingFileName}
-                        onChange={(e) => setEditingFileName(e.target.value)}
-                        onKeyDown={(e) => handleKeyPress(e, file)}
-                        className="flex-1 text-sm font-medium"
-                        placeholder="Enter file name"
-                        autoFocus
-                        disabled={renamingFiles.has(file.id)}
-                      />
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleSaveEdit(file)}
-                        disabled={renamingFiles.has(file.id) || !editingFileName.trim()}
-                      >
-                        <Check className="h-4 w-4 text-green-600" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleCancelEdit}
-                        disabled={renamingFiles.has(file.id)}
-                      >
-                        <X className="h-4 w-4 text-red-600" />
-                      </Button>
-                    </div>
-                  ) : (
-                    // Display mode
-                    <div>
-                      <p className="text-sm font-medium text-gray-900 truncate">
-                        {file.file_name}
-                      </p>
-                      <div className="flex items-center space-x-2 mt-1">
-                        <Badge className={getCategoryColor(file.category)}>
-                          {formatCategoryName(file.category)}
-                        </Badge>
-                        {file.created_at && (
-                          <span className="text-xs text-gray-500">
-                            {formatDistanceToNow(new Date(file.created_at), { addSuffix: true })}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                {editingFile !== file.id && (
-                  <>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleDownload(file)}
-                          disabled={downloadingFiles.has(file.id)}
-                        >
-                          <Download className="h-4 w-4" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Download file</p>
-                      </TooltipContent>
-                    </Tooltip>
-                    
-                     {hasWritePermission && (
-                       <Tooltip>
-                         <TooltipTrigger asChild>
-                           <Button
-                             variant="outline"
-                             size="sm"
-                             onClick={() => handleStartEdit(file)}
-                             disabled={renamingFiles.has(file.id)}
-                             className="opacity-0 group-hover:opacity-100 transition-opacity"
-                           >
-                             <Edit2 className="h-4 w-4" />
-                           </Button>
-                         </TooltipTrigger>
-                         <TooltipContent>
-                           <p>Rename file</p>
-                         </TooltipContent>
-                       </Tooltip>
-                     )}
-                     
-                     {hasWritePermission && (
-                       <MoveFileDialog
-                         file={file}
-                         projectId={projectId}
-                         category={category}
-                         currentPath={currentPath}
-                         onFileMoved={onContentChanged}
-                       >
-                         <Tooltip>
-                           <TooltipTrigger asChild>
-                             <Button
-                               variant="outline"
-                               size="sm"
-                               className="opacity-0 group-hover:opacity-100 transition-opacity"
-                             >
-                               <FolderInput className="h-4 w-4" />
-                             </Button>
-                           </TooltipTrigger>
-                           <TooltipContent>
-                             <p>Move file</p>
-                           </TooltipContent>
-                         </Tooltip>
-                       </MoveFileDialog>
-                     )}
-                     
-                     {hasWritePermission && (
-                       <AlertDialog>
-                         <Tooltip>
-                           <TooltipTrigger asChild>
-                             <AlertDialogTrigger asChild>
-                               <Button
-                                 variant="outline"
-                                 size="sm"
-                                 disabled={deletingItems.has(`file-${file.id}`)}
-                               >
-                                 <Trash2 className="h-4 w-4" />
-                               </Button>
-                             </AlertDialogTrigger>
-                           </TooltipTrigger>
-                           <TooltipContent>
-                             <p>Delete file</p>
-                           </TooltipContent>
-                         </Tooltip>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Delete File</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Are you sure you want to delete "{file.file_name}"? This action cannot be undone.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => handleDeleteFile(file)}
-                              className="bg-red-600 hover:bg-red-700"
-                            >
-                              Delete
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    )}
-                  </>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+            {/* Files */}
+            {files.map((file) => (
+              <FileItemComponent
+                key={file.id}
+                file={file}
+                projectId={projectId}
+                category={category}
+                currentPath={currentPath}
+                hasWritePermission={hasWritePermission}
+                onFileDeleted={onContentsChanged}
+              />
+            ))}
+          </div>
+        </CardContent>
+      </Card>
     </TooltipProvider>
   );
 };

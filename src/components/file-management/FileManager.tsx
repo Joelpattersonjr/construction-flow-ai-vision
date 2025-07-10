@@ -147,7 +147,7 @@ const FileManager: React.FC<FileManagerProps> = ({ projectId, hasWritePermission
               folders={filteredFolders} 
               files={filteredFiles} 
               onNavigate={handleNavigate}
-              onContentChanged={handleContentChanged}
+              onContentsChanged={handleContentChanged}
               hasWritePermission={effectiveWritePermission}
             />
           )}
