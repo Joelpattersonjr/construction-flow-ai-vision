@@ -74,28 +74,60 @@ export class FileService {
    * Upload a file to Supabase Storage and create a database record
    */
   static async uploadFile({ file, projectId, category, folderPath = '' }: UploadFileParams): Promise<DocumentRecord> {
-    const fileExt = file.name.split('.').pop();
+    // Get current user first to ensure we have authentication
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) {
+      throw new Error('User not authenticated');
+    }
+
+    // Validate file
+    if (!file || file.size === 0) {
+      throw new Error('Invalid file');
+    }
+
+    // Check write permissions
+    const hasPermission = await this.hasWritePermission(projectId);
+    if (!hasPermission) {
+      throw new Error('You do not have permission to upload files to this project');
+    }
+
+    const fileExt = file.name.split('.').pop() || '';
     const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
     const basePath = folderPath ? `${projectId}/${folderPath}` : projectId;
     const filePath = `${basePath}/${fileName}`;
 
+    console.log('Uploading file:', {
+      fileName: file.name,
+      size: file.size,
+      type: file.type,
+      category,
+      filePath,
+      projectId
+    });
+
     // Upload to storage bucket
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from(category)
-      .upload(filePath, file);
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: false
+      });
 
     if (uploadError) {
+      console.error('Storage upload error:', uploadError);
       throw new Error(`Upload failed: ${uploadError.message}`);
     }
+
+    console.log('File uploaded to storage successfully:', uploadData);
 
     // Create database record
     const documentData: TablesInsert<'documents'> = {
       project_id: projectId,
       file_name: file.name,
-      file_type: file.type,
+      file_type: file.type || 'application/octet-stream',
       category: category,
       storage_path: uploadData.path,
-      uploader_id: (await supabase.auth.getUser()).data.user?.id
+      uploader_id: user.id
     };
 
     const { data: document, error: dbError } = await supabase
@@ -105,11 +137,13 @@ export class FileService {
       .single();
 
     if (dbError) {
+      console.error('Database insert error:', dbError);
       // Clean up uploaded file if database insert fails
       await supabase.storage.from(category).remove([filePath]);
       throw new Error(`Database insert failed: ${dbError.message}`);
     }
 
+    console.log('Document record created successfully:', document);
     return document;
   }
 

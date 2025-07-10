@@ -57,7 +57,15 @@ const FileUploadDropzone: React.FC<FileUploadDropzoneProps> = ({
   };
 
   const uploadFiles = async () => {
+    if (pendingFiles.length === 0) return;
+    
+    console.log(`Starting upload of ${pendingFiles.length} files`);
+    
+    let successCount = 0;
+    let failCount = 0;
+
     for (const file of pendingFiles) {
+      console.log(`Uploading file: ${file.name}`);
       const result = await uploadFile({
         file,
         projectId,
@@ -65,8 +73,14 @@ const FileUploadDropzone: React.FC<FileUploadDropzoneProps> = ({
         folderPath: currentPath,
       });
       
-      if (!result) break; // Stop if upload fails
+      if (result) {
+        successCount++;
+      } else {
+        failCount++;
+      }
     }
+    
+    console.log(`Upload complete: ${successCount} successful, ${failCount} failed`);
     
     setPendingFiles([]);
     onUploadComplete();
