@@ -36,9 +36,9 @@ export class FileService {
     return getProjectFiles(projectId);
   };
 
-  static getFileUrl = async (category: any, storagePath: string) => {
+  static getFileUrl = async (category: any, storagePath: string, projectId?: string, fileName?: string) => {
     const { getFileUrl } = await import('./fileOperations');
-    return getFileUrl(category, storagePath);
+    return getFileUrl(category, storagePath, projectId, fileName);
   };
 
   static deleteFile = async (documentId: number, category: any, storagePath: string) => {

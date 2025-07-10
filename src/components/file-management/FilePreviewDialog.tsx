@@ -37,7 +37,9 @@ const FilePreviewDialog: React.FC<FilePreviewDialogProps> = ({
     try {
       const url = await FileService.getFileUrl(
         file.category, 
-        file.storage_path
+        file.storage_path,
+        projectId,
+        file.file_name
       );
       setPreviewUrl(url);
     } catch (error) {
