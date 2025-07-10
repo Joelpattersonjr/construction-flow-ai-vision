@@ -8,7 +8,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
-import { Crown, User, Trash2, Edit, Save, X } from 'lucide-react';
+import { Crown, User, Trash2, Edit, Save, X, Eye } from 'lucide-react';
+import { UserDetailsModal } from './UserDetailsModal';
 
 interface TeamMember {
   id: string;
@@ -36,6 +37,13 @@ export const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
   const [newRole, setNewRole] = useState<'company_admin' | 'company_member'>('company_member');
   const [editingName, setEditingName] = useState<string>('');
   const [editingJobTitle, setEditingJobTitle] = useState<string>('');
+  const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+
+  const handleViewDetails = (member: TeamMember) => {
+    setSelectedMember(member);
+    setIsDetailsModalOpen(true);
+  };
 
   const handleRoleChange = async (memberId: string, role: 'company_admin' | 'company_member') => {
     try {
@@ -157,160 +165,178 @@ export const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
   }
 
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Name</TableHead>
-          <TableHead>Job Title</TableHead>
-          <TableHead>Role</TableHead>
-          <TableHead>Joined</TableHead>
-          <TableHead className="text-right">Actions</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {members.map((member) => (
-          <TableRow key={member.id}>
-            <TableCell className="font-medium">
-              {editingInfo === member.id ? (
-                <Input
-                  value={editingName}
-                  onChange={(e) => setEditingName(e.target.value)}
-                  placeholder="Enter full name"
-                  className="w-full"
-                />
-              ) : (
-                <span className={!member.full_name ? 'text-muted-foreground italic' : ''}>
-                  {member.full_name || 'No name'}
-                </span>
-              )}
-            </TableCell>
-            <TableCell>
-              {editingInfo === member.id ? (
-                <Input
-                  value={editingJobTitle}
-                  onChange={(e) => setEditingJobTitle(e.target.value)}
-                  placeholder="Enter job title"
-                  className="w-full"
-                />
-              ) : (
-                <span className={!member.job_title ? 'text-muted-foreground italic' : ''}>
-                  {member.job_title || 'No title'}
-                </span>
-              )}
-            </TableCell>
-            <TableCell>
-              {editingMember === member.id ? (
-                <div className="flex items-center space-x-2">
-                  <Select
-                    value={newRole}
-                    onValueChange={(value: 'company_admin' | 'company_member') => setNewRole(value)}
-                  >
-                    <SelectTrigger className="w-32">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="company_member">Member</SelectItem>
-                      <SelectItem value="company_admin">Admin</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Button
-                    size="sm"
-                    onClick={() => handleRoleChange(member.id, newRole)}
-                  >
-                    Save
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => setEditingMember(null)}
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              ) : (
-                getRoleBadge(member.company_role)
-              )}
-            </TableCell>
-            <TableCell>
-              {new Date(member.updated_at).toLocaleDateString()}
-            </TableCell>
-            <TableCell className="text-right">
-              <div className="flex justify-end space-x-2">
+    <>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Name</TableHead>
+            <TableHead>Job Title</TableHead>
+            <TableHead>Role</TableHead>
+            <TableHead>Joined</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {members.map((member) => (
+            <TableRow key={member.id}>
+              <TableCell className="font-medium">
                 {editingInfo === member.id ? (
-                  <>
+                  <Input
+                    value={editingName}
+                    onChange={(e) => setEditingName(e.target.value)}
+                    placeholder="Enter full name"
+                    className="w-full"
+                  />
+                ) : (
+                  <span className={!member.full_name ? 'text-muted-foreground italic' : ''}>
+                    {member.full_name || 'No name'}
+                  </span>
+                )}
+              </TableCell>
+              <TableCell>
+                {editingInfo === member.id ? (
+                  <Input
+                    value={editingJobTitle}
+                    onChange={(e) => setEditingJobTitle(e.target.value)}
+                    placeholder="Enter job title"
+                    className="w-full"
+                  />
+                ) : (
+                  <span className={!member.job_title ? 'text-muted-foreground italic' : ''}>
+                    {member.job_title || 'No title'}
+                  </span>
+                )}
+              </TableCell>
+              <TableCell>
+                {editingMember === member.id ? (
+                  <div className="flex items-center space-x-2">
+                    <Select
+                      value={newRole}
+                      onValueChange={(value: 'company_admin' | 'company_member') => setNewRole(value)}
+                    >
+                      <SelectTrigger className="w-32">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="company_member">Member</SelectItem>
+                        <SelectItem value="company_admin">Admin</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <Button
                       size="sm"
-                      onClick={() => handleInfoSave(member.id)}
-                      className="flex items-center space-x-1"
+                      onClick={() => handleRoleChange(member.id, newRole)}
                     >
-                      <Save className="h-4 w-4" />
+                      Save
                     </Button>
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={handleInfoCancel}
-                      className="flex items-center space-x-1"
+                      onClick={() => setEditingMember(null)}
                     >
-                      <X className="h-4 w-4" />
+                      Cancel
                     </Button>
-                  </>
+                  </div>
                 ) : (
-                  member.id !== profile?.id && (
+                  getRoleBadge(member.company_role)
+                )}
+              </TableCell>
+              <TableCell>
+                {new Date(member.updated_at).toLocaleDateString()}
+              </TableCell>
+              <TableCell className="text-right">
+                <div className="flex justify-end space-x-2">
+                  {editingInfo === member.id ? (
                     <>
-                      {(!member.full_name || !member.job_title) && (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleInfoEdit(member.id, member)}
-                          title="Edit missing information"
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                      )}
+                      <Button
+                        size="sm"
+                        onClick={() => handleInfoSave(member.id)}
+                        className="flex items-center space-x-1"
+                      >
+                        <Save className="h-4 w-4" />
+                      </Button>
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => {
-                          setEditingMember(member.id);
-                          setNewRole(member.company_role);
-                        }}
-                        title="Edit role"
+                        onClick={handleInfoCancel}
+                        className="flex items-center space-x-1"
                       >
-                        <Crown className="h-4 w-4" />
+                        <X className="h-4 w-4" />
                       </Button>
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button size="sm" variant="destructive" title="Remove member">
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Remove Team Member</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Are you sure you want to remove {member.full_name || 'this team member'} from your company?
-                              This action cannot be undone.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => handleRemoveMember(member.id)}
-                              className="bg-red-600 hover:bg-red-700"
-                            >
-                              Remove
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
                     </>
-                  )
-                )}
-              </div>
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  );
-};
+                  ) : (
+                    member.id !== profile?.id && (
+                      <>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleViewDetails(member)}
+                          title="View details"
+                          className="flex items-center space-x-1"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        {(!member.full_name || !member.job_title) && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleInfoEdit(member.id, member)}
+                            title="Edit missing information"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        )}
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            setEditingMember(member.id);
+                            setNewRole(member.company_role);
+                          }}
+                          title="Edit role"
+                        >
+                          <Crown className="h-4 w-4" />
+                        </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button size="sm" variant="destructive" title="Remove member">
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Remove Team Member</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Are you sure you want to remove {member.full_name || 'this team member'} from your company?
+                                This action cannot be undone.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => handleRemoveMember(member.id)}
+                                className="bg-red-600 hover:bg-red-700"
+                              >
+                                Remove
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </>
+                    )
+                  )}
+                </div>
+              </TableCell>
+             </TableRow>
+           ))}
+         </TableBody>
+       </Table>
+       
+       <UserDetailsModal
+         member={selectedMember}
+         isOpen={isDetailsModalOpen}
+         onClose={() => setIsDetailsModalOpen(false)}
+         userEmail="Email not available"
+       />
+     </>
+   );
+ };
