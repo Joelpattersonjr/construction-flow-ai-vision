@@ -144,6 +144,51 @@ export type Database = {
           },
         ]
       }
+      file_analytics: {
+        Row: {
+          action_type: string
+          created_at: string
+          file_id: number
+          file_size: number | null
+          id: string
+          project_id: string
+          user_id: string
+        }
+        Insert: {
+          action_type: string
+          created_at?: string
+          file_id: number
+          file_size?: number | null
+          id?: string
+          project_id: string
+          user_id: string
+        }
+        Update: {
+          action_type?: string
+          created_at?: string
+          file_id?: number
+          file_size?: number | null
+          id?: string
+          project_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "file_analytics_file_id_fkey"
+            columns: ["file_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "file_analytics_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       permission_templates: {
         Row: {
           company_id: number
@@ -313,6 +358,38 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_storage_stats: {
+        Row: {
+          id: string
+          last_updated: string
+          project_id: string
+          total_files: number
+          total_size_bytes: number
+        }
+        Insert: {
+          id?: string
+          last_updated?: string
+          project_id: string
+          total_files?: number
+          total_size_bytes?: number
+        }
+        Update: {
+          id?: string
+          last_updated?: string
+          project_id?: string
+          total_files?: number
+          total_size_bytes?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_storage_stats_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: true
+            referencedRelation: "projects"
             referencedColumns: ["id"]
           },
         ]

@@ -6,6 +6,7 @@ import { File, Download, Trash2, Image, FileText, Archive, Edit2, FolderInput } 
 import { formatDistanceToNow } from 'date-fns';
 import { FileItem, FileService, FileCategory } from '@/services/file';
 import { useToast } from '@/hooks/use-toast';
+import { fileAnalyticsService } from '@/services/fileAnalyticsService';
 import RenameDialog from './RenameDialog';
 import DeleteConfirmDialog from './DeleteConfirmDialog';
 import MoveFileDialog from './MoveFileDialog';
@@ -63,6 +64,13 @@ const FileItemComponent: React.FC<FileItemProps> = ({
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+
+      // Track download analytics
+      await fileAnalyticsService.trackFileAction({
+        projectId,
+        fileId: file.id,
+        actionType: 'download'
+      });
     } catch (error) {
       toast({
         title: "Download failed",

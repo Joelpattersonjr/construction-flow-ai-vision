@@ -1,18 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, RefreshCw, Eye, Grid } from 'lucide-react';
+import { Search, RefreshCw, Eye, Grid, Activity, BarChart3 } from 'lucide-react';
 import FileUploadDropzone from './FileUploadDropzone';
 import FolderFileList from './FolderFileList';
 import BulkFileOperations from './BulkFileOperations';
 import FilePreviewDialog from './FilePreviewDialog';
 import AdvancedFileSearch from './AdvancedFileSearch';
+import FileActivityFeed from './FileActivityFeed';
+import StorageAnalytics from './StorageAnalytics';
 import { FileService, FileCategory, FolderItem, FileItem } from '@/services/file';
 import { useToast } from '@/hooks/use-toast';
 import { useProjectPermissions } from '@/hooks/useProjectPermissions';
 import { useAuth } from '@/contexts/AuthContext';
+import { useRealtimeFileUpdates } from '@/hooks/useRealtimeFileUpdates';
 
 interface FileManagerProps {
   projectId: string;
@@ -41,6 +45,14 @@ const FileManager: React.FC<FileManagerProps> = ({ projectId, hasWritePermission
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
   const { toast } = useToast();
   const { profile } = useAuth();
+  
+  // Initialize real-time updates
+  const { updates } = useRealtimeFileUpdates({ 
+    projectId,
+    onUpdate: (update) => {
+      console.log('Real-time file update:', update);
+    }
+  });
   
   // Use passed permission or fall back to hook-based check
   const { hasWritePermission: hookWritePermission, loading: permissionsLoading } = useProjectPermissions(projectId);
@@ -119,8 +131,16 @@ const FileManager: React.FC<FileManagerProps> = ({ projectId, hasWritePermission
   return (
     <div className="space-y-6">
       <Tabs defaultValue="browse" className="w-full">
-        <TabsList className={`grid w-full ${effectiveWritePermission ? 'grid-cols-2' : 'grid-cols-1'}`}>
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="browse">Browse Files</TabsTrigger>
+          <TabsTrigger value="activity" className="flex items-center gap-2">
+            <Activity className="h-4 w-4" />
+            Activity
+          </TabsTrigger>
+          <TabsTrigger value="analytics" className="flex items-center gap-2">
+            <BarChart3 className="h-4 w-4" />
+            Analytics
+          </TabsTrigger>
           {effectiveWritePermission && <TabsTrigger value="upload">Upload Files</TabsTrigger>}
         </TabsList>
         
@@ -208,6 +228,32 @@ const FileManager: React.FC<FileManagerProps> = ({ projectId, hasWritePermission
               onPreviewFile={setPreviewFile}
             />
           )}
+        </TabsContent>
+
+        <TabsContent value="activity">
+          <div className="grid gap-6 md:grid-cols-2">
+            <FileActivityFeed projectId={projectId} />
+            <Card>
+              <CardContent className="p-6">
+                <h3 className="text-lg font-medium mb-4">Real-time Updates</h3>
+                {updates.length === 0 ? (
+                  <p className="text-muted-foreground text-sm">No recent updates</p>
+                ) : (
+                  <div className="space-y-2">
+                    {updates.slice(0, 5).map((update, index) => (
+                      <div key={`${update.id}-${index}`} className="text-sm p-2 rounded border">
+                        <span className="font-medium">{update.action}</span>: {update.file_name}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="analytics">
+          <StorageAnalytics projectId={projectId} />
         </TabsContent>
         
         {effectiveWritePermission && (

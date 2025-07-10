@@ -3,6 +3,7 @@ import { TablesInsert } from '@/integrations/supabase/types';
 import { hasWritePermission } from './permissions';
 import { FileCategory, UploadFileParams, DocumentRecord } from './types';
 import { auditService } from '@/services/auditService';
+import { fileAnalyticsService } from '@/services/fileAnalyticsService';
 
 /**
  * Upload a file to Supabase Storage and create a database record
@@ -92,6 +93,14 @@ export async function uploadFile({ file, projectId, category, folderPath = '' }:
       folderPath: folderPath || 'root'
     }
   });
+
+  // Track upload analytics
+  await fileAnalyticsService.trackFileAction({
+    projectId,
+    fileId: document.id,
+    actionType: 'upload',
+    fileSize: file.size
+  });
   
   return document;
 }
@@ -136,6 +145,22 @@ export async function getFileUrl(category: FileCategory, storagePath: string, pr
         category
       }
     });
+
+    // Track file view analytics  
+    const fileData = await supabase
+      .from('documents')
+      .select('id')
+      .eq('storage_path', storagePath)
+      .eq('project_id', projectId)
+      .single();
+
+    if (fileData.data) {
+      await fileAnalyticsService.trackFileAction({
+        projectId,
+        fileId: fileData.data.id,
+        actionType: 'view'
+      });
+    }
   }
 
   // Convert relative URL to full URL
@@ -172,6 +197,15 @@ export async function deleteFile(documentId: number, category: FileCategory, sto
   if (storageError) {
     console.warn('Failed to delete from storage:', storageError.message);
     // Don't throw here as the database record is already deleted
+  }
+
+  // Track delete analytics
+  if (!fetchError && document) {
+    await fileAnalyticsService.trackFileAction({
+      projectId: document.project_id,
+      fileId: documentId,
+      actionType: 'delete'
+    });
   }
 
   // Log file deletion to audit trail
