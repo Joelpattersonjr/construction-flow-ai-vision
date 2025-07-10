@@ -40,6 +40,47 @@ export const useAuthActions = () => {
         }
       }
 
+      // Check if this is a temporary password
+      const { data: tempPasswordRecord } = await supabase
+        .from('admin_password_resets')
+        .select('*')
+        .eq('temporary_password', password)
+        .is('used_at', null)
+        .gt('expires_at', new Date().toISOString())
+        .single();
+
+      if (tempPasswordRecord) {
+        // Get user by email to verify it matches
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('email', email)
+          .single();
+
+        if (profile && profile.id === tempPasswordRecord.user_id) {
+          // Mark temporary password as used
+          await supabase
+            .from('admin_password_resets')
+            .update({ used_at: new Date().toISOString() })
+            .eq('id', tempPasswordRecord.id);
+
+          // Force user to change password by signing them in and prompting
+          const { error } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+          });
+
+          if (!error) {
+            toast({
+              title: "Temporary Password Used",
+              description: "Please update your password in your profile settings.",
+              variant: "default",
+            });
+          }
+          return { error };
+        }
+      }
+
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
