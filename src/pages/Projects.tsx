@@ -20,6 +20,8 @@ interface Project {
   start_date: string;
   end_date: string;
   created_at: string;
+  fileCount?: number;
+  recentFileActivity?: string;
 }
 
 const Projects: React.FC = () => {
@@ -52,7 +54,34 @@ const Projects: React.FC = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setProjects(data || []);
+      
+      // Enhance projects with file statistics
+      const projectsWithStats = await Promise.all(
+        (data || []).map(async (project) => {
+          // Get file count for this project
+          const { count } = await supabase
+            .from('documents')
+            .select('*', { count: 'exact', head: true })
+            .eq('project_id', project.id);
+
+          // Get most recent file activity
+          const { data: recentFile } = await supabase
+            .from('documents')
+            .select('created_at')
+            .eq('project_id', project.id)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .single();
+
+          return {
+            ...project,
+            fileCount: count || 0,
+            recentFileActivity: recentFile?.created_at
+          };
+        })
+      );
+      
+      setProjects(projectsWithStats);
     } catch (error) {
       toast({
         title: "Error loading projects",
@@ -380,29 +409,49 @@ const Projects: React.FC = () => {
                   </div>
                 )}
                 
-                <div className="flex items-center space-x-4 text-sm text-gray-600">
+                <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
                   <div className="flex items-center space-x-1">
                     <Calendar className="h-4 w-4 text-gray-400" />
                     <span>Created {formatDate(project.created_at)}</span>
                   </div>
+                  <div className="flex items-center space-x-1">
+                    <FileText className="h-4 w-4 text-gray-400" />
+                    <span>{project.fileCount || 0} files</span>
+                  </div>
                 </div>
+
+                {project.recentFileActivity && (
+                  <div className="text-xs text-gray-500">
+                    Last file activity: {formatDate(project.recentFileActivity)}
+                  </div>
+                )}
                 
                 <div className="flex space-x-2">
+                  <Button 
+                    variant="default" 
+                    size="sm"
+                    onClick={() => navigate(`/projects/${project.id}`)}
+                    className="flex-1"
+                  >
+                    View Details
+                  </Button>
                   <Button 
                     variant="outline" 
                     size="sm"
                     onClick={() => navigate(`/files?project=${project.id}`)}
-                    className="flex-1"
+                    className="flex items-center space-x-1"
                   >
-                    <FileText className="h-4 w-4 mr-1" />
-                    Files
+                    <FileText className="h-4 w-4" />
+                    <span className="hidden sm:inline">Files</span>
                   </Button>
                   <Button 
                     variant="outline" 
                     size="sm"
                     onClick={() => navigate(`/projects/${project.id}/permissions`)}
+                    className="flex items-center space-x-1"
                   >
                     <Settings className="h-4 w-4" />
+                    <span className="hidden sm:inline">Permissions</span>
                   </Button>
                 </div>
               </CardContent>
