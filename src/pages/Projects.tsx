@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { Plus, Folder, Calendar, MapPin, FileText, Settings } from 'lucide-react';
+import { Plus, Folder, Calendar, MapPin, FileText, Settings, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface Project {
@@ -209,6 +209,15 @@ const Projects: React.FC = () => {
 
   return (
     <div className="container mx-auto py-6 space-y-6">
+      <Button 
+        variant="ghost" 
+        onClick={() => navigate('/')}
+        className="mb-4 flex items-center gap-2"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Back to Dashboard
+      </Button>
+      
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
