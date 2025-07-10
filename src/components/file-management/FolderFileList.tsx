@@ -313,9 +313,9 @@ const FolderFileList: React.FC<FolderFileListProps> = ({
               <div className="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
                 {hasWritePermission && (
                   <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <AlertDialogTrigger asChild>
                           <Button
                             variant="outline"
                             size="sm"
@@ -324,12 +324,12 @@ const FolderFileList: React.FC<FolderFileListProps> = ({
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Delete folder</p>
-                        </TooltipContent>
-                      </Tooltip>
-                  </AlertDialogTrigger>
+                        </AlertDialogTrigger>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Delete folder</p>
+                      </TooltipContent>
+                    </Tooltip>
                   <AlertDialogContent>
                     <AlertDialogHeader>
                       <AlertDialogTitle>Delete Folder</AlertDialogTitle>
@@ -480,9 +480,9 @@ const FolderFileList: React.FC<FolderFileListProps> = ({
                      
                      {hasWritePermission && (
                        <AlertDialog>
-                         <AlertDialogTrigger asChild>
-                           <Tooltip>
-                             <TooltipTrigger asChild>
+                         <Tooltip>
+                           <TooltipTrigger asChild>
+                             <AlertDialogTrigger asChild>
                                <Button
                                  variant="outline"
                                  size="sm"
@@ -490,12 +490,12 @@ const FolderFileList: React.FC<FolderFileListProps> = ({
                                >
                                  <Trash2 className="h-4 w-4" />
                                </Button>
-                             </TooltipTrigger>
-                             <TooltipContent>
-                               <p>Delete file</p>
-                             </TooltipContent>
-                           </Tooltip>
-                         </AlertDialogTrigger>
+                             </AlertDialogTrigger>
+                           </TooltipTrigger>
+                           <TooltipContent>
+                             <p>Delete file</p>
+                           </TooltipContent>
+                         </Tooltip>
                         <AlertDialogContent>
                           <AlertDialogHeader>
                             <AlertDialogTitle>Delete File</AlertDialogTitle>
