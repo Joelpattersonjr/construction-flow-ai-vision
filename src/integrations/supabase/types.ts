@@ -534,6 +534,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: number
       }
+      get_user_company_from_jwt: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
       is_company_admin: {
         Args: { company_id_param: number }
         Returns: boolean
