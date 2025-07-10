@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { File, Download, Trash2, Image, FileText, Archive, Folder, FolderOpen, Edit2, Check, X, FolderInput } from 'lucide-react';
 import { FileService, FileCategory, FolderItem, FileItem } from '@/services/fileService';
 import { useToast } from '@/hooks/use-toast';
@@ -263,30 +264,31 @@ const FolderFileList: React.FC<FolderFileListProps> = ({
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div className="space-y-2">
-            <CardTitle className="flex items-center space-x-2">
-              <FolderOpen className="h-5 w-5" />
-              <span>Files & Folders ({folders.length + files.length})</span>
-            </CardTitle>
-            <Breadcrumbs currentPath={currentPath} onNavigate={onNavigate} />
+    <TooltipProvider>
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div className="space-y-2">
+              <CardTitle className="flex items-center space-x-2">
+                <FolderOpen className="h-5 w-5" />
+                <span>Files & Folders ({folders.length + files.length})</span>
+              </CardTitle>
+              <Breadcrumbs currentPath={currentPath} onNavigate={onNavigate} />
+            </div>
+            <CreateFolderDialog
+              projectId={projectId}
+              category={category}
+              currentPath={currentPath}
+              onFolderCreated={onContentChanged}
+              disabled={!hasWritePermission}
+            />
+            {!hasWritePermission && (
+              <p className="text-xs text-gray-500">
+                You need write permissions to manage folders
+              </p>
+            )}
           </div>
-          <CreateFolderDialog
-            projectId={projectId}
-            category={category}
-            currentPath={currentPath}
-            onFolderCreated={onContentChanged}
-            disabled={!hasWritePermission}
-          />
-          {!hasWritePermission && (
-            <p className="text-xs text-gray-500">
-              You need write permissions to manage folders
-            </p>
-          )}
-        </div>
-      </CardHeader>
+        </CardHeader>
       <CardContent>
         <div className="space-y-2">
           {/* Folders */}
@@ -312,14 +314,21 @@ const FolderFileList: React.FC<FolderFileListProps> = ({
                 {hasWritePermission && (
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={(e) => e.stopPropagation()}
-                        disabled={deletingItems.has(`folder-${folder.path}`)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={(e) => e.stopPropagation()}
+                            disabled={deletingItems.has(`folder-${folder.path}`)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Delete folder</p>
+                        </TooltipContent>
+                      </Tooltip>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
@@ -409,25 +418,39 @@ const FolderFileList: React.FC<FolderFileListProps> = ({
               <div className="flex items-center space-x-2">
                 {editingFile !== file.id && (
                   <>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleDownload(file)}
-                      disabled={downloadingFiles.has(file.id)}
-                    >
-                      <Download className="h-4 w-4" />
-                    </Button>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDownload(file)}
+                          disabled={downloadingFiles.has(file.id)}
+                        >
+                          <Download className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Download file</p>
+                      </TooltipContent>
+                    </Tooltip>
                     
                      {hasWritePermission && (
-                       <Button
-                         variant="outline"
-                         size="sm"
-                         onClick={() => handleStartEdit(file)}
-                         disabled={renamingFiles.has(file.id)}
-                         className="opacity-0 group-hover:opacity-100 transition-opacity"
-                       >
-                         <Edit2 className="h-4 w-4" />
-                       </Button>
+                       <Tooltip>
+                         <TooltipTrigger asChild>
+                           <Button
+                             variant="outline"
+                             size="sm"
+                             onClick={() => handleStartEdit(file)}
+                             disabled={renamingFiles.has(file.id)}
+                             className="opacity-0 group-hover:opacity-100 transition-opacity"
+                           >
+                             <Edit2 className="h-4 w-4" />
+                           </Button>
+                         </TooltipTrigger>
+                         <TooltipContent>
+                           <p>Rename file</p>
+                         </TooltipContent>
+                       </Tooltip>
                      )}
                      
                      {hasWritePermission && (
@@ -438,27 +461,41 @@ const FolderFileList: React.FC<FolderFileListProps> = ({
                          currentPath={currentPath}
                          onFileMoved={onContentChanged}
                        >
-                         <Button
-                           variant="outline"
-                           size="sm"
-                           className="opacity-0 group-hover:opacity-100 transition-opacity"
-                         >
-                           <FolderInput className="h-4 w-4" />
-                         </Button>
+                         <Tooltip>
+                           <TooltipTrigger asChild>
+                             <Button
+                               variant="outline"
+                               size="sm"
+                               className="opacity-0 group-hover:opacity-100 transition-opacity"
+                             >
+                               <FolderInput className="h-4 w-4" />
+                             </Button>
+                           </TooltipTrigger>
+                           <TooltipContent>
+                             <p>Move file</p>
+                           </TooltipContent>
+                         </Tooltip>
                        </MoveFileDialog>
                      )}
                      
                      {hasWritePermission && (
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            disabled={deletingItems.has(`file-${file.id}`)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </AlertDialogTrigger>
+                       <AlertDialog>
+                         <AlertDialogTrigger asChild>
+                           <Tooltip>
+                             <TooltipTrigger asChild>
+                               <Button
+                                 variant="outline"
+                                 size="sm"
+                                 disabled={deletingItems.has(`file-${file.id}`)}
+                               >
+                                 <Trash2 className="h-4 w-4" />
+                               </Button>
+                             </TooltipTrigger>
+                             <TooltipContent>
+                               <p>Delete file</p>
+                             </TooltipContent>
+                           </Tooltip>
+                         </AlertDialogTrigger>
                         <AlertDialogContent>
                           <AlertDialogHeader>
                             <AlertDialogTitle>Delete File</AlertDialogTitle>
@@ -486,6 +523,7 @@ const FolderFileList: React.FC<FolderFileListProps> = ({
         </div>
       </CardContent>
     </Card>
+    </TooltipProvider>
   );
 };
 
