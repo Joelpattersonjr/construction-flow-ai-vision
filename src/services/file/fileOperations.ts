@@ -138,7 +138,9 @@ export async function getFileUrl(category: FileCategory, storagePath: string, pr
     });
   }
 
-  return data.signedUrl;
+  // Convert relative URL to full URL
+  const baseUrl = 'https://gnyflfsjaqnxgnpsshwe.supabase.co/storage/v1';
+  return data.signedUrl.startsWith('/') ? `${baseUrl}${data.signedUrl}` : data.signedUrl;
 }
 
 /**
