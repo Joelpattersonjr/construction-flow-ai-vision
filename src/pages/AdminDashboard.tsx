@@ -14,6 +14,7 @@ import { InviteUserDialog } from '@/components/admin/InviteUserDialog';
 import { TeamMembersTable } from '@/components/admin/TeamMembersTable';
 import { PendingInvitationsTable } from '@/components/admin/PendingInvitationsTable';
 import AdminProjectsTable from '@/components/admin/AdminProjectsTable';
+import { ArrowLeft } from 'lucide-react';
 
 const AdminDashboard = () => {
   const { user, profile, signOut, clearAuthState } = useAuth();
@@ -102,7 +103,16 @@ const AdminDashboard = () => {
       <nav className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
+            <div className="flex items-center space-x-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate('/')}
+                className="flex items-center space-x-2"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                <span>Back to Dashboard</span>
+              </Button>
               <h1 className="text-xl font-semibold text-gray-900">Admin Dashboard</h1>
             </div>
             <div className="flex items-center space-x-4">
@@ -172,17 +182,7 @@ const AdminDashboard = () => {
                     </div>
                     
                     <div className="border-t pt-3 space-y-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={() => navigate('/')}
-                        className="w-full flex items-center justify-center space-x-2"
-                      >
-                        <Settings className="h-4 w-4" />
-                        <span>Main Dashboard</span>
-                      </Button>
-                      
-                      <Button 
+                      <Button
                         variant="outline" 
                         size="sm" 
                         onClick={signOut}
