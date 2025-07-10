@@ -81,6 +81,12 @@ export const useUserDetailsModal = (
     try {
       setLoading(true);
       
+      console.log('Saving profile updates:', {
+        member: member,
+        editingEmail: editingEmail,
+        memberEmail: member.email
+      });
+      
       const updates: any = {
         custom_fields: customFieldValues
       };
@@ -91,11 +97,14 @@ export const useUserDetailsModal = (
       
       if (editingEmail !== member.email) {
         updates.email = editingEmail;
+        console.log('Email update detected:', { old: member.email, new: editingEmail });
       }
       
       if (editingJobTitle !== member.job_title) {
         updates.job_title = editingJobTitle;
       }
+
+      console.log('Updates to be saved:', updates);
 
       const { error } = await supabase
         .from('profiles')
@@ -103,6 +112,8 @@ export const useUserDetailsModal = (
         .eq('id', member.id);
 
       if (error) throw error;
+
+      console.log('Profile updated successfully');
 
       toast({
         title: "Success",
