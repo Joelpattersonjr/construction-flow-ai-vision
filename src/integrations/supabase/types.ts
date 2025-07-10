@@ -513,6 +513,19 @@ export type Database = {
         Args: { user_id: string; project_company_id: number }
         Returns: boolean
       }
+      debug_storage_path: {
+        Args: { test_path: string; test_project_id: string }
+        Returns: {
+          path_input: string
+          project_id_extracted: string
+          folder_parts: string[]
+          first_folder: string
+          project_exists: boolean
+          user_company_id: number
+          project_company_id: number
+          access_granted: boolean
+        }[]
+      }
       get_company_name: {
         Args: { company_id_param: number }
         Returns: string
