@@ -4,12 +4,13 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { File, Download, Trash2, Image, FileText, Archive, Folder, FolderOpen, Edit2, Check, X } from 'lucide-react';
+import { File, Download, Trash2, Image, FileText, Archive, Folder, FolderOpen, Edit2, Check, X, FolderInput } from 'lucide-react';
 import { FileService, FileCategory, FolderItem, FileItem } from '@/services/fileService';
 import { useToast } from '@/hooks/use-toast';
 import { formatDistanceToNow } from 'date-fns';
 import Breadcrumbs from './Breadcrumbs';
 import CreateFolderDialog from './CreateFolderDialog';
+import MoveFileDialog from './MoveFileDialog';
 
 interface FolderFileListProps {
   projectId: string;
@@ -417,19 +418,37 @@ const FolderFileList: React.FC<FolderFileListProps> = ({
                       <Download className="h-4 w-4" />
                     </Button>
                     
-                    {hasWritePermission && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleStartEdit(file)}
-                        disabled={renamingFiles.has(file.id)}
-                        className="opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
-                        <Edit2 className="h-4 w-4" />
-                      </Button>
-                    )}
-                    
-                    {hasWritePermission && (
+                     {hasWritePermission && (
+                       <Button
+                         variant="outline"
+                         size="sm"
+                         onClick={() => handleStartEdit(file)}
+                         disabled={renamingFiles.has(file.id)}
+                         className="opacity-0 group-hover:opacity-100 transition-opacity"
+                       >
+                         <Edit2 className="h-4 w-4" />
+                       </Button>
+                     )}
+                     
+                     {hasWritePermission && (
+                       <MoveFileDialog
+                         file={file}
+                         projectId={projectId}
+                         category={category}
+                         currentPath={currentPath}
+                         onFileMoved={onContentChanged}
+                       >
+                         <Button
+                           variant="outline"
+                           size="sm"
+                           className="opacity-0 group-hover:opacity-100 transition-opacity"
+                         >
+                           <FolderInput className="h-4 w-4" />
+                         </Button>
+                       </MoveFileDialog>
+                     )}
+                     
+                     {hasWritePermission && (
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
                           <Button

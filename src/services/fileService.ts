@@ -344,6 +344,108 @@ export class FileService {
   }
 
   /**
+   * Move a file to a different folder
+   */
+  static async moveFile(documentId: number, newFolderPath: string): Promise<void> {
+    // Check write permissions first
+    const { data: document, error: fetchError } = await supabase
+      .from('documents')
+      .select('project_id, storage_path, category, file_name')
+      .eq('id', documentId)
+      .single();
+
+    if (fetchError || !document) {
+      throw new Error('File not found');
+    }
+
+    const hasPermission = await this.hasWritePermission(document.project_id);
+    if (!hasPermission) {
+      throw new Error('You do not have permission to move files in this project');
+    }
+
+    if (!document.storage_path || !document.category) {
+      throw new Error('Invalid file data');
+    }
+
+    // Extract project ID and current file name from storage path
+    const pathParts = document.storage_path.split('/');
+    const fileName = pathParts[pathParts.length - 1];
+    const projectId = pathParts[0];
+
+    // Build new storage path
+    const newStoragePath = newFolderPath 
+      ? `${projectId}/${newFolderPath}/${fileName}`
+      : `${projectId}/${fileName}`;
+
+    // Move file in storage
+    const { error: moveError } = await supabase.storage
+      .from(document.category as FileCategory)
+      .move(document.storage_path, newStoragePath);
+
+    if (moveError) {
+      throw new Error(`Failed to move file: ${moveError.message}`);
+    }
+
+    // Update database record with new storage path
+    const { error: updateError } = await supabase
+      .from('documents')
+      .update({ storage_path: newStoragePath })
+      .eq('id', documentId);
+
+    if (updateError) {
+      // Try to move the file back if database update fails
+      await supabase.storage
+        .from(document.category as FileCategory)
+        .move(newStoragePath, document.storage_path);
+      
+      throw new Error(`Failed to update file record: ${updateError.message}`);
+    }
+  }
+
+  /**
+   * Get all folders for a project and category (for move dialog)
+   */
+  static async getAllFolders(projectId: string, category: FileCategory): Promise<FolderItem[]> {
+    const { data: storageFiles, error: storageError } = await supabase.storage
+      .from(category)
+      .list(projectId, { limit: 1000, sortBy: { column: 'name', order: 'asc' } });
+
+    if (storageError) {
+      throw new Error(`Failed to list folders: ${storageError.message}`);
+    }
+
+    const folders: FolderItem[] = [
+      // Add root folder option
+      {
+        name: 'Root',
+        path: '',
+        type: 'folder',
+        created_at: new Date().toISOString(),
+      }
+    ];
+
+    // Recursively get all folder paths
+    const getAllFolderPaths = (files: any[], basePath: string = ''): void => {
+      files?.forEach(item => {
+        if (!item.metadata?.size && item.name !== '.gitkeep') {
+          // This is a folder
+          const folderPath = basePath ? `${basePath}/${item.name}` : item.name;
+          folders.push({
+            name: item.name,
+            path: folderPath,
+            type: 'folder',
+            created_at: item.created_at || new Date().toISOString(),
+          });
+        }
+      });
+    };
+
+    getAllFolderPaths(storageFiles);
+
+    return folders;
+  }
+
+  /**
    * Delete a folder and all its contents
    */
   static async deleteFolder(projectId: string, category: FileCategory, folderPath: string): Promise<void> {
