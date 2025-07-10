@@ -99,15 +99,9 @@ const FilePreviewDialog: React.FC<FilePreviewDialogProps> = ({
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
             <span>{file.file_name}</span>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" onClick={handleDownload}>
-                <Download className="h-4 w-4 mr-2" />
-                Download
-              </Button>
-              <Button variant="ghost" size="sm" onClick={onClose}>
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
+            <Button variant="ghost" size="sm" onClick={onClose}>
+              <X className="h-4 w-4" />
+            </Button>
           </DialogTitle>
         </DialogHeader>
 
