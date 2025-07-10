@@ -1,15 +1,7 @@
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Mail, Briefcase, Building2, Calendar } from 'lucide-react';
-
-interface TeamMember {
-  id: string;
-  full_name: string;
-  job_title: string;
-  company_role: 'company_admin' | 'company_member';
-  updated_at: string;
-  custom_fields?: Record<string, any>;
-}
+import { TeamMember } from '@/types/admin';
 
 interface UserDetailsFormProps {
   member: TeamMember;

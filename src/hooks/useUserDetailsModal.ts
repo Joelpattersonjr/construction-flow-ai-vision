@@ -2,24 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-
-interface TeamMember {
-  id: string;
-  full_name: string;
-  job_title: string;
-  company_role: 'company_admin' | 'company_member';
-  updated_at: string;
-  custom_fields?: Record<string, any>;
-}
-
-interface CustomField {
-  id: string;
-  field_name: string;
-  field_label: string;
-  field_type: string;
-  field_options: string[];
-  is_required: boolean;
-}
+import { CustomField, TeamMember } from '@/types/admin';
 
 export const useUserDetailsModal = (
   member: TeamMember | null,

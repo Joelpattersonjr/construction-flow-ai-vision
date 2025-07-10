@@ -8,15 +8,7 @@ import { UserDetailsBadge } from './user-details/UserDetailsBadge';
 import { UserDetailsForm } from './user-details/UserDetailsForm';
 import { CustomFieldRenderer } from './user-details/CustomFieldRenderer';
 import { useUserDetailsModal } from '@/hooks/useUserDetailsModal';
-
-interface TeamMember {
-  id: string;
-  full_name: string;
-  job_title: string;
-  company_role: 'company_admin' | 'company_member';
-  updated_at: string;
-  custom_fields?: Record<string, any>;
-}
+import { TeamMember } from '@/types/admin';
 
 interface UserDetailsModalProps {
   member: TeamMember | null;

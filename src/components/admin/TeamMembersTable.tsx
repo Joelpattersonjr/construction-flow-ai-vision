@@ -10,15 +10,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useToast } from '@/hooks/use-toast';
 import { Crown, User, Trash2, Edit, Save, X, Eye } from 'lucide-react';
 import { UserDetailsModal } from './UserDetailsModal';
-
-interface TeamMember {
-  id: string;
-  full_name: string;
-  job_title: string;
-  company_role: 'company_admin' | 'company_member';
-  updated_at: string;
-  custom_fields?: Record<string, any>;
-}
+import { TeamMember } from '@/types/admin';
 
 interface TeamMembersTableProps {
   members: TeamMember[];

@@ -3,15 +3,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Briefcase } from 'lucide-react';
-
-interface CustomField {
-  id: string;
-  field_name: string;
-  field_label: string;
-  field_type: string;
-  field_options: string[];
-  is_required: boolean;
-}
+import { CustomField } from '@/types/admin';
 
 interface CustomFieldRendererProps {
   field: CustomField;
