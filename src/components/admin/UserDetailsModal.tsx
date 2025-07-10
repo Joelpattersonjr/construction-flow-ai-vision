@@ -49,11 +49,17 @@ export const UserDetailsModal: React.FC<UserDetailsModalProps> = ({
   const [customFields, setCustomFields] = useState<CustomField[]>([]);
   const [customFieldValues, setCustomFieldValues] = useState<Record<string, any>>({});
   const [loading, setLoading] = useState(false);
+  
+  // Editable standard fields
+  const [editingName, setEditingName] = useState('');
+  const [editingJobTitle, setEditingJobTitle] = useState('');
 
   useEffect(() => {
     if (member && isOpen && profile?.company_id) {
       fetchCustomFields();
       setCustomFieldValues(member.custom_fields || {});
+      setEditingName(member.full_name || '');
+      setEditingJobTitle(member.job_title || '');
     }
   }, [member, isOpen, profile?.company_id]);
 
@@ -84,25 +90,39 @@ export const UserDetailsModal: React.FC<UserDetailsModalProps> = ({
 
     try {
       setLoading(true);
+      
+      // Update both standard fields and custom fields
+      const updates: any = {
+        custom_fields: customFieldValues
+      };
+      
+      if (editingName !== member.full_name) {
+        updates.full_name = editingName;
+      }
+      
+      if (editingJobTitle !== member.job_title) {
+        updates.job_title = editingJobTitle;
+      }
+
       const { error } = await supabase
         .from('profiles')
-        .update({ custom_fields: customFieldValues })
+        .update(updates)
         .eq('id', member.id);
 
       if (error) throw error;
 
       toast({
         title: "Success",
-        description: "Custom fields updated successfully",
+        description: "Profile updated successfully",
       });
 
       setIsEditing(false);
       onRefresh?.();
     } catch (error) {
-      console.error('Error updating custom fields:', error);
+      console.error('Error updating profile:', error);
       toast({
         title: "Error",
-        description: "Failed to update custom fields",
+        description: "Failed to update profile",
         variant: "destructive",
       });
     } finally {
@@ -237,9 +257,20 @@ export const UserDetailsModal: React.FC<UserDetailsModalProps> = ({
         <div className="space-y-6">
           {/* Header with name and role */}
           <div className="text-center space-y-2">
-            <h3 className="text-lg font-semibold">
-              {member.full_name || 'No name provided'}
-            </h3>
+            {isEditing ? (
+              <div className="space-y-2">
+                <Input
+                  value={editingName}
+                  onChange={(e) => setEditingName(e.target.value)}
+                  placeholder="Enter full name"
+                  className="text-center text-lg font-semibold"
+                />
+              </div>
+            ) : (
+              <h3 className="text-lg font-semibold">
+                {member.full_name || 'No name provided'}
+              </h3>
+            )}
             {getRoleBadge(member.company_role)}
           </div>
 
@@ -255,9 +286,18 @@ export const UserDetailsModal: React.FC<UserDetailsModalProps> = ({
 
             <div className="flex items-start space-x-3">
               <Briefcase className="h-4 w-4 text-muted-foreground mt-1" />
-              <div>
+              <div className="flex-1">
                 <p className="text-sm font-medium text-muted-foreground">Job Title</p>
-                <p className="text-sm">{member.job_title || 'No title specified'}</p>
+                {isEditing ? (
+                  <Input
+                    value={editingJobTitle}
+                    onChange={(e) => setEditingJobTitle(e.target.value)}
+                    placeholder="Enter job title"
+                    className="text-sm mt-1"
+                  />
+                ) : (
+                  <p className="text-sm">{member.job_title || 'No title specified'}</p>
+                )}
               </div>
             </div>
 
