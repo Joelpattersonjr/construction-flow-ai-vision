@@ -99,30 +99,42 @@ export type Database = {
       documents: {
         Row: {
           category: string | null
+          content: string | null
+          content_type: string | null
           created_at: string
           file_name: string | null
+          file_size: number | null
           file_type: string | null
           id: number
+          is_editable: boolean | null
           project_id: string | null
           storage_path: string | null
           uploader_id: string | null
         }
         Insert: {
           category?: string | null
+          content?: string | null
+          content_type?: string | null
           created_at?: string
           file_name?: string | null
+          file_size?: number | null
           file_type?: string | null
           id?: number
+          is_editable?: boolean | null
           project_id?: string | null
           storage_path?: string | null
           uploader_id?: string | null
         }
         Update: {
           category?: string | null
+          content?: string | null
+          content_type?: string | null
           created_at?: string
           file_name?: string | null
+          file_size?: number | null
           file_type?: string | null
           id?: number
+          is_editable?: boolean | null
           project_id?: string | null
           storage_path?: string | null
           uploader_id?: string | null
@@ -185,6 +197,126 @@ export type Database = {
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      file_collaborators: {
+        Row: {
+          cursor_position: number | null
+          document_id: number
+          id: string
+          last_activity: string
+          selection_end: number | null
+          selection_start: number | null
+          user_color: string | null
+          user_id: string
+        }
+        Insert: {
+          cursor_position?: number | null
+          document_id: number
+          id?: string
+          last_activity?: string
+          selection_end?: number | null
+          selection_start?: number | null
+          user_color?: string | null
+          user_id: string
+        }
+        Update: {
+          cursor_position?: number | null
+          document_id?: number
+          id?: string
+          last_activity?: string
+          selection_end?: number | null
+          selection_start?: number | null
+          user_color?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "file_collaborators_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      file_locks: {
+        Row: {
+          document_id: number
+          expires_at: string
+          id: string
+          locked_at: string
+          session_data: Json | null
+          user_id: string
+        }
+        Insert: {
+          document_id: number
+          expires_at?: string
+          id?: string
+          locked_at?: string
+          session_data?: Json | null
+          user_id: string
+        }
+        Update: {
+          document_id?: number
+          expires_at?: string
+          id?: string
+          locked_at?: string
+          session_data?: Json | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "file_locks_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      file_versions: {
+        Row: {
+          change_description: string | null
+          content: string
+          content_hash: string
+          created_at: string
+          created_by: string
+          document_id: number
+          file_size: number | null
+          id: string
+          version_number: number
+        }
+        Insert: {
+          change_description?: string | null
+          content: string
+          content_hash: string
+          created_at?: string
+          created_by: string
+          document_id: number
+          file_size?: number | null
+          id?: string
+          version_number: number
+        }
+        Update: {
+          change_description?: string | null
+          content?: string
+          content_hash?: string
+          created_at?: string
+          created_by?: string
+          document_id?: number
+          file_size?: number | null
+          id?: string
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "file_versions_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
             referencedColumns: ["id"]
           },
         ]
@@ -577,6 +709,10 @@ export type Database = {
       belongs_to_company: {
         Args: { company_id_param: number }
         Returns: boolean
+      }
+      cleanup_expired_locks: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
       current_user_company_id: {
         Args: Record<PropertyKey, never>

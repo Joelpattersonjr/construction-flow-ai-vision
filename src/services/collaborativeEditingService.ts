@@ -239,22 +239,86 @@ export class CollaborativeEditingService {
     this.onErrorCallback = callback;
   }
 
-  // Static methods for file versions (placeholder implementations until database migration is applied)
+  // Static methods for file versions
   static async getFileVersions(documentId: string): Promise<DocumentVersion[]> {
-    console.log('Version history not yet available - database migration required');
-    return [];
+    const { data, error } = await supabase
+      .from('file_versions')
+      .select(`
+        *,
+        profiles!file_versions_created_by_fkey(full_name)
+      `)
+      .eq('document_id', parseInt(documentId))
+      .order('version_number', { ascending: false });
+
+    if (error) throw error;
+    return data || [];
   }
 
   static async getFileVersion(documentId: string, versionNumber: number): Promise<DocumentVersion | null> {
-    console.log('Version retrieval not yet available - database migration required');
-    return null;
+    const { data, error } = await supabase
+      .from('file_versions')
+      .select('*')
+      .eq('document_id', parseInt(documentId))
+      .eq('version_number', versionNumber)
+      .single();
+
+    if (error) throw error;
+    return data;
   }
 
   static async revertToVersion(documentId: string, versionNumber: number): Promise<void> {
-    throw new Error('Version revert functionality not yet available - database migration required');
+    const version = await this.getFileVersion(documentId, versionNumber);
+    if (!version) throw new Error('Version not found');
+
+    const { error } = await supabase
+      .from('documents')
+      .update({ 
+        content: version.content,
+        file_size: version.file_size,
+      })
+      .eq('id', parseInt(documentId));
+
+    if (error) throw error;
+
+    // Create a new version entry for the revert
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
+    await this.createManualVersion(documentId, version.content, `Reverted to version ${versionNumber}`);
   }
 
   static async createManualVersion(documentId: string, content: string, description: string): Promise<void> {
-    throw new Error('Manual version creation not yet available - database migration required');
+    const { data: latestVersion } = await supabase
+      .from('file_versions')
+      .select('version_number')
+      .eq('document_id', parseInt(documentId))
+      .order('version_number', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    const nextVersion = (latestVersion?.version_number || 0) + 1;
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
+    // Generate content hash
+    const encoder = new TextEncoder();
+    const data = encoder.encode(content);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const contentHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+    const { error } = await supabase
+      .from('file_versions')
+      .insert({
+        document_id: parseInt(documentId),
+        version_number: nextVersion,
+        content,
+        content_hash: contentHash,
+        created_by: user.id,
+        change_description: description,
+        file_size: content.length,
+      });
+
+    if (error) throw error;
   }
 }

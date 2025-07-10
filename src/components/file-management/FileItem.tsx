@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { File, Download, Trash2, Image, FileText, Archive, Edit2, FolderInput } from 'lucide-react';
+import { File, Download, Trash2, Image, FileText, Archive, Edit2, FolderInput, Pencil } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { FileItem, FileService, FileCategory } from '@/services/file';
 import { useToast } from '@/hooks/use-toast';
@@ -21,6 +21,7 @@ interface FileItemProps {
   isSelected?: boolean;
   onSelectionChange?: (selected: boolean) => void;
   onPreview?: () => void;
+  onEdit?: () => void;
 }
 
 const getFileIcon = (fileType: string | null) => {
@@ -43,6 +44,7 @@ const FileItemComponent: React.FC<FileItemProps> = ({
   isSelected = false,
   onSelectionChange,
   onPreview,
+  onEdit,
 }) => {
   const [isRenameOpen, setIsRenameOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -128,6 +130,22 @@ const FileItemComponent: React.FC<FileItemProps> = ({
     }
   };
 
+  const isTextFile = (fileType: string | null): boolean => {
+    if (!fileType) return false;
+    const textTypes = [
+      'text/plain',
+      'text/markdown',
+      'application/json',
+      'text/csv',
+      'text/xml',
+      'text/html',
+      'text/css',
+      'text/javascript',
+      'application/javascript',
+    ];
+    return textTypes.includes(fileType) || fileType.startsWith('text/');
+  };
+
   return (
     <>
       <div className={`group flex items-center justify-between p-3 hover:bg-muted/50 rounded-lg transition-colors ${isSelected ? 'bg-muted/50 ring-2 ring-primary' : ''}`}>
@@ -179,6 +197,23 @@ const FileItemComponent: React.FC<FileItemProps> = ({
 
           {hasWritePermission && (
             <>
+              {isTextFile(file.file_type) && onEdit && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={onEdit}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Edit file</p>
+                  </TooltipContent>
+                </Tooltip>
+              )}
+
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
