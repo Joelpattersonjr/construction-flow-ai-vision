@@ -68,7 +68,6 @@ const AdminDashboard = () => {
 
       if (projectsError) throw projectsError;
 
-      console.log('Fetched team members:', members);
       setTeamMembers(members || []);
       setPendingInvitations(invitations || []);
       setProjects(projectsData || []);
