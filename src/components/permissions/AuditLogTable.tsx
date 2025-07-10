@@ -48,6 +48,25 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({ auditLogs, loading }) => 
 
   const formatActionDescription = (entry: AuditLogEntry) => {
     const actor = entry.profiles?.full_name || 'Unknown User';
+    
+    // Handle file-related activities from metadata
+    if (entry.metadata && typeof entry.metadata === 'object') {
+      const metadata = entry.metadata as any;
+      if (metadata.action) {
+        switch (metadata.action) {
+          case 'file_uploaded':
+            return `${actor} uploaded file "${metadata.fileName}" (${metadata.fileType})`;
+          case 'file_deleted':
+            return `${actor} deleted file "${metadata.fileName}"`;
+          case 'file_renamed':
+            return `${actor} renamed file from "${metadata.oldFileName}" to "${metadata.newFileName}"`;
+          case 'file_accessed':
+            return `${actor} accessed file "${metadata.fileName}"`;
+          default:
+            break;
+        }
+      }
+    }
     const target = entry.target_profiles?.full_name || 'Unknown User';
 
     switch (entry.action_type) {

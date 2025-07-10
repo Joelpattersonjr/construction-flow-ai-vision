@@ -17,6 +17,9 @@ interface FileItemProps {
   currentPath: string;
   hasWritePermission: boolean;
   onFileDeleted: () => void;
+  isSelected?: boolean;
+  onSelectionChange?: (selected: boolean) => void;
+  onPreview?: () => void;
 }
 
 const getFileIcon = (fileType: string | null) => {
@@ -36,6 +39,9 @@ const FileItemComponent: React.FC<FileItemProps> = ({
   currentPath,
   hasWritePermission,
   onFileDeleted,
+  isSelected = false,
+  onSelectionChange,
+  onPreview,
 }) => {
   const [isRenameOpen, setIsRenameOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -116,13 +122,24 @@ const FileItemComponent: React.FC<FileItemProps> = ({
 
   return (
     <>
-      <div className="group flex items-center justify-between p-3 hover:bg-muted/50 rounded-lg transition-colors">
+      <div className={`group flex items-center justify-between p-3 hover:bg-muted/50 rounded-lg transition-colors ${isSelected ? 'bg-muted/50 ring-2 ring-primary' : ''}`}>
         <div className="flex items-center space-x-3 flex-1 min-w-0">
+          {onSelectionChange && (
+            <input
+              type="checkbox"
+              checked={isSelected}
+              onChange={(e) => onSelectionChange(e.target.checked)}
+              className="rounded border-gray-300"
+            />
+          )}
           <div className="flex-shrink-0">
             <FileIcon className="h-6 w-6 text-muted-foreground" />
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-foreground truncate">
+          <div 
+            className="flex-1 min-w-0 cursor-pointer" 
+            onClick={onPreview}
+          >
+            <p className="text-sm font-medium text-foreground truncate hover:text-primary">
               {file.file_name}
             </p>
             <div className="flex items-center space-x-2 mt-1">

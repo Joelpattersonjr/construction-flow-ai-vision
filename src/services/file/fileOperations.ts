@@ -2,6 +2,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { TablesInsert } from '@/integrations/supabase/types';
 import { hasWritePermission } from './permissions';
 import { FileCategory, UploadFileParams, DocumentRecord } from './types';
+import { auditService } from '@/services/auditService';
 
 /**
  * Upload a file to Supabase Storage and create a database record
@@ -77,6 +78,21 @@ export async function uploadFile({ file, projectId, category, folderPath = '' }:
   }
 
   console.log('Document record created successfully:', document);
+  
+  // Log file upload to audit trail
+  await auditService.logActivity({
+    projectId,
+    actionType: 'member_added', // Will be enhanced with file-specific actions
+    metadata: {
+      action: 'file_uploaded',
+      fileName: file.name,
+      fileSize: file.size,
+      fileType: file.type,
+      category,
+      folderPath: folderPath || 'root'
+    }
+  });
+  
   return document;
 }
 
@@ -100,13 +116,26 @@ export async function getProjectFiles(projectId: string): Promise<DocumentRecord
 /**
  * Get download URL for a file
  */
-export async function getFileUrl(category: FileCategory, storagePath: string): Promise<string> {
+export async function getFileUrl(category: FileCategory, storagePath: string, projectId?: string, fileName?: string): Promise<string> {
   const { data, error } = await supabase.storage
     .from(category)
     .createSignedUrl(storagePath, 3600); // 1 hour expiry
 
   if (error) {
     throw new Error(`Failed to get file URL: ${error.message}`);
+  }
+
+  // Log file access to audit trail if project info is provided
+  if (projectId && fileName) {
+    await auditService.logActivity({
+      projectId,
+      actionType: 'member_added', // Will be enhanced with file-specific actions
+      metadata: {
+        action: 'file_accessed',
+        fileName,
+        category
+      }
+    });
   }
 
   return data.signedUrl;
@@ -116,6 +145,13 @@ export async function getFileUrl(category: FileCategory, storagePath: string): P
  * Delete a file from storage and database
  */
 export async function deleteFile(documentId: number, category: FileCategory, storagePath: string): Promise<void> {
+  // Get file info for audit logging before deletion
+  const { data: document, error: fetchError } = await supabase
+    .from('documents')
+    .select('project_id, file_name')
+    .eq('id', documentId)
+    .single();
+
   // Delete from database first
   const { error: dbError } = await supabase
     .from('documents')
@@ -134,6 +170,19 @@ export async function deleteFile(documentId: number, category: FileCategory, sto
   if (storageError) {
     console.warn('Failed to delete from storage:', storageError.message);
     // Don't throw here as the database record is already deleted
+  }
+
+  // Log file deletion to audit trail
+  if (!fetchError && document) {
+    await auditService.logActivity({
+      projectId: document.project_id,
+      actionType: 'member_removed', // Will be enhanced with file-specific actions
+      metadata: {
+        action: 'file_deleted',
+        fileName: document.file_name,
+        category
+      }
+    });
   }
 }
 
@@ -162,6 +211,13 @@ export async function renameFile(documentId: number, newFileName: string): Promi
     throw new Error('File name cannot be empty');
   }
 
+  // Get old filename for audit logging
+  const { data: oldFile, error: oldFileError } = await supabase
+    .from('documents')
+    .select('file_name')
+    .eq('id', documentId)
+    .single();
+
   // Update the file name in the database
   const { error } = await supabase
     .from('documents')
@@ -170,6 +226,19 @@ export async function renameFile(documentId: number, newFileName: string): Promi
 
   if (error) {
     throw new Error(`Failed to rename file: ${error.message}`);
+  }
+
+  // Log file rename to audit trail
+  if (!oldFileError && oldFile) {
+    await auditService.logActivity({
+      projectId: document.project_id,
+      actionType: 'member_added', // Will be enhanced with file-specific actions
+      metadata: {
+        action: 'file_renamed',
+        oldFileName: oldFile.file_name,
+        newFileName: newFileName.trim()
+      }
+    });
   }
 }
 

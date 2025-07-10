@@ -15,6 +15,8 @@ interface FolderItemProps {
   hasWritePermission: boolean;
   onFolderClick: (folderPath: string) => void;
   onFolderDeleted: () => void;
+  isSelected?: boolean;
+  onSelectionChange?: (selected: boolean) => void;
 }
 
 const FolderItemComponent: React.FC<FolderItemProps> = ({
@@ -24,6 +26,8 @@ const FolderItemComponent: React.FC<FolderItemProps> = ({
   hasWritePermission,
   onFolderClick,
   onFolderDeleted,
+  isSelected = false,
+  onSelectionChange,
 }) => {
   const [isRenameOpen, setIsRenameOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -63,22 +67,32 @@ const FolderItemComponent: React.FC<FolderItemProps> = ({
 
   return (
     <>
-      <div className="group flex items-center justify-between p-3 hover:bg-muted/50 rounded-lg transition-colors">
-        <div 
-          className="flex items-center space-x-3 cursor-pointer flex-1"
-          onClick={() => onFolderClick(folder.path)}
-        >
-          <div className="flex-shrink-0">
-            <Folder className="h-6 w-6 text-blue-500 group-hover:hidden" />
-            <FolderOpen className="h-6 w-6 text-blue-600 hidden group-hover:block" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-foreground truncate">
-              {folder.name}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              Folder • {formatDistanceToNow(new Date(folder.created_at), { addSuffix: true })}
-            </p>
+      <div className={`group flex items-center justify-between p-3 hover:bg-muted/50 rounded-lg transition-colors ${isSelected ? 'bg-muted/50 ring-2 ring-primary' : ''}`}>
+        <div className="flex items-center space-x-3 flex-1">
+          {onSelectionChange && (
+            <input
+              type="checkbox"
+              checked={isSelected}
+              onChange={(e) => onSelectionChange(e.target.checked)}
+              className="rounded border-gray-300"
+            />
+          )}
+          <div 
+            className="flex items-center space-x-3 cursor-pointer flex-1"
+            onClick={() => onFolderClick(folder.path)}
+          >
+            <div className="flex-shrink-0">
+              <Folder className="h-6 w-6 text-blue-500 group-hover:hidden" />
+              <FolderOpen className="h-6 w-6 text-blue-600 hidden group-hover:block" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-foreground truncate">
+                {folder.name}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Folder • {formatDistanceToNow(new Date(folder.created_at), { addSuffix: true })}
+              </p>
+            </div>
           </div>
         </div>
         

@@ -17,6 +17,10 @@ interface FolderFileListProps {
   onNavigate: (path: string) => void;
   onContentsChanged: () => void;
   hasWritePermission: boolean;
+  selectedFiles?: FileItem[];
+  selectedFolders?: FolderItem[];
+  onSelectionChange?: (files: FileItem[], folders: FolderItem[]) => void;
+  onPreviewFile?: (file: FileItem) => void;
 }
 
 const FolderFileList: React.FC<FolderFileListProps> = ({ 
@@ -28,6 +32,10 @@ const FolderFileList: React.FC<FolderFileListProps> = ({
   onNavigate, 
   onContentsChanged,
   hasWritePermission,
+  selectedFiles = [],
+  selectedFolders = [],
+  onSelectionChange,
+  onPreviewFile,
 }) => {
   const handleFolderClick = (folderPath: string) => {
     onNavigate(folderPath);
@@ -94,6 +102,15 @@ const FolderFileList: React.FC<FolderFileListProps> = ({
                 hasWritePermission={hasWritePermission}
                 onFolderClick={handleFolderClick}
                 onFolderDeleted={onContentsChanged}
+                isSelected={selectedFolders.some(f => f.path === folder.path)}
+                onSelectionChange={(selected) => {
+                  if (onSelectionChange) {
+                    const newSelectedFolders = selected
+                      ? [...selectedFolders, folder]
+                      : selectedFolders.filter(f => f.path !== folder.path);
+                    onSelectionChange(selectedFiles, newSelectedFolders);
+                  }
+                }}
               />
             ))}
 
@@ -107,6 +124,16 @@ const FolderFileList: React.FC<FolderFileListProps> = ({
                 currentPath={currentPath}
                 hasWritePermission={hasWritePermission}
                 onFileDeleted={onContentsChanged}
+                isSelected={selectedFiles.some(f => f.id === file.id)}
+                onSelectionChange={(selected) => {
+                  if (onSelectionChange) {
+                    const newSelectedFiles = selected
+                      ? [...selectedFiles, file]
+                      : selectedFiles.filter(f => f.id !== file.id);
+                    onSelectionChange(newSelectedFiles, selectedFolders);
+                  }
+                }}
+                onPreview={() => onPreviewFile?.(file)}
               />
             ))}
           </div>
