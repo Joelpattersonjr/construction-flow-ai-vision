@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { File, Download, Trash2, Image, FileText, Archive } from 'lucide-react';
-import { DocumentRecord, FileService, FileCategory } from '@/services/fileService';
+import { DocumentRecord, FileService, FileCategory } from '@/services/file';
 import { useToast } from '@/hooks/use-toast';
 import { formatDistanceToNow } from 'date-fns';
 

@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { FolderPlus, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { FileService, FileCategory } from '@/services/fileService';
+import { FileService, FileCategory } from '@/services/file';
 
 interface CreateFolderDialogProps {
   projectId: string;

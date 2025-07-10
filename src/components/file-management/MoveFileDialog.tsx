@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { FolderOpen, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { FileService, FileCategory, FolderItem, FileItem } from '@/services/fileService';
+import { FileService, FileCategory, FolderItem, FileItem } from '@/services/file';
 
 interface MoveFileDialogProps {
   file: FileItem;

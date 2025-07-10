@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { FileService } from '@/services/fileService';
+import { FileService } from '@/services/file';
 
 interface UseProjectPermissionsReturn {
   hasWritePermission: boolean;

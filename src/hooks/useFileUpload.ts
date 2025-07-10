@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FileService, UploadFileParams, DocumentRecord } from '@/services/fileService';
+import { FileService, UploadFileParams, DocumentRecord } from '@/services/file';
 import { useToast } from '@/hooks/use-toast';
 
 interface UseFileUploadReturn {

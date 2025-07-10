@@ -6,7 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Upload, File, X } from 'lucide-react';
 import { useFileUpload } from '@/hooks/useFileUpload';
-import { FileCategory } from '@/services/fileService';
+import { FileCategory } from '@/services/file';
 
 interface FileUploadDropzoneProps {
   projectId: string;

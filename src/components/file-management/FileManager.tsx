@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Search, RefreshCw } from 'lucide-react';
 import FileUploadDropzone from './FileUploadDropzone';
 import FolderFileList from './FolderFileList';
-import { FileService, FileCategory, FolderItem, FileItem } from '@/services/fileService';
+import { FileService, FileCategory, FolderItem, FileItem } from '@/services/file';
 import { useToast } from '@/hooks/use-toast';
 import { useProjectPermissions } from '@/hooks/useProjectPermissions';
 

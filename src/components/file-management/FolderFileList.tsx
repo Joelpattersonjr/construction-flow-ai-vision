@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { File, Download, Trash2, Image, FileText, Archive, Folder, FolderOpen, Edit2, Check, X, FolderInput } from 'lucide-react';
-import { FileService, FileCategory, FolderItem, FileItem } from '@/services/fileService';
+import { FileService, FileCategory, FolderItem, FileItem } from '@/services/file';
 import { useToast } from '@/hooks/use-toast';
 import { formatDistanceToNow } from 'date-fns';
 import Breadcrumbs from './Breadcrumbs';
