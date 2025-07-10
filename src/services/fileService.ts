@@ -70,6 +70,7 @@ export class FileService {
       return false;
     }
   }
+
   /**
    * Upload a file to Supabase Storage and create a database record
    */
@@ -201,6 +202,42 @@ export class FileService {
     if (storageError) {
       console.warn('Failed to delete from storage:', storageError.message);
       // Don't throw here as the database record is already deleted
+    }
+  }
+
+  /**
+   * Rename a file in the database
+   */
+  static async renameFile(documentId: number, newFileName: string): Promise<void> {
+    // Check write permissions first
+    const { data: document, error: fetchError } = await supabase
+      .from('documents')
+      .select('project_id')
+      .eq('id', documentId)
+      .single();
+
+    if (fetchError || !document) {
+      throw new Error('File not found');
+    }
+
+    const hasPermission = await this.hasWritePermission(document.project_id);
+    if (!hasPermission) {
+      throw new Error('You do not have permission to rename files in this project');
+    }
+
+    // Validate new file name
+    if (!newFileName.trim()) {
+      throw new Error('File name cannot be empty');
+    }
+
+    // Update the file name in the database
+    const { error } = await supabase
+      .from('documents')
+      .update({ file_name: newFileName.trim() })
+      .eq('id', documentId);
+
+    if (error) {
+      throw new Error(`Failed to rename file: ${error.message}`);
     }
   }
 

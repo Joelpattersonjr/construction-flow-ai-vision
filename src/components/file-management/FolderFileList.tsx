@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { File, Download, Trash2, Image, FileText, Archive, Folder, FolderOpen } from 'lucide-react';
+import { File, Download, Trash2, Image, FileText, Archive, Folder, FolderOpen, Edit2, Check, X } from 'lucide-react';
 import { FileService, FileCategory, FolderItem, FileItem } from '@/services/fileService';
 import { useToast } from '@/hooks/use-toast';
 import { formatDistanceToNow } from 'date-fns';
@@ -73,6 +74,9 @@ const FolderFileList: React.FC<FolderFileListProps> = ({
 }) => {
   const [downloadingFiles, setDownloadingFiles] = useState<Set<number>>(new Set());
   const [deletingItems, setDeletingItems] = useState<Set<string>>(new Set());
+  const [editingFile, setEditingFile] = useState<number | null>(null);
+  const [editingFileName, setEditingFileName] = useState('');
+  const [renamingFiles, setRenamingFiles] = useState<Set<number>>(new Set());
   const { toast } = useToast();
 
   const handleDownload = async (file: FileItem) => {
@@ -167,6 +171,66 @@ const FolderFileList: React.FC<FolderFileListProps> = ({
 
   const handleFolderClick = (folder: FolderItem) => {
     onNavigate(folder.path);
+  };
+
+  const handleStartEdit = (file: FileItem) => {
+    setEditingFile(file.id);
+    setEditingFileName(file.file_name || '');
+  };
+
+  const handleCancelEdit = () => {
+    setEditingFile(null);
+    setEditingFileName('');
+  };
+
+  const handleSaveEdit = async (file: FileItem) => {
+    if (!editingFileName.trim()) {
+      toast({
+        title: "Invalid file name",
+        description: "File name cannot be empty",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (editingFileName.trim() === file.file_name) {
+      handleCancelEdit();
+      return;
+    }
+
+    setRenamingFiles(prev => new Set(prev).add(file.id));
+
+    try {
+      await FileService.renameFile(file.id, editingFileName.trim());
+      
+      toast({
+        title: "File renamed",
+        description: `File renamed to "${editingFileName.trim()}" successfully`,
+      });
+      
+      handleCancelEdit();
+      onContentChanged();
+    } catch (error) {
+      toast({
+        title: "Rename failed",
+        description: error instanceof Error ? error.message : "Failed to rename file",
+        variant: "destructive",
+      });
+    } finally {
+      setRenamingFiles(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(file.id);
+        return newSet;
+      });
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent, file: FileItem) => {
+    if (e.key === 'Enter') {
+      handleSaveEdit(file);
+    } else if (e.key === 'Escape') {
+      handleCancelEdit();
+    }
   };
 
   if (folders.length === 0 && files.length === 0) {
@@ -283,7 +347,7 @@ const FolderFileList: React.FC<FolderFileListProps> = ({
           {files.map((file) => (
             <div
               key={file.id}
-              className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50"
+              className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 group"
             >
               <div className="flex items-center space-x-3 flex-1 min-w-0">
                 <div className="text-gray-500">
@@ -291,60 +355,112 @@ const FolderFileList: React.FC<FolderFileListProps> = ({
                 </div>
                 
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate">
-                    {file.file_name}
-                  </p>
-                  <div className="flex items-center space-x-2 mt-1">
-                    <Badge className={getCategoryColor(file.category)}>
-                      {formatCategoryName(file.category)}
-                    </Badge>
-                    {file.created_at && (
-                      <span className="text-xs text-gray-500">
-                        {formatDistanceToNow(new Date(file.created_at), { addSuffix: true })}
-                      </span>
-                    )}
-                  </div>
+                  {editingFile === file.id ? (
+                    // Editing mode
+                    <div className="flex items-center space-x-2">
+                      <Input
+                        value={editingFileName}
+                        onChange={(e) => setEditingFileName(e.target.value)}
+                        onKeyDown={(e) => handleKeyPress(e, file)}
+                        className="flex-1 text-sm font-medium"
+                        placeholder="Enter file name"
+                        autoFocus
+                        disabled={renamingFiles.has(file.id)}
+                      />
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleSaveEdit(file)}
+                        disabled={renamingFiles.has(file.id) || !editingFileName.trim()}
+                      >
+                        <Check className="h-4 w-4 text-green-600" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleCancelEdit}
+                        disabled={renamingFiles.has(file.id)}
+                      >
+                        <X className="h-4 w-4 text-red-600" />
+                      </Button>
+                    </div>
+                  ) : (
+                    // Display mode
+                    <div>
+                      <p className="text-sm font-medium text-gray-900 truncate">
+                        {file.file_name}
+                      </p>
+                      <div className="flex items-center space-x-2 mt-1">
+                        <Badge className={getCategoryColor(file.category)}>
+                          {formatCategoryName(file.category)}
+                        </Badge>
+                        {file.created_at && (
+                          <span className="text-xs text-gray-500">
+                            {formatDistanceToNow(new Date(file.created_at), { addSuffix: true })}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
               
               <div className="flex items-center space-x-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleDownload(file)}
-                  disabled={downloadingFiles.has(file.id)}
-                >
-                  <Download className="h-4 w-4" />
-                </Button>
-                
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
+                {editingFile !== file.id && (
+                  <>
                     <Button
                       variant="outline"
                       size="sm"
-                      disabled={deletingItems.has(`file-${file.id}`)}
+                      onClick={() => handleDownload(file)}
+                      disabled={downloadingFiles.has(file.id)}
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Download className="h-4 w-4" />
                     </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Delete File</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        Are you sure you want to delete "{file.file_name}"? This action cannot be undone.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction
-                        onClick={() => handleDeleteFile(file)}
-                        className="bg-red-600 hover:bg-red-700"
+                    
+                    {hasWritePermission && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleStartEdit(file)}
+                        disabled={renamingFiles.has(file.id)}
+                        className="opacity-0 group-hover:opacity-100 transition-opacity"
                       >
-                        Delete
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
+                        <Edit2 className="h-4 w-4" />
+                      </Button>
+                    )}
+                    
+                    {hasWritePermission && (
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            disabled={deletingItems.has(`file-${file.id}`)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete File</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to delete "{file.file_name}"? This action cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleDeleteFile(file)}
+                              className="bg-red-600 hover:bg-red-700"
+                            >
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    )}
+                  </>
+                )}
               </div>
             </div>
           ))}
