@@ -26,14 +26,14 @@ interface TaskTemplate {
 
 interface TaskTemplateDialogProps {
   onCreateFromTemplate: (template: TaskTemplate) => void;
-  children: React.ReactNode;
+  onClose: () => void;
 }
 
 export const TaskTemplateDialog: React.FC<TaskTemplateDialogProps> = ({
   onCreateFromTemplate,
-  children,
+  onClose,
 }) => {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newTemplate, setNewTemplate] = useState({
     name: '',
@@ -157,7 +157,7 @@ export const TaskTemplateDialog: React.FC<TaskTemplateDialogProps> = ({
 
   const handleUseTemplate = (template: TaskTemplate) => {
     onCreateFromTemplate(template);
-    setOpen(false);
+    onClose();
   };
 
   const handleDeleteTemplate = (id: string) => {
@@ -167,10 +167,10 @@ export const TaskTemplateDialog: React.FC<TaskTemplateDialogProps> = ({
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {children}
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={(open) => {
+      setOpen(open);
+      if (!open) onClose();
+    }}>
       <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">

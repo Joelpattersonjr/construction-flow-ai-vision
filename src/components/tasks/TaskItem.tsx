@@ -21,9 +21,9 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { TaskWithDetails, TaskPriority, TaskStatus } from '@/types/tasks';
 // import { TaskLabels } from './TaskLabels';
-// import { TaskComments } from './TaskComments';
-// import { TaskActivityFeed } from './TaskActivityFeed';
-// import { TaskFileAttachments } from './TaskFileAttachments';
+import { TaskComments } from './TaskComments';
+import { TaskActivityFeed } from './TaskActivityFeed';
+import { TaskFileAttachments } from './TaskFileAttachments';
 
 interface TaskItemProps {
   task: TaskWithDetails;
@@ -247,11 +247,9 @@ export const TaskItem: React.FC<TaskItemProps> = ({
         {/* Collapsible sections for detailed features */}
         <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
           <CollapsibleContent className="space-y-4 mt-4">
-          {/* Detailed features - Temporarily disabled */}
-          {/* <TaskComments taskId={task.id} />
-          <TaskActivityFeed taskId={task.id} />
-          <TaskFileAttachments taskId={task.id} /> */}
-          <div className="text-sm text-muted-foreground">Additional features temporarily disabled</div>
+            <TaskComments taskId={task.id} />
+            <TaskActivityFeed taskId={task.id} />
+            <TaskFileAttachments taskId={task.id} />
           </CollapsibleContent>
         </Collapsible>
       </CardContent>

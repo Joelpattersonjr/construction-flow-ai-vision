@@ -6,53 +6,63 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface TaskFiltersProps {
-  searchTerm: string;
-  setSearchTerm: (value: string) => void;
-  selectedProject: string;
-  setSelectedProject: (value: string) => void;
-  selectedStatus: string;
-  setSelectedStatus: (value: string) => void;
-  selectedPriority: string;
-  setSelectedPriority: (value: string) => void;
+  filters: {
+    status: string;
+    priority: string;
+    assignee: string;
+    project: string;
+    search: string;
+  };
+  onFiltersChange: (filters: any) => void;
   projects: Array<{ id: string; name: string }>;
-  onClearFilters: () => void;
+  teamMembers: Array<{ id: string; full_name: string; email: string }>;
 }
 
 export const TaskFilters: React.FC<TaskFiltersProps> = ({
-  searchTerm,
-  setSearchTerm,
-  selectedProject,
-  setSelectedProject,
-  selectedStatus,
-  setSelectedStatus,
-  selectedPriority,
-  setSelectedPriority,
+  filters,
+  onFiltersChange,
   projects,
-  onClearFilters,
+  teamMembers,
 }) => {
+  const updateFilter = (key: string, value: string) => {
+    onFiltersChange({ ...filters, [key]: value });
+  };
+
+  const clearFilters = () => {
+    onFiltersChange({
+      status: '',
+      priority: '',
+      assignee: '',
+      project: '',
+      search: ''
+    });
+  };
+
+  const hasActiveFilters = Object.values(filters).some(value => value !== '');
+
   return (
     <Card className="mb-6">
       <CardHeader>
         <CardTitle>Filters</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Search tasks..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              value={filters.search}
+              onChange={(e) => updateFilter('search', e.target.value)}
               className="pl-10"
             />
           </div>
           
-          <Select value={selectedProject} onValueChange={setSelectedProject}>
+          <Select value={filters.project} onValueChange={(value) => updateFilter('project', value)}>
             <SelectTrigger>
               <SelectValue placeholder="All Projects" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Projects</SelectItem>
+              <SelectItem value="">All Projects</SelectItem>
               {projects.map((project) => (
                 <SelectItem key={project.id} value={project.id}>
                   {project.name}
@@ -61,12 +71,12 @@ export const TaskFilters: React.FC<TaskFiltersProps> = ({
             </SelectContent>
           </Select>
 
-          <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+          <Select value={filters.status} onValueChange={(value) => updateFilter('status', value)}>
             <SelectTrigger>
               <SelectValue placeholder="All Status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="">All Status</SelectItem>
               <SelectItem value="todo">To Do</SelectItem>
               <SelectItem value="in_progress">In Progress</SelectItem>
               <SelectItem value="review">Review</SelectItem>
@@ -75,12 +85,12 @@ export const TaskFilters: React.FC<TaskFiltersProps> = ({
             </SelectContent>
           </Select>
 
-          <Select value={selectedPriority} onValueChange={setSelectedPriority}>
+          <Select value={filters.priority} onValueChange={(value) => updateFilter('priority', value)}>
             <SelectTrigger>
               <SelectValue placeholder="All Priority" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Priority</SelectItem>
+              <SelectItem value="">All Priority</SelectItem>
               <SelectItem value="low">Low</SelectItem>
               <SelectItem value="medium">Medium</SelectItem>
               <SelectItem value="high">High</SelectItem>
@@ -88,7 +98,22 @@ export const TaskFilters: React.FC<TaskFiltersProps> = ({
             </SelectContent>
           </Select>
 
-          <Button variant="outline" onClick={onClearFilters}>
+          <Select value={filters.assignee} onValueChange={(value) => updateFilter('assignee', value)}>
+            <SelectTrigger>
+              <SelectValue placeholder="All Assignees" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">All Assignees</SelectItem>
+              <SelectItem value="unassigned">Unassigned</SelectItem>
+              {teamMembers.map((member) => (
+                <SelectItem key={member.id} value={member.id}>
+                  {member.full_name || member.email}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Button variant="outline" onClick={clearFilters} disabled={!hasActiveFilters}>
             Clear Filters
           </Button>
         </div>

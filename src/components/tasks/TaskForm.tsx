@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { TaskWithDetails, TaskPriority, TaskStatus } from '@/types/tasks';
-// import { TaskDependencySelector } from './TaskDependencySelector';
+import { TaskDependencySelector } from './TaskDependencySelector';
 // import { TaskTemplateDialog } from './TaskTemplateDialog';
 import { cn } from '@/lib/utils';
 
@@ -38,7 +38,7 @@ interface TaskFormProps {
   projects: Array<{ id: string; name: string }>;
   teamMembers: Array<{ id: string; full_name: string; email: string }>;
   onSubmit: (data: TaskFormData) => Promise<void>;
-  children: React.ReactNode;
+  onClose?: () => void;
 }
 
 const statusOptions: { value: TaskStatus; label: string }[] = [
@@ -62,9 +62,9 @@ export const TaskForm: React.FC<TaskFormProps> = ({
   projects,
   teamMembers,
   onSubmit,
-  children,
+  onClose,
 }) => {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   
   const form = useForm<TaskFormData>({
     resolver: zodResolver(taskSchema),
@@ -90,15 +90,15 @@ export const TaskForm: React.FC<TaskFormProps> = ({
 
   const handleSubmit = async (data: TaskFormData) => {
     await onSubmit(data);
-    setOpen(false);
+    onClose?.();
     form.reset();
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {children}
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={(open) => {
+      setOpen(open);
+      if (!open) onClose?.();
+    }}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>{task ? 'Edit Task' : 'Create New Task'}</DialogTitle>
@@ -325,15 +325,15 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                 )}
               />
 
-              {/* Dependency Selector - Temporarily disabled */}
-              {/* <div className="col-span-2">
+              {/* Dependency Selector */}
+              <div className="col-span-2">
                 <TaskDependencySelector
                   tasks={tasks}
                   currentTaskId={task?.id}
                   selectedDependency={form.watch('dependency_id')}
                   onDependencyChange={(id) => form.setValue('dependency_id', id)}
                 />
-              </div> */}
+              </div>
             </div>
 
             {/* Template and Actions */}
@@ -348,7 +348,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                 </TaskTemplateDialog>
               )} */}
                <div className="flex gap-2 ml-auto">
-                <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+                <Button type="button" variant="outline" onClick={onClose}>
                   Cancel
                 </Button>
                 <Button type="submit">
