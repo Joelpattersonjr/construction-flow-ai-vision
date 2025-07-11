@@ -346,12 +346,13 @@ const Tasks = () => {
           </TabsContent>
 
           <TabsContent value="kanban" className="mt-6">
-            <Card>
-              <CardContent className="text-center py-8">
-                <p className="text-muted-foreground">Kanban board temporarily disabled for debugging</p>
-                <p className="text-sm text-muted-foreground mt-2">Tasks found: {filteredTasks.length}</p>
-              </CardContent>
-            </Card>
+            <DragDropKanban
+              tasks={filteredTasks}
+              onStatusChange={handleStatusChange}
+              onEditTask={setEditingTask}
+              onAddLabel={handleAddLabel}
+              onRemoveLabel={handleRemoveLabel}
+            />
           </TabsContent>
         </Tabs>
       </main>
