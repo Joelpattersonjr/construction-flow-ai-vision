@@ -1,127 +1,174 @@
-import React, { useState } from 'react';
-import { Plus } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Plus, Search, Filter, ListIcon, Grid3X3Icon, EditIcon } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { useToast } from '@/hooks/use-toast';
 import AppHeader from '@/components/navigation/AppHeader';
 import { TaskForm } from '@/components/tasks/TaskForm';
 import { TaskItem } from '@/components/tasks/TaskItem';
-import { TaskFilters } from '@/components/tasks/TaskFilters';
-import { BulkOperations } from '@/components/tasks/BulkOperations';
-import { TaskTemplateDialog } from '@/components/tasks/TaskTemplateDialog';
-import { useTasks } from '@/hooks/useTasks';
-import { TaskWithDetails, TaskStatus } from '@/types/tasks';
+import { taskService } from '@/services/taskService';
+import { TaskWithDetails, TaskStatus, TaskPriority } from '@/types/tasks';
+import { supabase } from '@/integrations/supabase/client';
 
 const Tasks = () => {
-  const [showTaskForm, setShowTaskForm] = useState(false);
-  const [showTemplateDialog, setShowTemplateDialog] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedProject, setSelectedProject] = useState<string>('all');
+  const [selectedStatus, setSelectedStatus] = useState<string>('all');
+  const [selectedPriority, setSelectedPriority] = useState<string>('all');
   const [editingTask, setEditingTask] = useState<TaskWithDetails | null>(null);
-  const [selectedTasks, setSelectedTasks] = useState<number[]>([]);
-  const [filters, setFilters] = useState({
-    status: 'all',
-    priority: 'all',
-    assignee: 'all',
-    project: 'all',
-    search: ''
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  // Fetch tasks
+  const { data: tasks = [], isLoading: tasksLoading } = useQuery({
+    queryKey: ['tasks'],
+    queryFn: () => taskService.getCompanyTasks(),
   });
 
-  const {
-    tasks,
-    projects,
-    teamMembers,
-    tasksLoading,
-    tasksError,
-    handleCreateTask,
-    handleUpdateTask,
-    handleDeleteTask,
-    handleStatusChange,
-    handleAddLabel,
-    handleRemoveLabel,
-  } = useTasks();
+  // Fetch projects
+  const { data: projects = [] } = useQuery({
+    queryKey: ['projects'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('projects')
+        .select('id, name')
+        .order('name');
+      if (error) throw error;
+      return data || [];
+    },
+  });
 
-  // Filter tasks based on current filters
-  const filteredTasks = tasks.filter(task => {
-    if (filters.status && filters.status !== 'all' && task.status !== filters.status) return false;
-    if (filters.priority && filters.priority !== 'all' && task.priority !== filters.priority) return false;
-    if (filters.assignee && filters.assignee !== 'all' && task.assignee_id !== filters.assignee) return false;
-    if (filters.project && filters.project !== 'all' && task.project_id !== filters.project) return false;
-    if (filters.search && !task.title?.toLowerCase().includes(filters.search.toLowerCase())) return false;
-    return true;
+  // Fetch team members
+  const { data: teamMembers = [] } = useQuery({
+    queryKey: ['team-members'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, full_name, email')
+        .order('full_name');
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
+  // Create task mutation
+  const createTaskMutation = useMutation({
+    mutationFn: (taskData: any) => taskService.createTask({
+      ...taskData,
+      start_date: taskData.start_date?.toISOString().split('T')[0],
+      end_date: taskData.end_date?.toISOString().split('T')[0],
+    }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      toast({ title: 'Task created successfully!' });
+    },
+    onError: (error) => {
+      toast({
+        title: 'Error creating task',
+        description: error instanceof Error ? error.message : 'Unknown error',
+        variant: 'destructive',
+      });
+    },
+  });
+
+  // Update task mutation
+  const updateTaskMutation = useMutation({
+    mutationFn: ({ id, updates }: { id: number; updates: any }) => 
+      taskService.updateTask(id, {
+        ...updates,
+        start_date: updates.start_date?.toISOString().split('T')[0],
+        end_date: updates.end_date?.toISOString().split('T')[0],
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      toast({ title: 'Task updated successfully!' });
+      setEditingTask(null);
+    },
+    onError: (error) => {
+      toast({
+        title: 'Error updating task',
+        description: error instanceof Error ? error.message : 'Unknown error',
+        variant: 'destructive',
+      });
+    },
+  });
+
+  // Delete task mutation
+  const deleteTaskMutation = useMutation({
+    mutationFn: (id: number) => taskService.deleteTask(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      toast({ title: 'Task deleted successfully!' });
+    },
+    onError: (error) => {
+      toast({
+        title: 'Error deleting task',
+        description: error instanceof Error ? error.message : 'Unknown error',
+        variant: 'destructive',
+      });
+    },
+  });
+
+  // Filter tasks
+  const filteredTasks = tasks.filter((task) => {
+    const matchesSearch = !searchTerm || 
+      task.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      task.description?.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesProject = !selectedProject || selectedProject === 'all' || task.project_id === selectedProject;
+    const matchesStatus = !selectedStatus || selectedStatus === 'all' || task.status === selectedStatus;
+    const matchesPriority = !selectedPriority || selectedPriority === 'all' || task.priority === selectedPriority;
+
+    return matchesSearch && matchesProject && matchesStatus && matchesPriority;
   });
 
   // Group tasks by status for kanban view
-  const tasksByStatus = filteredTasks.reduce((acc, task) => {
-    const status = (task.status as TaskStatus) || 'todo';
-    if (!acc[status]) acc[status] = [];
-    acc[status].push(task);
-    return acc;
-  }, {} as Record<TaskStatus, TaskWithDetails[]>);
+  const tasksByStatus = {
+    todo: filteredTasks.filter(task => task.status === 'todo'),
+    in_progress: filteredTasks.filter(task => task.status === 'in_progress'),
+    review: filteredTasks.filter(task => task.status === 'review'),
+    completed: filteredTasks.filter(task => task.status === 'completed'),
+    blocked: filteredTasks.filter(task => task.status === 'blocked'),
+  };
 
-  const statusColumns: { key: TaskStatus; label: string; color: string }[] = [
-    { key: 'todo', label: 'To Do', color: 'bg-gray-100' },
-    { key: 'in_progress', label: 'In Progress', color: 'bg-blue-100' },
-    { key: 'review', label: 'Review', color: 'bg-yellow-100' },
-    { key: 'completed', label: 'Completed', color: 'bg-green-100' },
-    { key: 'blocked', label: 'Blocked', color: 'bg-red-100' },
+  const handleCreateTask = async (taskData: any) => {
+    await createTaskMutation.mutateAsync(taskData);
+  };
+
+  const handleUpdateTask = async (taskData: any) => {
+    if (!editingTask) return;
+    await updateTaskMutation.mutateAsync({
+      id: editingTask.id,
+      updates: taskData,
+    });
+  };
+
+  const handleDeleteTask = async (taskId: number) => {
+    if (confirm('Are you sure you want to delete this task?')) {
+      await deleteTaskMutation.mutateAsync(taskId);
+    }
+  };
+
+  const handleStatusChange = async (taskId: number, status: TaskStatus) => {
+    await updateTaskMutation.mutateAsync({
+      id: taskId,
+      updates: { status },
+    });
+  };
+
+  const statusColumns = [
+    { id: 'todo', label: 'To Do', color: 'bg-gray-50' },
+    { id: 'in_progress', label: 'In Progress', color: 'bg-blue-50' },
+    { id: 'review', label: 'Review', color: 'bg-yellow-50' },
+    { id: 'completed', label: 'Completed', color: 'bg-green-50' },
+    { id: 'blocked', label: 'Blocked', color: 'bg-red-50' },
   ];
-
-  const handleTaskSelect = (taskId: number, selected: boolean) => {
-    if (selected) {
-      setSelectedTasks(prev => [...prev, taskId]);
-    } else {
-      setSelectedTasks(prev => prev.filter(id => id !== taskId));
-    }
-  };
-
-  const handleSelectAll = (selected: boolean) => {
-    if (selected) {
-      setSelectedTasks(filteredTasks.map(task => task.id));
-    } else {
-      setSelectedTasks([]);
-    }
-  };
-
-  const handleBulkStatusChange = async (status: TaskStatus) => {
-    try {
-      await Promise.all(
-        selectedTasks.map(taskId => handleStatusChange(taskId, status))
-      );
-      setSelectedTasks([]);
-    } catch (error) {
-      console.error('Error updating task statuses:', error);
-    }
-  };
-
-  const handleEdit = (task: TaskWithDetails) => {
-    setEditingTask(task);
-    setShowTaskForm(true);
-  };
-
-  const handleCloseForm = () => {
-    setShowTaskForm(false);
-    setEditingTask(null);
-  };
-
-  const getDependencyTask = (dependencyId: number | null) => {
-    if (!dependencyId) return null;
-    return tasks.find(task => task.id === dependencyId) || null;
-  };
-
-  if (tasksError) {
-    return (
-      <div className="min-h-screen bg-background">
-        <AppHeader />
-        <main className="container mx-auto py-6 px-4">
-          <div className="text-center py-8">
-            <p className="text-lg text-destructive">
-              Error loading tasks: {tasksError.message}
-            </p>
-          </div>
-        </main>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -132,110 +179,172 @@ const Tasks = () => {
           <div>
             <h1 className="text-3xl font-bold">Tasks</h1>
             <p className="text-muted-foreground">
-              Manage and track your project tasks
+              Manage and track project tasks
             </p>
           </div>
           
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setShowTemplateDialog(true)}
-            >
-              Templates
-            </Button>
-            <Button onClick={() => setShowTaskForm(true)}>
+          <TaskForm
+            projects={projects}
+            teamMembers={teamMembers}
+            onSubmit={editingTask ? handleUpdateTask : handleCreateTask}
+            task={editingTask}
+          >
+            <Button>
               <Plus className="h-4 w-4 mr-2" />
               New Task
             </Button>
-          </div>
+          </TaskForm>
         </div>
 
         {/* Filters */}
-        <TaskFilters
-          filters={filters}
-          onFiltersChange={setFilters}
-          projects={projects}
-          teamMembers={teamMembers}
-        />
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Filters</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search tasks..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              
+              <Select value={selectedProject} onValueChange={setSelectedProject}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All Projects" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Projects</SelectItem>
+                  {projects.map((project) => (
+                    <SelectItem key={project.id} value={project.id}>
+                      {project.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-        {/* Bulk Operations */}
-        {selectedTasks.length > 0 && (
-          <BulkOperations
-            selectedTasks={selectedTasks}
-            tasks={filteredTasks}
-            onBulkStatusChange={(taskIds, status) => {
-              Promise.all(taskIds.map(taskId => handleStatusChange(taskId, status)));
-              setSelectedTasks([]);
-            }}
-            onBulkDelete={(taskIds) => {
-              Promise.all(taskIds.map(taskId => handleDeleteTask(taskId)));
-              setSelectedTasks([]);
-            }}
-            onClearSelection={() => setSelectedTasks([])}
-          />
-        )}
+              <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="todo">To Do</SelectItem>
+                  <SelectItem value="in_progress">In Progress</SelectItem>
+                  <SelectItem value="review">Review</SelectItem>
+                  <SelectItem value="completed">Completed</SelectItem>
+                  <SelectItem value="blocked">Blocked</SelectItem>
+                </SelectContent>
+              </Select>
 
-        <Tabs defaultValue="list" className="space-y-6">
-          <TabsList>
-            <TabsTrigger value="list">List View</TabsTrigger>
-            <TabsTrigger value="kanban">Kanban Board</TabsTrigger>
+              <Select value={selectedPriority} onValueChange={setSelectedPriority}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All Priority" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Priority</SelectItem>
+                  <SelectItem value="low">Low</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="high">High</SelectItem>
+                  <SelectItem value="critical">Critical</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  setSearchTerm('');
+                  setSelectedProject('all');
+                  setSelectedStatus('all');
+                  setSelectedPriority('all');
+                }}
+              >
+                Clear Filters
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Task Views */}
+        <Tabs defaultValue="list" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
+            <TabsTrigger value="list" className="flex items-center gap-2">
+              <ListIcon className="h-4 w-4" />
+              List View
+            </TabsTrigger>
+            <TabsTrigger value="kanban" className="flex items-center gap-2">
+              <Grid3X3Icon className="h-4 w-4" />
+              Kanban Board
+            </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="list" className="space-y-4">
+          <TabsContent value="list" className="mt-6">
             {tasksLoading ? (
-              <div className="text-center py-8">
-                <p className="text-muted-foreground">Loading tasks...</p>
-              </div>
+              <div className="text-center py-8">Loading tasks...</div>
             ) : filteredTasks.length === 0 ? (
-              <div className="text-center py-8">
-                <p className="text-muted-foreground">
-                  {tasks.length === 0 ? 'No tasks yet. Create your first task!' : 'No tasks match the current filters.'}
-                </p>
-              </div>
+              <Card>
+                <CardContent className="text-center py-8">
+                  <p className="text-muted-foreground">No tasks found</p>
+                </CardContent>
+              </Card>
             ) : (
-              filteredTasks.map((task) => (
-                <TaskItem
-                  key={task.id}
-                  task={task}
-                  onEdit={handleEdit}
-                  onDelete={handleDeleteTask}
-                  onStatusChange={handleStatusChange}
-                  onAddLabel={handleAddLabel}
-                  onRemoveLabel={handleRemoveLabel}
-                  isSelected={selectedTasks.includes(task.id)}
-                  onSelect={handleTaskSelect}
-                  dependencyTask={getDependencyTask(task.dependency_id)}
-                />
-              ))
+              <div className="grid gap-4">
+                {filteredTasks.map((task) => (
+                  <TaskItem
+                    key={task.id}
+                    task={task}
+                    onEdit={setEditingTask}
+                    onDelete={handleDeleteTask}
+                    onStatusChange={handleStatusChange}
+                  />
+                ))}
+              </div>
             )}
           </TabsContent>
 
-          <TabsContent value="kanban" className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
-              {statusColumns.map(({ key, label, color }) => (
-                <Card key={key} className="min-h-[400px]">
+          <TabsContent value="kanban" className="mt-6">
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 min-h-[600px]">
+              {statusColumns.map((column) => (
+                <Card key={column.id} className={`${column.color} border-dashed`}>
                   <CardHeader className="pb-3">
-                    <CardTitle className="flex items-center justify-between text-sm">
-                      <span>{label}</span>
-                      <Badge variant="secondary" className={color}>
-                        {tasksByStatus[key]?.length || 0}
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-sm font-medium">
+                        {column.label}
+                      </CardTitle>
+                      <Badge variant="secondary">
+                        {tasksByStatus[column.id as keyof typeof tasksByStatus].length}
                       </Badge>
-                    </CardTitle>
+                    </div>
                   </CardHeader>
                   <CardContent className="space-y-3">
-                    {tasksByStatus[key]?.map((task) => (
-                      <TaskItem
-                        key={task.id}
-                        task={task}
-                        onEdit={handleEdit}
-                        onDelete={handleDeleteTask}
-                        onStatusChange={handleStatusChange}
-                        onAddLabel={handleAddLabel}
-                        onRemoveLabel={handleRemoveLabel}
-                        isSelected={selectedTasks.includes(task.id)}
-                        onSelect={handleTaskSelect}
-                        dependencyTask={getDependencyTask(task.dependency_id)}
-                      />
+                    {tasksByStatus[column.id as keyof typeof tasksByStatus].map((task) => (
+                      <div key={task.id} className="bg-white rounded-lg border p-3 shadow-sm hover:shadow-md transition-shadow">
+                        <h4 className="font-medium text-sm mb-1">{task.title}</h4>
+                        {task.description && (
+                          <p className="text-xs text-muted-foreground mb-2 line-clamp-2">
+                            {task.description}
+                          </p>
+                        )}
+                        <div className="flex items-center justify-between">
+                          <Badge variant="outline">
+                            {task.priority}
+                          </Badge>
+                          <div className="flex gap-1">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => setEditingTask(task)}
+                              className="h-6 w-6 p-0"
+                            >
+                              <EditIcon className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
                     ))}
                   </CardContent>
                 </Card>
@@ -244,32 +353,6 @@ const Tasks = () => {
           </TabsContent>
         </Tabs>
       </main>
-
-      {/* Task Form Dialog */}
-      {showTaskForm && (
-        <TaskForm
-          task={editingTask}
-          projects={projects}
-          teamMembers={teamMembers}
-          tasks={tasks}
-          onSubmit={editingTask ? 
-            (data) => handleUpdateTask(editingTask.id, data) : 
-            handleCreateTask
-          }
-          onClose={handleCloseForm}
-        />
-      )}
-
-      {/* Task Template Dialog */}
-      {showTemplateDialog && (
-        <TaskTemplateDialog
-          onClose={() => setShowTemplateDialog(false)}
-          onCreateFromTemplate={(templateData) => {
-            handleCreateTask(templateData);
-            setShowTemplateDialog(false);
-          }}
-        />
-      )}
     </div>
   );
 };

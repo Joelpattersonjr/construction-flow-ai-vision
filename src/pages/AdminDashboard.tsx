@@ -32,25 +32,13 @@ const AdminDashboard = () => {
   const isCompanyAdmin = profile?.company_role === 'company_admin';
 
   useEffect(() => {
-    console.log('AdminDashboard useEffect triggered', { 
-      isCompanyAdmin, 
-      profile: profile ? { company_id: profile.company_id, company_role: profile.company_role } : null 
-    });
-    
-    if (!isCompanyAdmin) {
-      console.log('User is not company admin, skipping data fetch');
-      return;
-    }
+    if (!isCompanyAdmin) return;
     
     fetchTeamData();
   }, [isCompanyAdmin]);
 
   const fetchTeamData = async () => {
-    console.log('fetchTeamData called', { profile_company_id: profile?.company_id });
-    if (!profile?.company_id) {
-      console.log('No company_id found, returning early');
-      return;
-    }
+    if (!profile?.company_id) return;
 
     try {
       setLoading(true);
