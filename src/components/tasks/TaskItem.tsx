@@ -14,12 +14,15 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { TaskWithDetails, TaskPriority, TaskStatus } from '@/types/tasks';
+import { TaskLabels } from './TaskLabels';
 
 interface TaskItemProps {
   task: TaskWithDetails;
   onEdit: (task: TaskWithDetails) => void;
   onDelete: (taskId: number) => void;
   onStatusChange: (taskId: number, status: TaskStatus) => void;
+  onAddLabel?: (taskId: number, name: string, color: string) => void;
+  onRemoveLabel?: (labelId: string) => void;
 }
 
 const statusConfig = {
@@ -42,6 +45,8 @@ export const TaskItem: React.FC<TaskItemProps> = ({
   onEdit,
   onDelete,
   onStatusChange,
+  onAddLabel,
+  onRemoveLabel,
 }) => {
   const status = (task.status as TaskStatus) || 'todo';
   const priority = (task.priority as TaskPriority) || 'medium';
@@ -140,6 +145,15 @@ export const TaskItem: React.FC<TaskItemProps> = ({
             </div>
           </div>
         </div>
+
+        {task.labels && task.labels.length > 0 && onAddLabel && onRemoveLabel && (
+          <TaskLabels
+            labels={task.labels}
+            onAddLabel={(name, color) => onAddLabel(task.id, name, color)}
+            onRemoveLabel={onRemoveLabel}
+            className="mt-2"
+          />
+        )}
 
         {(task.start_date && task.end_date) && (
           <div className="mt-3 pt-3 border-t">

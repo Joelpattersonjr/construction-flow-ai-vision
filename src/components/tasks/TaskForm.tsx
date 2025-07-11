@@ -262,6 +262,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                           onSelect={field.onChange}
                           disabled={(date) => date < new Date("1900-01-01")}
                           initialFocus
+                          className="p-3 pointer-events-auto"
                         />
                       </PopoverContent>
                     </Popover>
@@ -302,6 +303,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                           onSelect={field.onChange}
                           disabled={(date) => date < new Date("1900-01-01")}
                           initialFocus
+                          className="p-3 pointer-events-auto"
                         />
                       </PopoverContent>
                     </Popover>

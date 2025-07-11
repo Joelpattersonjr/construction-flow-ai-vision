@@ -12,6 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import AppHeader from '@/components/navigation/AppHeader';
 import { TaskForm } from '@/components/tasks/TaskForm';
 import { TaskItem } from '@/components/tasks/TaskItem';
+import { DragDropKanban } from '@/components/tasks/DragDropKanban';
 import { taskService } from '@/services/taskService';
 import { TaskWithDetails, TaskStatus, TaskPriority } from '@/types/tasks';
 import { supabase } from '@/integrations/supabase/client';
@@ -115,6 +116,39 @@ const Tasks = () => {
     },
   });
 
+  // Add label mutation
+  const addLabelMutation = useMutation({
+    mutationFn: ({ taskId, name, color }: { taskId: number; name: string; color: string }) =>
+      taskService.addTaskLabel(taskId, name, color),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      toast({ title: 'Label added successfully!' });
+    },
+    onError: (error) => {
+      toast({
+        title: 'Error adding label',
+        description: error instanceof Error ? error.message : 'Unknown error',
+        variant: 'destructive',
+      });
+    },
+  });
+
+  // Remove label mutation  
+  const removeLabelMutation = useMutation({
+    mutationFn: (labelId: string) => taskService.removeTaskLabel(labelId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      toast({ title: 'Label removed successfully!' });
+    },
+    onError: (error) => {
+      toast({
+        title: 'Error removing label',
+        description: error instanceof Error ? error.message : 'Unknown error',
+        variant: 'destructive',
+      });
+    },
+  });
+
   // Filter tasks
   const filteredTasks = tasks.filter((task) => {
     const matchesSearch = !searchTerm || 
@@ -128,13 +162,12 @@ const Tasks = () => {
     return matchesSearch && matchesProject && matchesStatus && matchesPriority;
   });
 
-  // Group tasks by status for kanban view
-  const tasksByStatus = {
-    todo: filteredTasks.filter(task => task.status === 'todo'),
-    in_progress: filteredTasks.filter(task => task.status === 'in_progress'),
-    review: filteredTasks.filter(task => task.status === 'review'),
-    completed: filteredTasks.filter(task => task.status === 'completed'),
-    blocked: filteredTasks.filter(task => task.status === 'blocked'),
+  const handleAddLabel = async (taskId: number, name: string, color: string) => {
+    await addLabelMutation.mutateAsync({ taskId, name, color });
+  };
+
+  const handleRemoveLabel = async (labelId: string) => {
+    await removeLabelMutation.mutateAsync(labelId);
   };
 
   const handleCreateTask = async (taskData: any) => {
@@ -161,14 +194,6 @@ const Tasks = () => {
       updates: { status },
     });
   };
-
-  const statusColumns = [
-    { id: 'todo', label: 'To Do', color: 'bg-gray-50' },
-    { id: 'in_progress', label: 'In Progress', color: 'bg-blue-50' },
-    { id: 'review', label: 'Review', color: 'bg-yellow-50' },
-    { id: 'completed', label: 'Completed', color: 'bg-green-50' },
-    { id: 'blocked', label: 'Blocked', color: 'bg-red-50' },
-  ];
 
   return (
     <div className="min-h-screen bg-background">
@@ -300,6 +325,8 @@ const Tasks = () => {
                     onEdit={setEditingTask}
                     onDelete={handleDeleteTask}
                     onStatusChange={handleStatusChange}
+                    onAddLabel={handleAddLabel}
+                    onRemoveLabel={handleRemoveLabel}
                   />
                 ))}
               </div>
@@ -307,49 +334,13 @@ const Tasks = () => {
           </TabsContent>
 
           <TabsContent value="kanban" className="mt-6">
-            <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 min-h-[600px]">
-              {statusColumns.map((column) => (
-                <Card key={column.id} className={`${column.color} border-dashed`}>
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-sm font-medium">
-                        {column.label}
-                      </CardTitle>
-                      <Badge variant="secondary">
-                        {tasksByStatus[column.id as keyof typeof tasksByStatus].length}
-                      </Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    {tasksByStatus[column.id as keyof typeof tasksByStatus].map((task) => (
-                      <div key={task.id} className="bg-white rounded-lg border p-3 shadow-sm hover:shadow-md transition-shadow">
-                        <h4 className="font-medium text-sm mb-1">{task.title}</h4>
-                        {task.description && (
-                          <p className="text-xs text-muted-foreground mb-2 line-clamp-2">
-                            {task.description}
-                          </p>
-                        )}
-                        <div className="flex items-center justify-between">
-                          <Badge variant="outline">
-                            {task.priority}
-                          </Badge>
-                          <div className="flex gap-1">
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => setEditingTask(task)}
-                              className="h-6 w-6 p-0"
-                            >
-                              <EditIcon className="h-3 w-3" />
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            <DragDropKanban
+              tasks={filteredTasks}
+              onStatusChange={handleStatusChange}
+              onEditTask={setEditingTask}
+              onAddLabel={handleAddLabel}
+              onRemoveLabel={handleRemoveLabel}
+            />
           </TabsContent>
         </Tabs>
       </main>
