@@ -28,12 +28,7 @@ const Tasks = () => {
   // Fetch tasks
   const { data: tasks = [], isLoading: tasksLoading } = useQuery({
     queryKey: ['tasks'],
-    queryFn: async () => {
-      console.log('🔄 Query: Fetching tasks...');
-      const result = await taskService.getCompanyTasks();
-      console.log('📋 Query result: tasks =', result);
-      return result;
-    },
+    queryFn: () => taskService.getCompanyTasks(),
   });
 
   // Fetch projects

@@ -824,6 +824,20 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "fk_tasks_assignee_id"
+            columns: ["assignee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_tasks_created_by"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "tasks_dependency_id_fkey"
             columns: ["dependency_id"]
             isOneToOne: false
