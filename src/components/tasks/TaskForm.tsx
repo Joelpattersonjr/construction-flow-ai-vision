@@ -64,16 +64,32 @@ export const TaskForm: React.FC<TaskFormProps> = ({
   const form = useForm<TaskFormData>({
     resolver: zodResolver(taskSchema),
     defaultValues: {
-      title: task?.title || '',
-      description: task?.description || '',
-      status: (task?.status as TaskStatus) || 'todo',
-      priority: (task?.priority as TaskPriority) || 'medium',
-      start_date: task?.start_date ? new Date(task.start_date) : undefined,
-      end_date: task?.end_date ? new Date(task.end_date) : undefined,
-      project_id: task?.project_id || projects[0]?.id || '',
-      assignee_id: task?.assignee_id || 'none',
+      title: '',
+      description: '',
+      status: 'todo',
+      priority: 'medium',
+      start_date: undefined,
+      end_date: undefined,
+      project_id: projects[0]?.id || '',
+      assignee_id: 'none',
     },
   });
+
+  // Reset form with task data when task changes or dialog opens
+  React.useEffect(() => {
+    if (open) {
+      form.reset({
+        title: task?.title || '',
+        description: task?.description || '',
+        status: (task?.status as TaskStatus) || 'todo',
+        priority: (task?.priority as TaskPriority) || 'medium',
+        start_date: task?.start_date ? new Date(task.start_date) : undefined,
+        end_date: task?.end_date ? new Date(task.end_date) : undefined,
+        project_id: task?.project_id || projects[0]?.id || '',
+        assignee_id: task?.assignee_id || 'none',
+      });
+    }
+  }, [task, open, projects, form]);
 
   const handleSubmit = async (data: TaskFormData) => {
     await onSubmit(data);
@@ -81,8 +97,18 @@ export const TaskForm: React.FC<TaskFormProps> = ({
     form.reset();
   };
 
+  const handleOpenChange = (newOpen: boolean) => {
+    setOpen(newOpen);
+    if (!newOpen) {
+      // Clear form when dialog closes
+      setTimeout(() => {
+        form.reset();
+      }, 100);
+    }
+  };
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>
@@ -132,7 +158,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Project</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select project" />
@@ -157,7 +183,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Assignee</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select assignee" />
@@ -186,7 +212,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Status</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select status" />
@@ -211,7 +237,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Priority</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select priority" />
