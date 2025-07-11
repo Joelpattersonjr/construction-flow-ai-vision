@@ -14,7 +14,7 @@ import FileManagement from "./pages/FileManagement";
 import Projects from "./pages/Projects";
 import ProjectDetails from "./pages/ProjectDetails";
 import ProjectPermissions from "./pages/ProjectPermissions";
-import TasksSimple from "./pages/TasksSimple";
+import Tasks from "./pages/Tasks";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -75,7 +75,7 @@ const App = () => {
                 path="/tasks" 
                 element={
                   <ProtectedRoute>
-                    <TasksSimple />
+                    <Tasks />
                   </ProtectedRoute>
                 } 
               />

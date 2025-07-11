@@ -26,11 +26,19 @@ const Tasks = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Fetch tasks
-  const { data: tasks = [], isLoading: tasksLoading } = useQuery({
+  // Fetch tasks with error handling
+  const { data: tasks = [], isLoading: tasksLoading, error: tasksError } = useQuery({
     queryKey: ['tasks'],
     queryFn: () => taskService.getCompanyTasks(),
+    retry: false,
   });
+
+  // Log any task loading errors
+  React.useEffect(() => {
+    if (tasksError) {
+      console.error('Tasks loading error:', tasksError);
+    }
+  }, [tasksError]);
 
   // Fetch projects
   const { data: projects = [] } = useQuery({
