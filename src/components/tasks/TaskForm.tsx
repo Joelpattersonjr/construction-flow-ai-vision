@@ -34,7 +34,9 @@ interface TaskFormProps {
   projects: Array<{ id: string; name: string }>;
   teamMembers: Array<{ id: string; full_name: string; email: string }>;
   onSubmit: (data: TaskFormData) => Promise<void>;
-  children: React.ReactNode;
+  children?: React.ReactNode;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 const statusOptions: { value: TaskStatus; label: string }[] = [
@@ -58,8 +60,14 @@ export const TaskForm: React.FC<TaskFormProps> = ({
   teamMembers,
   onSubmit,
   children,
+  open: externalOpen,
+  onOpenChange: externalOnOpenChange,
 }) => {
-  const [open, setOpen] = React.useState(false);
+  const [internalOpen, setInternalOpen] = React.useState(false);
+  
+  // Use external open state if provided, otherwise use internal
+  const open = externalOpen !== undefined ? externalOpen : internalOpen;
+  const setOpen = externalOnOpenChange || setInternalOpen;
   
   const form = useForm<TaskFormData>({
     resolver: zodResolver(taskSchema),
@@ -77,7 +85,6 @@ export const TaskForm: React.FC<TaskFormProps> = ({
 
   // Reset form with task data when task changes or dialog opens
   React.useEffect(() => {
-    console.log('TaskForm useEffect triggered', { task, open, taskTitle: task?.title });
     if (open) {
       const formData = {
         title: task?.title || '',
@@ -89,7 +96,6 @@ export const TaskForm: React.FC<TaskFormProps> = ({
         project_id: task?.project_id || projects[0]?.id || '',
         assignee_id: task?.assignee_id || 'none',
       };
-      console.log('Resetting form with data:', formData);
       form.reset(formData);
     }
   }, [task, open, projects, form]);
@@ -112,9 +118,11 @@ export const TaskForm: React.FC<TaskFormProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogTrigger asChild>
-        {children}
-      </DialogTrigger>
+      {children && (
+        <DialogTrigger asChild>
+          {children}
+        </DialogTrigger>
+      )}
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>{task ? 'Edit Task' : 'Create New Task'}</DialogTitle>

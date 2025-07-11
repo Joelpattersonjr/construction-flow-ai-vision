@@ -25,9 +25,14 @@ const Tasks = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Add logging when editingTask changes
+  // State for edit dialog
+  const [editDialogOpen, setEditDialogOpen] = React.useState(false);
+
+  // Open edit dialog when editingTask is set
   React.useEffect(() => {
-    console.log('editingTask state changed:', editingTask);
+    if (editingTask) {
+      setEditDialogOpen(true);
+    }
   }, [editingTask]);
 
   // Fetch tasks
@@ -94,6 +99,7 @@ const Tasks = () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       toast({ title: 'Task updated successfully!' });
       setEditingTask(null);
+      setEditDialogOpen(false);
     },
     onError: (error) => {
       toast({
@@ -191,15 +197,28 @@ const Tasks = () => {
           <TaskForm
             projects={projects}
             teamMembers={teamMembers}
-            onSubmit={editingTask ? handleUpdateTask : handleCreateTask}
-            task={editingTask}
-            key={editingTask ? `edit-${editingTask.id}` : 'create'}
+            onSubmit={handleCreateTask}
           >
             <Button>
               <Plus className="h-4 w-4 mr-2" />
               New Task
             </Button>
           </TaskForm>
+
+          {/* Separate Edit Dialog */}
+          <TaskForm
+            projects={projects}
+            teamMembers={teamMembers}
+            onSubmit={handleUpdateTask}
+            task={editingTask}
+            open={editDialogOpen}
+            onOpenChange={(open) => {
+              setEditDialogOpen(open);
+              if (!open) {
+                setEditingTask(null);
+              }
+            }}
+          />
         </div>
 
         {/* Filters */}

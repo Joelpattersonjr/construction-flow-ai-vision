@@ -88,10 +88,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => {
-                console.log('Edit button clicked for task:', task);
-                onEdit(task);
-              }}
+              onClick={() => onEdit(task)}
               className="h-8 w-8 p-0"
               title="Edit Task"
             >
