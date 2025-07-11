@@ -197,7 +197,7 @@ export function DragDropKanban({
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 8,
+        distance: 3,
       },
     })
   );
@@ -209,11 +209,13 @@ export function DragDropKanban({
   }, {} as Record<string, TaskWithDetails[]>);
 
   function handleDragStart(event: DragStartEvent) {
+    console.log('Drag start:', event.active.id);
     const task = tasks.find(t => t.id === event.active.id);
     setActiveTask(task || null);
   }
 
   function handleDragEnd(event: DragEndEvent) {
+    console.log('Drag end:', event.active.id, 'over:', event.over?.id);
     const { active, over } = event;
     setActiveTask(null);
 
@@ -221,6 +223,8 @@ export function DragDropKanban({
 
     const taskId = active.id as number;
     const newStatus = over.id as TaskStatus;
+    
+    console.log('Status change:', taskId, 'from', tasks.find(t => t.id === taskId)?.status, 'to', newStatus);
     
     // Find current task and check if status changed
     const task = tasks.find(t => t.id === taskId);
