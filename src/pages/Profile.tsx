@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { AvatarUpload } from '@/components/profile/AvatarUpload';
 import { PreferencesForm } from '@/components/profile/PreferencesForm';
+import { NotificationTestPanel } from '@/components/profile/NotificationTestPanel';
 import { profileService, UserPreferences } from '@/services/profileService';
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, Save } from 'lucide-react';
@@ -200,6 +201,11 @@ export default function Profile() {
               onPreferencesChange={handlePreferencesChange}
             />
           </div>
+        </div>
+
+        {/* Email Notification System Testing */}
+        <div className="mt-8">
+          <NotificationTestPanel />
         </div>
 
         {/* Save Button */}
