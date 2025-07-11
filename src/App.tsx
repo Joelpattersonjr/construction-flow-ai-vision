@@ -10,7 +10,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import AdminDashboard from "./pages/AdminDashboard";
 import InviteAcceptance from "./pages/InviteAcceptance";
-import FileManagement from "./pages/FileManagement";
+import FileManagementSimple from "./pages/FileManagementSimple";
 import Projects from "./pages/Projects";
 import ProjectDetails from "./pages/ProjectDetails";
 import ProjectPermissions from "./pages/ProjectPermissions";
@@ -67,7 +67,7 @@ const App = () => {
                 path="/files" 
                 element={
                   <ProtectedRoute>
-                    <FileManagement />
+                    <FileManagementSimple />
                   </ProtectedRoute>
                 } 
               />
