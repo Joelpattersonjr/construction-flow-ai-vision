@@ -76,6 +76,41 @@ export const useAuthActions = () => {
         console.log('Sign in result:', { signInError });
         
         if (!signInError) {
+          // After successful sign in, we need to link the existing profile data to the new auth user
+          const currentAuthUser = (await supabase.auth.getUser()).data.user;
+          if (currentAuthUser && currentAuthUser.id !== result.existing_profile_id) {
+            console.log('Linking existing profile data to new auth user');
+            
+            // Get the existing profile data
+            const { data: existingProfile } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', result.existing_profile_id)
+              .single();
+            
+            if (existingProfile) {
+              // Update the auto-created profile with the existing profile data
+              await supabase
+                .from('profiles')
+                .update({
+                  full_name: existingProfile.full_name,
+                  email: existingProfile.email,
+                  job_title: existingProfile.job_title,
+                  company_id: existingProfile.company_id,
+                  company_role: existingProfile.company_role,
+                  custom_fields: existingProfile.custom_fields,
+                  updated_at: new Date().toISOString()
+                })
+                .eq('id', currentAuthUser.id);
+              
+              // Delete the old profile
+              await supabase
+                .from('profiles')
+                .delete()
+                .eq('id', result.existing_profile_id);
+            }
+          }
+          
           // Mark temporary password as used
           await supabase
             .from('admin_password_resets')
