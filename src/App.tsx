@@ -87,8 +87,16 @@ const App = () => {
                   </ProtectedRoute>
                 } 
               />
-              <Route path="/test" element={<div>TEST ROUTE WORKS</div>} />
-              <Route path="/invite/:token" element={<InviteAcceptance />} />
+              <Route path="/test" element={<div>TEST ROUTE WORKS - App is loading properly!</div>} />
+              <Route path="/simple-tasks" element={
+                <ProtectedRoute>
+                  <div className="p-8">
+                    <h1 className="text-2xl font-bold mb-4">Simple Tasks Page</h1>
+                    <p>If you can see this, the routing and authentication are working.</p>
+                    <p>Navigate to /tasks to test the full Tasks page.</p>
+                  </div>
+                </ProtectedRoute>
+              } />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
