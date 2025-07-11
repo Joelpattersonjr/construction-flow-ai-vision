@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { format } from 'date-fns';
 import { 
   CalendarIcon, 
@@ -6,7 +6,10 @@ import {
   EditIcon, 
   TrashIcon,
   ClockIcon,
-  FlagIcon
+  FlagIcon,
+  MessageSquare,
+  Paperclip,
+  Eye
 } from 'lucide-react';
 
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -14,6 +17,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { TaskWithDetails, TaskPriority, TaskStatus } from '@/types/tasks';
+import { TaskDetailsDialog } from './TaskDetailsDialog';
 
 interface TaskItemProps {
   task: TaskWithDetails;
@@ -43,6 +47,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
   onDelete,
   onStatusChange,
 }) => {
+  const [showDetails, setShowDetails] = useState(false);
   const status = (task.status as TaskStatus) || 'todo';
   const priority = (task.priority as TaskPriority) || 'medium';
   
@@ -74,8 +79,18 @@ export const TaskItem: React.FC<TaskItemProps> = ({
             <Button
               variant="ghost"
               size="sm"
+              onClick={() => setShowDetails(true)}
+              className="h-8 w-8 p-0"
+              title="View Details"
+            >
+              <Eye className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() => onEdit(task)}
               className="h-8 w-8 p-0"
+              title="Edit Task"
             >
               <EditIcon className="h-4 w-4" />
             </Button>
@@ -84,6 +99,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
               size="sm"
               onClick={() => onDelete(task.id)}
               className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+              title="Delete Task"
             >
               <TrashIcon className="h-4 w-4" />
             </Button>
@@ -148,7 +164,25 @@ export const TaskItem: React.FC<TaskItemProps> = ({
             </div>
           </div>
         )}
+
+        {/* Quick Info Actions */}
+        <div className="mt-3 pt-3 border-t flex items-center gap-4 text-xs text-muted-foreground">
+          <div className="flex items-center gap-1 cursor-pointer hover:text-foreground" onClick={() => setShowDetails(true)}>
+            <MessageSquare className="h-3 w-3" />
+            <span>Comments</span>
+          </div>
+          <div className="flex items-center gap-1 cursor-pointer hover:text-foreground" onClick={() => setShowDetails(true)}>
+            <Paperclip className="h-3 w-3" />
+            <span>Files</span>
+          </div>
+        </div>
       </CardContent>
+
+      <TaskDetailsDialog
+        task={task}
+        open={showDetails}
+        onOpenChange={setShowDetails}
+      />
     </Card>
   );
 };

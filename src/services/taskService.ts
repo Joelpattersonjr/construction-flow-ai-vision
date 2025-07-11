@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { Task, TaskWithDetails, TaskLabel } from "@/types/tasks";
+import { taskActivityService } from "./taskActivityService";
 
 export const taskService = {
   // Get all tasks for a project
@@ -55,6 +56,13 @@ export const taskService = {
 
   // Update a task
   async updateTask(id: number, updates: Partial<Task>): Promise<Task> {
+    // Get current task for comparison
+    const { data: currentTask } = await supabase
+      .from('tasks')
+      .select('*')
+      .eq('id', id)
+      .single();
+
     const updateData = {
       ...updates,
       assignee_id: updates.assignee_id === 'none' ? null : updates.assignee_id,
@@ -68,6 +76,45 @@ export const taskService = {
       .single();
 
     if (error) throw error;
+
+    // Create activity log for significant changes
+    if (currentTask) {
+      const changes = [];
+      if (currentTask.status !== updateData.status && updateData.status) {
+        changes.push({
+          field: 'status',
+          old: currentTask.status,
+          new: updateData.status
+        });
+      }
+      if (currentTask.assignee_id !== updateData.assignee_id) {
+        changes.push({
+          field: 'assignee',
+          old: currentTask.assignee_id,
+          new: updateData.assignee_id
+        });
+      }
+      if (currentTask.priority !== updateData.priority && updateData.priority) {
+        changes.push({
+          field: 'priority',
+          old: currentTask.priority,
+          new: updateData.priority
+        });
+      }
+
+      // Log each change
+      for (const change of changes) {
+        await taskActivityService.createActivity(
+          id,
+          'updated',
+          `${change.field} changed`,
+          change.field,
+          change.old,
+          change.new
+        );
+      }
+    }
+
     return data as Task;
   },
 
