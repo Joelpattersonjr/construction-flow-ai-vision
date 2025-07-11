@@ -16,7 +16,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { EditIcon } from 'lucide-react';
+import { EditIcon, GripVertical } from 'lucide-react';
 import { TaskWithDetails, TaskStatus } from '@/types/tasks';
 import { TaskLabels } from './TaskLabels';
 
@@ -37,6 +37,7 @@ interface SortableTaskCardProps {
 
 interface TaskCardProps extends SortableTaskCardProps {
   isDragging?: boolean;
+  dragHandleProps?: any;
 }
 
 const statusColumns = [
@@ -54,7 +55,7 @@ const priorityConfig = {
   critical: { label: 'Critical', color: 'text-red-600' },
 };
 
-function TaskCard({ task, onEditTask, onAddLabel, onRemoveLabel, isDragging = false }: TaskCardProps) {
+function TaskCard({ task, onEditTask, onAddLabel, onRemoveLabel, isDragging = false, dragHandleProps }: TaskCardProps) {
   const priority = priorityConfig[task.priority as keyof typeof priorityConfig] || priorityConfig.medium;
   
   return (
@@ -64,7 +65,15 @@ function TaskCard({ task, onEditTask, onAddLabel, onRemoveLabel, isDragging = fa
       }`}
     >
       <div className="flex items-start justify-between mb-2">
-        <h4 className="font-medium text-sm flex-1">{task.title}</h4>
+        <div className="flex items-center gap-2 flex-1">
+          <div 
+            {...dragHandleProps}
+            className="cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground"
+          >
+            <GripVertical className="h-4 w-4" />
+          </div>
+          <h4 className="font-medium text-sm flex-1">{task.title}</h4>
+        </div>
         <Button
           size="sm"
           variant="ghost"
@@ -76,21 +85,23 @@ function TaskCard({ task, onEditTask, onAddLabel, onRemoveLabel, isDragging = fa
       </div>
       
       {task.description && (
-        <p className="text-xs text-muted-foreground mb-2 line-clamp-2">
+        <p className="text-xs text-muted-foreground mb-2 line-clamp-2 ml-6">
           {task.description}
         </p>
       )}
       
       {task.labels && task.labels.length > 0 && (
-        <TaskLabels
-          labels={task.labels}
-          onAddLabel={(name, color) => onAddLabel(task.id, name, color)}
-          onRemoveLabel={onRemoveLabel}
-          className="mb-2"
-        />
+        <div className="ml-6">
+          <TaskLabels
+            labels={task.labels}
+            onAddLabel={(name, color) => onAddLabel(task.id, name, color)}
+            onRemoveLabel={onRemoveLabel}
+            className="mb-2"
+          />
+        </div>
       )}
       
-      <div className="flex items-center justify-between mt-2">
+      <div className="flex items-center justify-between mt-2 ml-6">
         <Badge variant="outline" className={priority.color}>
           {priority.label}
         </Badge>
@@ -124,10 +135,8 @@ function SortableTaskCard(props: SortableTaskCardProps) {
       ref={setNodeRef}
       style={style}
       {...attributes}
-      {...listeners}
-      className="cursor-grab active:cursor-grabbing"
     >
-      <TaskCard {...props} isDragging={isDragging} />
+      <TaskCard {...props} isDragging={isDragging} dragHandleProps={listeners} />
     </div>
   );
 }
