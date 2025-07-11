@@ -175,6 +175,16 @@ const Tasks = () => {
     blocked: filteredTasks.filter(task => task.status === 'blocked'),
   };
 
+  // Debug logging
+  console.log('Tasks debug:', {
+    totalTasks: tasks.length,
+    filteredTasks: filteredTasks.length,
+    tasksByStatus: currentTasksByStatus,
+    selectedProject,
+    selectedStatus,
+    selectedPriority
+  });
+
   // Update local state when filtered tasks change
   React.useEffect(() => {
     if (Object.keys(localTasksByStatus).length === 0) {
