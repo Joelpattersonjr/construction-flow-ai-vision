@@ -15,11 +15,11 @@ interface SimpleKanbanProps {
 }
 
 const statusColumns = [
-  { id: 'todo', label: 'To Do', color: 'bg-gray-50' },
-  { id: 'in_progress', label: 'In Progress', color: 'bg-blue-50' },
-  { id: 'review', label: 'Review', color: 'bg-yellow-50' },
-  { id: 'completed', label: 'Completed', color: 'bg-green-50' },
-  { id: 'blocked', label: 'Blocked', color: 'bg-red-50' },
+  { id: 'todo', label: 'To Do', shortLabel: 'To Do', color: 'bg-gray-50' },
+  { id: 'in_progress', label: 'In Progress', shortLabel: 'Progress', color: 'bg-blue-50' },
+  { id: 'review', label: 'Review', shortLabel: 'Review', color: 'bg-yellow-50' },
+  { id: 'completed', label: 'Completed', shortLabel: 'Done', color: 'bg-green-50' },
+  { id: 'blocked', label: 'Blocked', shortLabel: 'Blocked', color: 'bg-red-50' },
 ];
 
 const priorityConfig = {
@@ -71,11 +71,11 @@ function SimpleTaskCard({ task, onEditTask, onStatusChange }: SimpleTaskCardProp
           value={task.status || 'todo'} 
           onValueChange={(value) => onStatusChange(task.id, value as TaskStatus)}
         >
-          <SelectTrigger className="w-20 h-6 text-xs border-0 bg-transparent p-1">
+          <SelectTrigger className="w-16 h-6 text-xs border-0 bg-transparent p-1 [&>span]:truncate">
             <SelectValue />
           </SelectTrigger>
           <SelectContent 
-            className="min-w-32 z-50" 
+            className="min-w-20 z-50" 
             position="popper"
             sideOffset={5}
             align="end"
@@ -84,9 +84,9 @@ function SimpleTaskCard({ task, onEditTask, onStatusChange }: SimpleTaskCardProp
               <SelectItem 
                 key={status.id} 
                 value={status.id}
-                className="text-xs cursor-pointer"
+                className="text-xs cursor-pointer px-2 py-1"
               >
-                {status.label}
+                {status.shortLabel}
               </SelectItem>
             ))}
           </SelectContent>
