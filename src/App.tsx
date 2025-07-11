@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -21,6 +20,25 @@ const queryClient = new QueryClient();
 
 const App = () => {
   console.log('🔥 App component rendering');
+  
+  // Simple test to check if React is working
+  const isTestMode = window.location.pathname === '/basic-test';
+  
+  if (isTestMode) {
+    return (
+      <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
+        <h1>App is Loading!</h1>
+        <p>If you can see this, the basic React app is working.</p>
+        <p>Current time: {new Date().toLocaleString()}</p>
+        <button onClick={() => alert('Button works!')}>Test Button</button>
+        <hr />
+        <p>Try these links:</p>
+        <a href="/test" style={{ marginRight: '10px' }}>Simple Test</a>
+        <a href="/" style={{ marginRight: '10px' }}>Home</a>
+        <a href="/tasks">Tasks</a>
+      </div>
+    );
+  }
   
   return (
     <QueryClientProvider client={queryClient}>
@@ -87,7 +105,7 @@ const App = () => {
                   </ProtectedRoute>
                 } 
               />
-              <Route path="/test" element={<div>TEST ROUTE WORKS - App is loading properly!</div>} />
+              <Route path="/test" element={<div style={{ padding: '20px' }}>TEST ROUTE WORKS - App is loading properly!</div>} />
               <Route path="/simple-tasks" element={
                 <ProtectedRoute>
                   <div className="p-8">
@@ -97,7 +115,7 @@ const App = () => {
                   </div>
                 </ProtectedRoute>
               } />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="/invite/:token" element={<InviteAcceptance />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
