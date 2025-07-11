@@ -106,9 +106,20 @@ export function SimpleKanban({
   console.log('🔍 SimpleKanban - Total tasks received:', tasks.length);
   console.log('🔍 SimpleKanban - Tasks by status:', tasks.map(t => ({ id: t.id, title: t.title, status: t.status })));
   
-  // Group tasks by status
+  // Group tasks by status - handle both string and numeric status values
   const tasksByStatus = statusColumns.reduce((acc, column) => {
-    acc[column.id] = tasks.filter(task => task.status === column.id);
+    acc[column.id] = tasks.filter(task => {
+      // Handle legacy numeric status values
+      const statusValue = task.status?.toString();
+      if (statusValue === '1') return column.id === 'todo';
+      if (statusValue === '2') return column.id === 'in_progress';
+      if (statusValue === '3') return column.id === 'review';
+      if (statusValue === '4') return column.id === 'completed';
+      if (statusValue === '5') return column.id === 'blocked';
+      
+      // Handle string status values
+      return task.status === column.id;
+    });
     return acc;
   }, {} as Record<string, TaskWithDetails[]>);
 
