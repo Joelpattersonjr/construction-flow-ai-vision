@@ -18,6 +18,8 @@ import { TaskWithDetails, TaskStatus, TaskPriority } from '@/types/tasks';
 import { supabase } from '@/integrations/supabase/client';
 
 const Tasks = () => {
+  console.log('🔥 Tasks component rendering');
+  
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedProject, setSelectedProject] = useState<string>('all');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
@@ -25,6 +27,8 @@ const Tasks = () => {
   const [editingTask, setEditingTask] = useState<TaskWithDetails | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  console.log('✅ State initialized successfully');
 
   // Fetch tasks with error handling
   const { data: tasks = [], isLoading: tasksLoading, error: tasksError } = useQuery({
@@ -342,13 +346,12 @@ const Tasks = () => {
           </TabsContent>
 
           <TabsContent value="kanban" className="mt-6">
-            <DragDropKanban
-              tasks={filteredTasks}
-              onStatusChange={handleStatusChange}
-              onEditTask={setEditingTask}
-              onAddLabel={handleAddLabel}
-              onRemoveLabel={handleRemoveLabel}
-            />
+            <Card>
+              <CardContent className="text-center py-8">
+                <p className="text-muted-foreground">Kanban board temporarily disabled for debugging</p>
+                <p className="text-sm text-muted-foreground mt-2">Tasks found: {filteredTasks.length}</p>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </main>
