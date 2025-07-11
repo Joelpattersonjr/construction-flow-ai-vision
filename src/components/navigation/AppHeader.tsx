@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Folder, Files, Users, Home } from 'lucide-react';
+import { Folder, Files, Users, Home, CheckSquare } from 'lucide-react';
 import UserProfilePopover from './UserProfilePopover';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -15,6 +15,7 @@ const AppHeader: React.FC = () => {
   const navigationItems = [
     { path: '/', label: 'Dashboard', icon: Home },
     { path: '/projects', label: 'Projects', icon: Folder },
+    { path: '/tasks', label: 'Tasks', icon: CheckSquare },
     { path: '/files', label: 'Files', icon: Files },
     ...(profile?.company_role === 'company_admin' ? [
       { path: '/admin', label: 'Admin', icon: Users }
