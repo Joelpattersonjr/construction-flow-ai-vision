@@ -54,18 +54,17 @@ export const useAuthActions = () => {
 
       if (tempPasswordRecord) {
         console.log('Found temporary password record:', tempPasswordRecord);
-        console.log('Looking up profile for email:', email);
         
-        // Get user by email to verify it matches
+        // Verify the profile exists for this user_id
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('id, email')
-          .eq('email', email)
+          .eq('id', tempPasswordRecord.user_id)
           .maybeSingle();
 
-        console.log('Profile lookup result:', { profile, profileError });
+        console.log('Profile lookup by user_id result:', { profile, profileError });
 
-        if (profile && profile.id === tempPasswordRecord.user_id) {
+        if (profile) {
           console.log('Profile matches temporary password user_id, proceeding with temp password login');
           
           // First, try to create the user in auth.users if they don't exist
