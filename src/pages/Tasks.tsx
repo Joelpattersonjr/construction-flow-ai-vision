@@ -12,6 +12,7 @@ import {
   DragOverlay,
   closestCorners
 } from '@dnd-kit/core';
+import { arrayMove } from '@dnd-kit/sortable';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -44,6 +45,7 @@ const Tasks = () => {
   
   // Drag and drop state
   const [activeTask, setActiveTask] = useState<TaskWithDetails | null>(null);
+  const [localTasksByStatus, setLocalTasksByStatus] = useState<Record<string, TaskWithDetails[]>>({});
   
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -164,14 +166,27 @@ const Tasks = () => {
     return matchesSearch && matchesProject && matchesStatus && matchesPriority;
   });
 
-  // Group tasks by status for kanban view
-  const tasksByStatus = {
+  // Group tasks by status for kanban view - use local state if available
+  const currentTasksByStatus = Object.keys(localTasksByStatus).length > 0 ? localTasksByStatus : {
     todo: filteredTasks.filter(task => task.status === 'todo'),
     in_progress: filteredTasks.filter(task => task.status === 'in_progress'),
     review: filteredTasks.filter(task => task.status === 'review'),
     completed: filteredTasks.filter(task => task.status === 'completed'),
     blocked: filteredTasks.filter(task => task.status === 'blocked'),
   };
+
+  // Update local state when filtered tasks change
+  React.useEffect(() => {
+    if (Object.keys(localTasksByStatus).length === 0) {
+      setLocalTasksByStatus({
+        todo: filteredTasks.filter(task => task.status === 'todo'),
+        in_progress: filteredTasks.filter(task => task.status === 'in_progress'),
+        review: filteredTasks.filter(task => task.status === 'review'),
+        completed: filteredTasks.filter(task => task.status === 'completed'),
+        blocked: filteredTasks.filter(task => task.status === 'blocked'),
+      });
+    }
+  }, [filteredTasks, localTasksByStatus]);
 
   const handleCreateTask = async (taskData: any) => {
     await createTaskMutation.mutateAsync(taskData);
@@ -233,41 +248,62 @@ const Tasks = () => {
     if (activeId === overId) return;
 
     const isActiveATask = active.data.current?.type === 'Task';
+    const isOverATask = over.data.current?.type === 'Task';
     const isOverAColumn = over.data.current?.type === 'Column';
 
-    // Only allow drops on columns, not on other tasks
-    if (!isActiveATask || !isOverAColumn) return;
+    if (!isActiveATask) return;
 
-    // Dragging a task over a column
-    const newStatus = over.data.current?.status as TaskStatus;
-    const task = active.data.current?.task as TaskWithDetails;
-    
-    if (task && task.status !== newStatus) {
-      handleStatusChange(task.id, newStatus);
+    const activeTask = active.data.current?.task as TaskWithDetails;
+
+    // Handle task reordering within the same column
+    if (isActiveATask && isOverATask) {
+      const overTask = over.data.current?.task as TaskWithDetails;
+      
+      // Only allow reordering within the same status
+      if (activeTask.status === overTask.status) {
+        const activeStatus = activeTask.status as string;
+        const activeIndex = currentTasksByStatus[activeStatus].findIndex(task => task.id === activeTask.id);
+        const overIndex = currentTasksByStatus[activeStatus].findIndex(task => task.id === overTask.id);
+        
+        if (activeIndex !== overIndex) {
+          setLocalTasksByStatus(prev => ({
+            ...prev,
+            [activeStatus]: arrayMove(prev[activeStatus], activeIndex, overIndex)
+          }));
+        }
+      }
+      return;
+    }
+
+    // Handle moving tasks between columns
+    if (isActiveATask && isOverAColumn) {
+      const newStatus = over.data.current?.status as TaskStatus;
+      
+      if (activeTask && activeTask.status !== newStatus) {
+        // Update local state immediately for smooth UI
+        setLocalTasksByStatus(prev => {
+          const oldStatus = activeTask.status as string;
+          const newTasks = { ...prev };
+          
+          // Remove from old column
+          newTasks[oldStatus] = newTasks[oldStatus].filter(task => task.id !== activeTask.id);
+          
+          // Add to new column
+          const updatedTask = { ...activeTask, status: newStatus };
+          newTasks[newStatus] = [...newTasks[newStatus], updatedTask];
+          
+          return newTasks;
+        });
+        
+        // Update in database
+        handleStatusChange(activeTask.id, newStatus);
+      }
     }
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
     setActiveTask(null);
-    const { active, over } = event;
-    if (!over) return;
-
-    const activeId = active.id;
-    const overId = over.id;
-
-    if (activeId === overId) return;
-
-    const isActiveATask = active.data.current?.type === 'Task';
-    const isOverAColumn = over.data.current?.type === 'Column';
-
-    if (isActiveATask && isOverAColumn) {
-      const newStatus = over.data.current?.status as TaskStatus;
-      const task = active.data.current?.task as TaskWithDetails;
-      
-      if (task && task.status !== newStatus) {
-        handleStatusChange(task.id, newStatus);
-      }
-    }
+    // No additional logic needed as handleDragOver handles everything
   };
 
   const statusColumns = [
@@ -446,7 +482,7 @@ const Tasks = () => {
                     key={column.id}
                     id={column.id}
                     title={column.label}
-                    tasks={tasksByStatus[column.id as keyof typeof tasksByStatus]}
+                    tasks={currentTasksByStatus[column.id as keyof typeof currentTasksByStatus]}
                     color={column.color}
                     onEditTask={setEditingTask}
                   />
