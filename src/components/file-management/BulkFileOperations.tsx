@@ -153,7 +153,7 @@ const BulkFileOperations: React.FC<BulkFileOperationsProps> = ({
                 <SelectValue placeholder="Select folder..." />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Root</SelectItem>
+                <SelectItem value="root">Root</SelectItem>
                 {/* Would need to populate with available folders */}
               </SelectContent>
             </Select>

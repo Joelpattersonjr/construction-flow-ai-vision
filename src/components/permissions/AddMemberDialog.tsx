@@ -122,7 +122,7 @@ const AddMemberDialog: React.FC<AddMemberDialogProps> = ({
     if (defaultTemplate) {
       setSelectedTemplate(defaultTemplate.id);
     } else {
-      setSelectedTemplate('');
+      setSelectedTemplate('manual');
     }
   };
 
@@ -130,7 +130,7 @@ const AddMemberDialog: React.FC<AddMemberDialogProps> = ({
   const handleTemplateChange = (templateId: string) => {
     setSelectedTemplate(templateId);
     
-    if (templateId) {
+    if (templateId && templateId !== 'manual') {
       const template = templates.find(t => t.id === templateId);
       if (template) {
         setRole(template.role);
@@ -207,7 +207,7 @@ const AddMemberDialog: React.FC<AddMemberDialogProps> = ({
 
       setOpen(false);
       setSelectedUserId('');
-      setSelectedTemplate('');
+      setSelectedTemplate('manual');
       setRole('member');
       setPermissions({ read: true, write: false, admin: false });
       onMemberAdded();
@@ -325,7 +325,7 @@ const AddMemberDialog: React.FC<AddMemberDialogProps> = ({
                   <SelectValue placeholder="Choose a template or set manually" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">
+                  <SelectItem value="manual">
                     <div>
                       <div className="font-medium">Manual Setup</div>
                       <div className="text-xs text-gray-500">Set permissions manually</div>
