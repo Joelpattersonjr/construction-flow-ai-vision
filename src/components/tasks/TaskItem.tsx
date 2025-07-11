@@ -48,18 +48,23 @@ export const TaskItem: React.FC<TaskItemProps> = ({
   onAddLabel,
   onRemoveLabel,
 }) => {
-  const status = (task.status as TaskStatus) || 'todo';
-  const priority = (task.priority as TaskPriority) || 'medium';
+  // Safely handle status and priority with proper fallbacks
+  const statusKey = task.status && typeof task.status === 'string' && task.status in statusConfig 
+    ? task.status as TaskStatus 
+    : 'todo';
+  const priorityKey = task.priority && typeof task.priority === 'string' && task.priority in priorityConfig 
+    ? task.priority as TaskPriority 
+    : 'medium';
   
-  const statusStyle = statusConfig[status];
-  const priorityStyle = priorityConfig[priority];
+  const statusStyle = statusConfig[statusKey];
+  const priorityStyle = priorityConfig[priorityKey];
 
   const getInitials = (name: string | null | undefined): string => {
     if (!name) return '?';
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   };
 
-  const isOverdue = task.end_date && new Date(task.end_date) < new Date() && status !== 'completed';
+  const isOverdue = task.end_date && new Date(task.end_date) < new Date() && statusKey !== 'completed';
 
   return (
     <Card className={`transition-all hover:shadow-md ${isOverdue ? 'border-red-200 bg-red-50' : ''}`}>
