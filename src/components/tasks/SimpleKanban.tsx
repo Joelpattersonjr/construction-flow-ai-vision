@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { EditIcon } from 'lucide-react';
 import { TaskWithDetails, TaskStatus } from '@/types/tasks';
 
@@ -66,19 +67,21 @@ function SimpleTaskCard({ task, onEditTask, onStatusChange }: SimpleTaskCardProp
           {priority.label}
         </Badge>
         
-        <div className="flex gap-1">
-          {statusColumns.map((status) => (
-            <Button
-              key={status.id}
-              size="sm"
-              variant={task.status === status.id ? "default" : "outline"}
-              onClick={() => onStatusChange(task.id, status.id as TaskStatus)}
-              className="h-6 text-xs px-2"
-            >
-              {status.label.split(' ')[0]} {/* Show first word only */}
-            </Button>
-          ))}
-        </div>
+        <Select 
+          value={task.status || 'todo'} 
+          onValueChange={(value) => onStatusChange(task.id, value as TaskStatus)}
+        >
+          <SelectTrigger className="w-24 h-6 text-xs">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {statusColumns.map((status) => (
+              <SelectItem key={status.id} value={status.id}>
+                {status.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
     </div>
   );
