@@ -41,6 +41,7 @@ export const useAuthActions = () => {
       }
 
       // Check if this is a temporary password
+      console.log('Checking temporary password:', password, 'for email:', email);
       const { data: tempPasswordRecord, error: tempPasswordError } = await supabase
         .from('admin_password_resets')
         .select('*')
@@ -48,6 +49,8 @@ export const useAuthActions = () => {
         .is('used_at', null)
         .gt('expires_at', new Date().toISOString())
         .maybeSingle();
+      
+      console.log('Temporary password lookup result:', { tempPasswordRecord, tempPasswordError });
 
       if (tempPasswordRecord) {
         console.log('Found temporary password record:', tempPasswordRecord);
