@@ -1,6 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { Task, TaskWithDetails, TaskLabel } from "@/types/tasks";
 import { taskActivityService } from "./taskActivityService";
+import { emailNotificationService } from "./emailNotificationService";
 
 export const taskService = {
   // Get all tasks for a project
@@ -51,6 +52,17 @@ export const taskService = {
       .single();
 
     if (error) throw error;
+
+    // Send assignment notification if task is assigned to someone
+    if (taskData.assignee_id && taskData.assignee_id !== user.user?.id) {
+      try {
+        await this.sendTaskAssignmentNotification(data as Task);
+      } catch (emailError) {
+        console.error('Failed to send task assignment notification:', emailError);
+        // Don't fail task creation if email fails
+      }
+    }
+
     return data as Task;
   },
 
@@ -77,7 +89,7 @@ export const taskService = {
 
     if (error) throw error;
 
-    // Create activity log for significant changes
+    // Handle email notifications and activity logs for significant changes
     if (currentTask) {
       const changes = [];
       if (currentTask.status !== updateData.status && updateData.status) {
@@ -93,6 +105,14 @@ export const taskService = {
           old: currentTask.assignee_id,
           new: updateData.assignee_id
         });
+        
+        // Send assignment notification if task was assigned to someone new
+        try {
+          await this.handleTaskAssignmentChange(id, currentTask.assignee_id, updateData.assignee_id);
+        } catch (emailError) {
+          console.error('Failed to send assignment change notification:', emailError);
+          // Don't fail task update if email fails
+        }
       }
       if (currentTask.priority !== updateData.priority && updateData.priority) {
         changes.push({
@@ -163,5 +183,73 @@ export const taskService = {
       .eq('id', labelId);
 
     if (error) throw error;
+  },
+
+  // Helper method to send task assignment notification
+  async sendTaskAssignmentNotification(task: Task) {
+    try {
+      // Get assignee details
+      const { data: assignee } = await supabase
+        .from('profiles')
+        .select('id, full_name, email, preferences')
+        .eq('id', task.assignee_id)
+        .single();
+
+      if (!assignee) return;
+
+      // Check if user wants assignment notifications
+      const shouldSend = await emailNotificationService.shouldSendNotification(
+        assignee.id, 
+        'task_assignment'
+      );
+      
+      if (!shouldSend) return;
+
+      // Get project details
+      const { data: project } = await supabase
+        .from('projects')
+        .select('id, name')
+        .eq('id', task.project_id)
+        .single();
+
+      // Get assigner details
+      const { data: assigner } = await supabase
+        .from('profiles')
+        .select('id, full_name, email')
+        .eq('id', task.created_by)
+        .single();
+
+      if (assignee && project && assigner) {
+        await emailNotificationService.sendTaskAssignmentNotification(
+          task,
+          assignee,
+          assigner,
+          project
+        );
+      }
+    } catch (error) {
+      console.error('Error sending task assignment notification:', error);
+      throw error;
+    }
+  },
+
+  // Helper method to send assignment notification on task update
+  async handleTaskAssignmentChange(taskId: number, oldAssigneeId: string | null, newAssigneeId: string | null) {
+    // If task was assigned to someone new
+    if (newAssigneeId && newAssigneeId !== oldAssigneeId) {
+      try {
+        const { data: task } = await supabase
+          .from('tasks')
+          .select('*')
+          .eq('id', taskId)
+          .single();
+
+        if (task) {
+          await this.sendTaskAssignmentNotification(task);
+        }
+      } catch (error) {
+        console.error('Error handling task assignment change:', error);
+      }
+    }
   }
 };

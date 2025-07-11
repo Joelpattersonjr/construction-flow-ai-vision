@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { emailNotificationService } from "./emailNotificationService";
 
 export interface TaskComment {
   id: string;
@@ -44,7 +45,80 @@ export const taskCommentsService = {
       .single();
 
     if (error) throw error;
+
+    // Send comment notifications
+    try {
+      await this.sendCommentNotifications(taskId, data, data.user);
+    } catch (emailError) {
+      console.error('Failed to send comment notifications:', emailError);
+      // Don't fail comment creation if email fails
+    }
+
     return data as TaskComment;
+  },
+
+  async sendCommentNotifications(taskId: number, comment: TaskComment, author: any) {
+    try {
+      // Get task details
+      const { data: task } = await supabase
+        .from('tasks')
+        .select(`
+          *,
+          assignee:profiles!fk_tasks_assignee_id(id, full_name, email),
+          project:projects(id, name)
+        `)
+        .eq('id', taskId)
+        .single();
+
+      if (!task) return;
+
+      // Send notification to assignee if comment is not from them
+      if (task.assignee && task.assignee.id !== author.id) {
+        const shouldSend = await emailNotificationService.shouldSendNotification(
+          task.assignee.id,
+          'task_comment'
+        );
+        
+        if (shouldSend) {
+          await emailNotificationService.sendTaskCommentNotification(
+            task,
+            comment,
+            task.assignee,
+            author,
+            task.project
+          );
+        }
+      }
+
+      // Send notification to task creator if comment is not from them and they're not the assignee
+      if (task.created_by && task.created_by !== author.id && task.created_by !== task.assignee?.id) {
+        const { data: creator } = await supabase
+          .from('profiles')
+          .select('id, full_name, email')
+          .eq('id', task.created_by)
+          .single();
+
+        if (creator) {
+          const shouldSend = await emailNotificationService.shouldSendNotification(
+            creator.id,
+            'task_comment'
+          );
+          
+          if (shouldSend) {
+            await emailNotificationService.sendTaskCommentNotification(
+              task,
+              comment,
+              creator,
+              author,
+              task.project
+            );
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error sending comment notifications:', error);
+      throw error;
+    }
   },
 
   async updateComment(commentId: string, content: string): Promise<void> {
