@@ -9,7 +9,7 @@ import { TaskForm } from '@/components/tasks/TaskForm';
 import { TaskItem } from '@/components/tasks/TaskItem';
 import { SimpleKanban } from '@/components/tasks/SimpleKanban';
 import { TaskFilters } from '@/components/tasks/TaskFilters';
-import { BulkOperations } from '@/components/tasks/BulkOperations';
+// import { BulkOperations } from '@/components/tasks/BulkOperations';
 import { TaskWithDetails } from '@/types/tasks';
 import { useTasks } from '@/hooks/useTasks';
 import { useTasksRealtime } from '@/hooks/useTasksRealtime';
