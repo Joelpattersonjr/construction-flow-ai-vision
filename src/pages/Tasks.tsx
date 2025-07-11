@@ -18,9 +18,9 @@ import { supabase } from '@/integrations/supabase/client';
 
 const Tasks = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedProject, setSelectedProject] = useState<string>('');
-  const [selectedStatus, setSelectedStatus] = useState<string>('');
-  const [selectedPriority, setSelectedPriority] = useState<string>('');
+  const [selectedProject, setSelectedProject] = useState<string>('all');
+  const [selectedStatus, setSelectedStatus] = useState<string>('all');
+  const [selectedPriority, setSelectedPriority] = useState<string>('all');
   const [editingTask, setEditingTask] = useState<TaskWithDetails | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
