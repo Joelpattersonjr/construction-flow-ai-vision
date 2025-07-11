@@ -51,7 +51,11 @@ interface TaskCardProps {
 }
 
 function TaskCard({ task, onEditTask, onAddLabel, onRemoveLabel, isDragging = false }: TaskCardProps) {
-  const priority = priorityConfig[task.priority as keyof typeof priorityConfig] || priorityConfig.medium;
+  // Safely handle priority with proper fallback
+  const priorityKey = task.priority && typeof task.priority === 'string' && task.priority in priorityConfig 
+    ? task.priority as keyof typeof priorityConfig 
+    : 'medium';
+  const priority = priorityConfig[priorityKey];
   
   return (
     <div 
