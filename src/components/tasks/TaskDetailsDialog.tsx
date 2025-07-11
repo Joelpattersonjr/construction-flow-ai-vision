@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
-import { MessageSquare, Paperclip, Activity, Send, Download, Trash2, Tag } from 'lucide-react';
+import { MessageSquare, Paperclip, Activity, Send, Download, Trash2, Tag, Eye, Upload } from 'lucide-react';
 
 import { TaskLabelsManager } from './TaskLabelsManager';
+import { FileUploadDropzone } from './FileUploadDropzone';
+import { FilePreviewDialog } from './FilePreviewDialog';
 
 import {
   Dialog,
@@ -42,6 +44,7 @@ export const TaskDetailsDialog: React.FC<TaskDetailsDialogProps> = ({
   const [labels, setLabels] = useState<TaskLabel[]>([]);
   const [newComment, setNewComment] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [previewFile, setPreviewFile] = useState<TaskFile | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -94,24 +97,8 @@ export const TaskDetailsDialog: React.FC<TaskDetailsDialogProps> = ({
     }
   };
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!task || !file) return;
-
-    setIsLoading(true);
-    try {
-      const taskFile = await taskFilesService.uploadFile(task.id, file);
-      setFiles([taskFile, ...files]);
-      toast({ title: 'File uploaded successfully' });
-    } catch (error) {
-      toast({
-        title: 'Error uploading file',
-        description: error instanceof Error ? error.message : 'Unknown error',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsLoading(false);
-    }
+  const handleFileUploaded = (newFile: TaskFile) => {
+    setFiles([newFile, ...files]);
   };
 
   const handleDeleteFile = async (file: TaskFile) => {
@@ -153,17 +140,6 @@ export const TaskDetailsDialog: React.FC<TaskDetailsDialogProps> = ({
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   };
 
-  const formatFileSize = (bytes: number | null): string => {
-    if (!bytes) return 'Unknown size';
-    const units = ['B', 'KB', 'MB', 'GB'];
-    let size = bytes;
-    let unitIndex = 0;
-    while (size >= 1024 && unitIndex < units.length - 1) {
-      size /= 1024;
-      unitIndex++;
-    }
-    return `${size.toFixed(1)} ${units[unitIndex]}`;
-  };
 
   if (!task) return null;
 
@@ -306,45 +282,54 @@ export const TaskDetailsDialog: React.FC<TaskDetailsDialogProps> = ({
           </TabsContent>
 
           <TabsContent value="files" className="space-y-4">
-            <div className="flex items-center gap-2">
-              <Input
-                type="file"
-                onChange={handleFileUpload}
-                disabled={isLoading}
-                className="hidden"
-                id="file-upload"
+            {task && (
+              <FileUploadDropzone
+                taskId={task.id}
+                onFileUploaded={handleFileUploaded}
               />
-              <Button asChild disabled={isLoading}>
-                <label htmlFor="file-upload" className="cursor-pointer">
-                  <Paperclip className="h-4 w-4 mr-2" />
-                  Upload File
-                </label>
-              </Button>
-            </div>
+            )}
 
             <div className="space-y-2 max-h-96 overflow-y-auto">
               {files.map((file) => (
-                <Card key={file.id}>
+                <Card key={file.id} className="hover:shadow-sm transition-shadow">
                   <CardContent className="pt-4">
                     <div className="flex items-center justify-between">
-                      <div className="flex-1">
-                        <h4 className="font-medium text-sm">{file.file_name}</h4>
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                          <span>{formatFileSize(file.file_size)}</span>
-                          <span>•</span>
-                          <span>
-                            Uploaded by {file.uploader?.full_name || file.uploader?.email}
-                          </span>
-                          <span>•</span>
-                          <span>{format(new Date(file.uploaded_at), 'MMM d, HH:mm')}</span>
+                      <div className="flex items-center gap-3 flex-1">
+                        <div className="text-2xl">
+                          {taskFilesService.getFileIcon(file.file_type)}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-medium text-sm truncate">{file.file_name}</h4>
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <span>{taskFilesService.formatFileSize(file.file_size)}</span>
+                            <span>•</span>
+                            <span>
+                              {file.uploader?.full_name || file.uploader?.email}
+                            </span>
+                            <span>•</span>
+                            <span>{format(new Date(file.uploaded_at), 'MMM d, HH:mm')}</span>
+                          </div>
                         </div>
                       </div>
                       <div className="flex gap-1">
+                        {(taskFilesService.isImageFile(file.file_type) || 
+                          taskFilesService.isPdfFile(file.file_type)) && (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => setPreviewFile(file)}
+                            className="h-8 w-8 p-0"
+                            title="Preview"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        )}
                         <Button
                           size="sm"
                           variant="ghost"
                           onClick={() => handleDownloadFile(file)}
                           className="h-8 w-8 p-0"
+                          title="Download"
                         >
                           <Download className="h-4 w-4" />
                         </Button>
@@ -353,6 +338,7 @@ export const TaskDetailsDialog: React.FC<TaskDetailsDialogProps> = ({
                           variant="ghost"
                           onClick={() => handleDeleteFile(file)}
                           className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
+                          title="Delete"
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -361,6 +347,14 @@ export const TaskDetailsDialog: React.FC<TaskDetailsDialogProps> = ({
                   </CardContent>
                 </Card>
               ))}
+              
+              {files.length === 0 && (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Paperclip className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                  <p>No files attached yet</p>
+                  <p className="text-sm">Drag and drop files above to get started</p>
+                </div>
+              )}
             </div>
           </TabsContent>
 
@@ -400,6 +394,12 @@ export const TaskDetailsDialog: React.FC<TaskDetailsDialogProps> = ({
             </div>
           </TabsContent>
         </Tabs>
+        
+        <FilePreviewDialog
+          file={previewFile}
+          open={!!previewFile}
+          onOpenChange={(open) => !open && setPreviewFile(null)}
+        />
       </DialogContent>
     </Dialog>
   );
