@@ -113,6 +113,13 @@ const App = () => {
                   <button onClick={() => alert('Button works!')}>Test Button</button>
                 </div>
               } />
+              <Route path="/tasks-debug" element={
+                <div style={{ padding: '20px', background: '#f0f0f0' }}>
+                  <h1>Tasks Debug Page</h1>
+                  <p>This bypasses all components to test if routing works.</p>
+                  <a href="/tasks" style={{ color: 'blue', textDecoration: 'underline' }}>Try Tasks Page</a>
+                </div>
+              } />
               <Route path="/test" element={<div style={{ padding: '20px' }}>TEST ROUTE WORKS - App is loading properly!</div>} />
               <Route path="/simple-tasks" element={
                 <ProtectedRoute>
