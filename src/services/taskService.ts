@@ -20,6 +20,8 @@ export const taskService = {
 
   // Get all tasks for current user's company
   async getCompanyTasks(): Promise<TaskWithDetails[]> {
+    console.log('🔍 Fetching company tasks...');
+    
     const { data, error } = await supabase
       .from('tasks')
       .select(`
@@ -29,13 +31,21 @@ export const taskService = {
       `)
       .order('created_at', { ascending: false });
 
-    if (error) throw error;
+    console.log('📊 Tasks query result:', { data, error, count: data?.length || 0 });
+    
+    if (error) {
+      console.error('❌ Error fetching tasks:', error);
+      throw error;
+    }
+    
     return (data || []) as unknown as TaskWithDetails[];
   },
 
   // Create a new task
   async createTask(task: Partial<Task>): Promise<Task> {
+    console.log('📝 Creating task:', task);
     const { data: user } = await supabase.auth.getUser();
+    console.log('👤 Current user:', user.user?.id);
     
     const taskData = {
       ...task,
@@ -43,13 +53,21 @@ export const taskService = {
       assignee_id: task.assignee_id === 'none' ? null : task.assignee_id,
     };
     
+    console.log('📋 Task data being inserted:', taskData);
+    
     const { data, error } = await supabase
       .from('tasks')
       .insert(taskData)
       .select()
       .single();
 
-    if (error) throw error;
+    console.log('✅ Task creation result:', { data, error });
+    
+    if (error) {
+      console.error('❌ Task creation error:', error);
+      throw error;
+    }
+    
     return data as Task;
   },
 
