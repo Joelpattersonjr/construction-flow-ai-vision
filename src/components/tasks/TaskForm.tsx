@@ -81,12 +81,13 @@ export const TaskForm: React.FC<TaskFormProps> = ({
     },
   });
 
-  const handleTemplateSelect = (template: any) => {
-    form.setValue('title', template.title_template);
-    form.setValue('description', template.description_template || '');
-    form.setValue('priority', template.priority);
-    setOpen(true);
-  };
+  // Template functionality temporarily disabled
+  // const handleTemplateSelect = (template: any) => {
+  //   form.setValue('title', template.title_template);
+  //   form.setValue('description', template.description_template || '');
+  //   form.setValue('priority', template.priority);
+  //   setOpen(true);
+  // };
 
   const handleSubmit = async (data: TaskFormData) => {
     await onSubmit(data);
