@@ -40,8 +40,9 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   }
 
   // Check if user needs to set up their company (first-time admin users)
+  console.log('ProtectedRoute profile data:', profile);
   if (profile && !profile.company_id && location.pathname !== '/company-setup') {
-    console.log('ProtectedRoute: user needs company setup');
+    console.log('ProtectedRoute: user needs company setup - company_id:', profile.company_id);
     return <CompanySetup />;
   }
 
