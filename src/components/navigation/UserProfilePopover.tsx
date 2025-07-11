@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { User, ChevronDown, LogOut, UserCheck, Building2, Settings } from 'lucide-react';
+import { User, ChevronDown, LogOut, UserCheck, Building2, Settings, UserCog } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 const UserProfilePopover: React.FC = () => {
@@ -88,6 +88,16 @@ const UserProfilePopover: React.FC = () => {
           </div>
           
           <div className="border-t pt-3 space-y-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => navigate('/profile')}
+              className="w-full flex items-center justify-center space-x-2"
+            >
+              <UserCog className="h-4 w-4" />
+              <span>Profile Settings</span>
+            </Button>
+            
             {profile?.company_role === 'company_admin' && (
               <Button 
                 variant="outline" 

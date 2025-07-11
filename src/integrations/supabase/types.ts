@@ -523,6 +523,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          avatar_url: string | null
           company_id: number | null
           company_role: string | null
           custom_fields: Json | null
@@ -530,9 +531,11 @@ export type Database = {
           full_name: string | null
           id: string
           job_title: string | null
+          preferences: Json | null
           updated_at: string
         }
         Insert: {
+          avatar_url?: string | null
           company_id?: number | null
           company_role?: string | null
           custom_fields?: Json | null
@@ -540,9 +543,11 @@ export type Database = {
           full_name?: string | null
           id?: string
           job_title?: string | null
+          preferences?: Json | null
           updated_at?: string
         }
         Update: {
+          avatar_url?: string | null
           company_id?: number | null
           company_role?: string | null
           custom_fields?: Json | null
@@ -550,6 +555,7 @@ export type Database = {
           full_name?: string | null
           id?: string
           job_title?: string | null
+          preferences?: Json | null
           updated_at?: string
         }
         Relationships: [
