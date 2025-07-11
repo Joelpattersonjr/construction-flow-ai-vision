@@ -14,8 +14,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { TaskWithDetails, TaskPriority, TaskStatus } from '@/types/tasks';
-import { TaskDependencySelector } from './TaskDependencySelector';
-import { TaskTemplateDialog } from './TaskTemplateDialog';
+// import { TaskDependencySelector } from './TaskDependencySelector';
+// import { TaskTemplateDialog } from './TaskTemplateDialog';
 import { cn } from '@/lib/utils';
 
 const taskSchema = z.object({
@@ -325,27 +325,21 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                 )}
               />
 
-              {/* Dependency Selector */}
-              <div className="col-span-2">
-                <TaskDependencySelector
-                  tasks={tasks}
-                  currentTaskId={task?.id}
-                  selectedDependency={form.watch('dependency_id')}
-                  onDependencyChange={(id) => form.setValue('dependency_id', id)}
-                />
-              </div>
+              {/* Dependency Selector - Coming Soon */}
+              {/* <div className="col-span-2">
+                Add dependency selector here when ready
+              </div> */}
             </div>
 
             {/* Template and Actions */}
             <div className="flex justify-between items-center">
-              {!task && (
-                <TaskTemplateDialog onCreateFromTemplate={handleTemplateSelect}>
-                  <Button type="button" variant="outline" size="sm">
-                    <FileText className="h-4 w-4 mr-2" />
-                    Use Template
-                  </Button>
-                </TaskTemplateDialog>
-              )}
+              {/* Template Button - Coming Soon */}
+              {/* {!task && (
+                <Button type="button" variant="outline" size="sm">
+                  <FileText className="h-4 w-4 mr-2" />
+                  Use Template
+                </Button>
+              )} */}
                <div className="flex gap-2 ml-auto">
                 <Button type="button" variant="outline" onClick={() => setOpen(false)}>
                   Cancel
