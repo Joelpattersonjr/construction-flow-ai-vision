@@ -233,25 +233,17 @@ const Tasks = () => {
     if (activeId === overId) return;
 
     const isActiveATask = active.data.current?.type === 'Task';
-    const isOverATask = over.data.current?.type === 'Task';
     const isOverAColumn = over.data.current?.type === 'Column';
 
-    if (!isActiveATask) return;
-
-    // Dragging a task over another task
-    if (isActiveATask && isOverATask) {
-      // Handle reordering within same column or moving between columns
-      return;
-    }
+    // Only allow drops on columns, not on other tasks
+    if (!isActiveATask || !isOverAColumn) return;
 
     // Dragging a task over a column
-    if (isActiveATask && isOverAColumn) {
-      const newStatus = over.data.current?.status as TaskStatus;
-      const task = active.data.current?.task as TaskWithDetails;
-      
-      if (task && task.status !== newStatus) {
-        handleStatusChange(task.id, newStatus);
-      }
+    const newStatus = over.data.current?.status as TaskStatus;
+    const task = active.data.current?.task as TaskWithDetails;
+    
+    if (task && task.status !== newStatus) {
+      handleStatusChange(task.id, newStatus);
     }
   };
 
