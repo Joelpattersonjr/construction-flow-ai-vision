@@ -9,14 +9,15 @@ import {
   FlagIcon,
   MessageSquare,
   Paperclip,
-  Eye
+  Eye,
+  Tag
 } from 'lucide-react';
 
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { TaskWithDetails, TaskPriority, TaskStatus } from '@/types/tasks';
+import { TaskWithDetails, TaskPriority, TaskStatus, TaskLabel } from '@/types/tasks';
 import { TaskDetailsDialog } from './TaskDetailsDialog';
 
 interface TaskItemProps {
@@ -48,6 +49,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
   onStatusChange,
 }) => {
   const [showDetails, setShowDetails] = useState(false);
+  const [labels, setLabels] = useState<TaskLabel[]>([]);
   const status = (task.status as TaskStatus) || 'todo';
   const priority = (task.priority as TaskPriority) || 'medium';
   
@@ -58,6 +60,20 @@ export const TaskItem: React.FC<TaskItemProps> = ({
     if (!name) return '?';
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   };
+
+  // Load task labels when component mounts
+  React.useEffect(() => {
+    const loadLabels = async () => {
+      try {
+        const { taskService } = await import('@/services/taskService');
+        const taskLabels = await taskService.getTaskLabels(task.id);
+        setLabels(taskLabels);
+      } catch (error) {
+        console.error('Failed to load task labels:', error);
+      }
+    };
+    loadLabels();
+  }, [task.id]);
 
   const isOverdue = task.end_date && new Date(task.end_date) < new Date() && status !== 'completed';
 
@@ -156,6 +172,28 @@ export const TaskItem: React.FC<TaskItemProps> = ({
             </div>
           </div>
         </div>
+
+        {/* Task Labels */}
+        {labels.length > 0 && (
+          <div className="mt-3 flex flex-wrap gap-1">
+            {labels.slice(0, 3).map((label) => (
+              <Badge 
+                key={label.id} 
+                variant="outline" 
+                className="text-xs gap-1"
+                style={{ borderColor: label.label_color, color: label.label_color }}
+              >
+                <Tag className="h-2 w-2" />
+                {label.label_name}
+              </Badge>
+            ))}
+            {labels.length > 3 && (
+              <Badge variant="outline" className="text-xs">
+                +{labels.length - 3} more
+              </Badge>
+            )}
+          </div>
+        )}
 
         {(task.start_date && task.end_date) && (
           <div className="mt-3 pt-3 border-t">

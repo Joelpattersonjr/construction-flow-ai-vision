@@ -1,6 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Search, Filter, ListIcon, Grid3X3Icon, EditIcon } from 'lucide-react';
+import { 
+  DndContext, 
+  DragEndEvent, 
+  DragOverEvent,
+  DragStartEvent,
+  PointerSensor, 
+  useSensor, 
+  useSensors,
+  DragOverlay,
+  closestCorners
+} from '@dnd-kit/core';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,9 +23,12 @@ import { useToast } from '@/hooks/use-toast';
 import AppHeader from '@/components/navigation/AppHeader';
 import { TaskForm } from '@/components/tasks/TaskForm';
 import { TaskItem } from '@/components/tasks/TaskItem';
+import { TaskTemplateManager } from '@/components/tasks/TaskTemplateManager';
 import { taskService } from '@/services/taskService';
 import { TaskWithDetails, TaskStatus, TaskPriority } from '@/types/tasks';
 import { supabase } from '@/integrations/supabase/client';
+import { KanbanColumn } from '@/components/tasks/KanbanColumn';
+import { KanbanTaskCard } from '@/components/tasks/KanbanTaskCard';
 
 const Tasks = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -27,6 +41,17 @@ const Tasks = () => {
 
   // State for edit dialog
   const [editDialogOpen, setEditDialogOpen] = React.useState(false);
+  
+  // Drag and drop state
+  const [activeTask, setActiveTask] = useState<TaskWithDetails | null>(null);
+  
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 3,
+      },
+    })
+  );
 
   // Open edit dialog when editingTask is set
   React.useEffect(() => {
@@ -160,6 +185,24 @@ const Tasks = () => {
     });
   };
 
+  const handleUseTemplate = (template: any) => {
+    setEditingTask({
+      id: 0, // Temporary ID for new task
+      title: template.title_template,
+      description: template.description_template,
+      priority: template.priority,
+      status: 'todo',
+      project_id: projects[0]?.id || null,
+      assignee_id: null,
+      dependency_id: null,
+      created_by: null,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      start_date: null,
+      end_date: null,
+    } as any);
+  };
+
   const handleDeleteTask = async (taskId: number) => {
     if (confirm('Are you sure you want to delete this task?')) {
       await deleteTaskMutation.mutateAsync(taskId);
@@ -171,6 +214,68 @@ const Tasks = () => {
       id: taskId,
       updates: { status },
     });
+  };
+
+  // Drag and drop handlers
+  const handleDragStart = (event: DragStartEvent) => {
+    if (event.active.data.current?.type === 'Task') {
+      setActiveTask(event.active.data.current.task);
+    }
+  };
+
+  const handleDragOver = (event: DragOverEvent) => {
+    const { active, over } = event;
+    if (!over) return;
+
+    const activeId = active.id;
+    const overId = over.id;
+
+    if (activeId === overId) return;
+
+    const isActiveATask = active.data.current?.type === 'Task';
+    const isOverATask = over.data.current?.type === 'Task';
+    const isOverAColumn = over.data.current?.type === 'Column';
+
+    if (!isActiveATask) return;
+
+    // Dragging a task over another task
+    if (isActiveATask && isOverATask) {
+      // Handle reordering within same column or moving between columns
+      return;
+    }
+
+    // Dragging a task over a column
+    if (isActiveATask && isOverAColumn) {
+      const newStatus = over.data.current?.status as TaskStatus;
+      const task = active.data.current?.task as TaskWithDetails;
+      
+      if (task && task.status !== newStatus) {
+        handleStatusChange(task.id, newStatus);
+      }
+    }
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    setActiveTask(null);
+    const { active, over } = event;
+    if (!over) return;
+
+    const activeId = active.id;
+    const overId = over.id;
+
+    if (activeId === overId) return;
+
+    const isActiveATask = active.data.current?.type === 'Task';
+    const isOverAColumn = over.data.current?.type === 'Column';
+
+    if (isActiveATask && isOverAColumn) {
+      const newStatus = over.data.current?.status as TaskStatus;
+      const task = active.data.current?.task as TaskWithDetails;
+      
+      if (task && task.status !== newStatus) {
+        handleStatusChange(task.id, newStatus);
+      }
+    }
   };
 
   const statusColumns = [
@@ -194,23 +299,27 @@ const Tasks = () => {
             </p>
           </div>
           
-          <TaskForm
-            projects={projects}
-            teamMembers={teamMembers}
-            onSubmit={handleCreateTask}
-          >
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              New Task
-            </Button>
-          </TaskForm>
+          <div className="flex gap-2">
+            <TaskForm
+              projects={projects}
+              teamMembers={teamMembers}
+              onSubmit={handleCreateTask}
+            >
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                New Task
+              </Button>
+            </TaskForm>
+            
+            <TaskTemplateManager onUseTemplate={handleUseTemplate} />
+          </div>
 
           {/* Separate Edit Dialog */}
           <TaskForm
             projects={projects}
             teamMembers={teamMembers}
-            onSubmit={handleUpdateTask}
-            task={editingTask}
+            onSubmit={editingTask?.id === 0 ? handleCreateTask : handleUpdateTask}
+            task={editingTask?.id === 0 ? null : editingTask}
             open={editDialogOpen}
             onOpenChange={(open) => {
               setEditDialogOpen(open);
@@ -332,49 +441,32 @@ const Tasks = () => {
           </TabsContent>
 
           <TabsContent value="kanban" className="mt-6">
-            <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 min-h-[600px]">
-              {statusColumns.map((column) => (
-                <Card key={column.id} className={`${column.color} border-dashed`}>
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-sm font-medium">
-                        {column.label}
-                      </CardTitle>
-                      <Badge variant="secondary">
-                        {tasksByStatus[column.id as keyof typeof tasksByStatus].length}
-                      </Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    {tasksByStatus[column.id as keyof typeof tasksByStatus].map((task) => (
-                      <div key={task.id} className="bg-white rounded-lg border p-3 shadow-sm hover:shadow-md transition-shadow">
-                        <h4 className="font-medium text-sm mb-1">{task.title}</h4>
-                        {task.description && (
-                          <p className="text-xs text-muted-foreground mb-2 line-clamp-2">
-                            {task.description}
-                          </p>
-                        )}
-                        <div className="flex items-center justify-between">
-                          <Badge variant="outline">
-                            {task.priority}
-                          </Badge>
-                          <div className="flex gap-1">
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => setEditingTask(task)}
-                              className="h-6 w-6 p-0"
-                            >
-                              <EditIcon className="h-3 w-3" />
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCorners}
+              onDragStart={handleDragStart}
+              onDragOver={handleDragOver}
+              onDragEnd={handleDragEnd}
+            >
+              <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 min-h-[600px]">
+                {statusColumns.map((column) => (
+                  <KanbanColumn
+                    key={column.id}
+                    id={column.id}
+                    title={column.label}
+                    tasks={tasksByStatus[column.id as keyof typeof tasksByStatus]}
+                    color={column.color}
+                    onEditTask={setEditingTask}
+                  />
+                ))}
+              </div>
+              
+              <DragOverlay>
+                {activeTask ? (
+                  <KanbanTaskCard task={activeTask} onEdit={() => {}} />
+                ) : null}
+              </DragOverlay>
+            </DndContext>
           </TabsContent>
         </Tabs>
       </main>

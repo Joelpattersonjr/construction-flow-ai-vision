@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
-import { MessageSquare, Paperclip, Activity, Send, Download, Trash2 } from 'lucide-react';
+import { MessageSquare, Paperclip, Activity, Send, Download, Trash2, Tag } from 'lucide-react';
+
+import { TaskLabelsManager } from './TaskLabelsManager';
 
 import {
   Dialog,
@@ -17,10 +19,11 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 
-import { TaskWithDetails } from '@/types/tasks';
+import { TaskWithDetails, TaskLabel } from '@/types/tasks';
 import { taskCommentsService, TaskComment } from '@/services/taskCommentsService';
 import { taskFilesService, TaskFile } from '@/services/taskFilesService';
 import { taskActivityService, TaskActivity } from '@/services/taskActivityService';
+import { taskService } from '@/services/taskService';
 
 interface TaskDetailsDialogProps {
   task: TaskWithDetails | null;
@@ -36,6 +39,7 @@ export const TaskDetailsDialog: React.FC<TaskDetailsDialogProps> = ({
   const [comments, setComments] = useState<TaskComment[]>([]);
   const [files, setFiles] = useState<TaskFile[]>([]);
   const [activity, setActivity] = useState<TaskActivity[]>([]);
+  const [labels, setLabels] = useState<TaskLabel[]>([]);
   const [newComment, setNewComment] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -50,15 +54,17 @@ export const TaskDetailsDialog: React.FC<TaskDetailsDialogProps> = ({
     if (!task) return;
     
     try {
-      const [commentsData, filesData, activityData] = await Promise.all([
+      const [commentsData, filesData, activityData, labelsData] = await Promise.all([
         taskCommentsService.getTaskComments(task.id),
         taskFilesService.getTaskFiles(task.id),
         taskActivityService.getTaskActivity(task.id),
+        taskService.getTaskLabels(task.id),
       ]);
       
       setComments(commentsData);
       setFiles(filesData);
       setActivity(activityData);
+      setLabels(labelsData);
     } catch (error) {
       toast({
         title: 'Error loading task data',
@@ -171,8 +177,11 @@ export const TaskDetailsDialog: React.FC<TaskDetailsDialogProps> = ({
           </DialogTitle>
         </DialogHeader>
 
-        <Tabs defaultValue="comments" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+        <Tabs defaultValue="details" className="w-full">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="details">
+              Details & Labels
+            </TabsTrigger>
             <TabsTrigger value="comments" className="flex items-center gap-2">
               <MessageSquare className="h-4 w-4" />
               Comments ({comments.length})
@@ -186,6 +195,69 @@ export const TaskDetailsDialog: React.FC<TaskDetailsDialogProps> = ({
               Activity ({activity.length})
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="details" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Task Details</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {task.description && (
+                  <div>
+                    <h4 className="font-medium text-sm mb-2">Description</h4>
+                    <p className="text-sm text-muted-foreground">{task.description}</p>
+                  </div>
+                )}
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="font-medium text-sm mb-1">Priority</h4>
+                    <Badge variant="outline">{task.priority}</Badge>
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-sm mb-1">Status</h4>
+                    <Badge variant="outline">{task.status}</Badge>
+                  </div>
+                  {task.assignee && (
+                    <div>
+                      <h4 className="font-medium text-sm mb-1">Assignee</h4>
+                      <p className="text-sm">{task.assignee.full_name || task.assignee.email}</p>
+                    </div>
+                  )}
+                  {task.project && (
+                    <div>
+                      <h4 className="font-medium text-sm mb-1">Project</h4>
+                      <p className="text-sm">{task.project.name}</p>
+                    </div>
+                  )}
+                </div>
+                
+                {(task.start_date || task.end_date) && (
+                  <div>
+                    <h4 className="font-medium text-sm mb-2">Timeline</h4>
+                    <div className="text-sm text-muted-foreground">
+                      {task.start_date && (
+                        <span>Start: {format(new Date(task.start_date), 'MMM d, yyyy')}</span>
+                      )}
+                      {task.start_date && task.end_date && <span> • </span>}
+                      {task.end_date && (
+                        <span>End: {format(new Date(task.end_date), 'MMM d, yyyy')}</span>
+                      )}
+                    </div>
+                  </div>
+                )}
+                
+                <div>
+                  <h4 className="font-medium text-sm mb-2">Labels</h4>
+                  <TaskLabelsManager
+                    taskId={task.id}
+                    labels={labels}
+                    onLabelsChange={setLabels}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
           <TabsContent value="comments" className="space-y-4">
             <div className="space-y-4 max-h-96 overflow-y-auto">
