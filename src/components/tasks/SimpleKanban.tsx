@@ -71,12 +71,21 @@ function SimpleTaskCard({ task, onEditTask, onStatusChange }: SimpleTaskCardProp
           value={task.status || 'todo'} 
           onValueChange={(value) => onStatusChange(task.id, value as TaskStatus)}
         >
-          <SelectTrigger className="w-24 h-6 text-xs">
+          <SelectTrigger className="w-20 h-6 text-xs border-0 bg-transparent p-1">
             <SelectValue />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent 
+            className="min-w-32 z-50" 
+            position="popper"
+            sideOffset={5}
+            align="end"
+          >
             {statusColumns.map((status) => (
-              <SelectItem key={status.id} value={status.id}>
+              <SelectItem 
+                key={status.id} 
+                value={status.id}
+                className="text-xs cursor-pointer"
+              >
                 {status.label}
               </SelectItem>
             ))}
