@@ -25,6 +25,11 @@ const Tasks = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // Add logging when editingTask changes
+  React.useEffect(() => {
+    console.log('editingTask state changed:', editingTask);
+  }, [editingTask]);
+
   // Fetch tasks
   const { data: tasks = [], isLoading: tasksLoading } = useQuery({
     queryKey: ['tasks'],
@@ -188,6 +193,7 @@ const Tasks = () => {
             teamMembers={teamMembers}
             onSubmit={editingTask ? handleUpdateTask : handleCreateTask}
             task={editingTask}
+            key={editingTask ? `edit-${editingTask.id}` : 'create'}
           >
             <Button>
               <Plus className="h-4 w-4 mr-2" />

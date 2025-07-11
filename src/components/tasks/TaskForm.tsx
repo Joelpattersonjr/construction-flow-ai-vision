@@ -77,8 +77,9 @@ export const TaskForm: React.FC<TaskFormProps> = ({
 
   // Reset form with task data when task changes or dialog opens
   React.useEffect(() => {
+    console.log('TaskForm useEffect triggered', { task, open, taskTitle: task?.title });
     if (open) {
-      form.reset({
+      const formData = {
         title: task?.title || '',
         description: task?.description || '',
         status: (task?.status as TaskStatus) || 'todo',
@@ -87,7 +88,9 @@ export const TaskForm: React.FC<TaskFormProps> = ({
         end_date: task?.end_date ? new Date(task.end_date) : undefined,
         project_id: task?.project_id || projects[0]?.id || '',
         assignee_id: task?.assignee_id || 'none',
-      });
+      };
+      console.log('Resetting form with data:', formData);
+      form.reset(formData);
     }
   }, [task, open, projects, form]);
 
