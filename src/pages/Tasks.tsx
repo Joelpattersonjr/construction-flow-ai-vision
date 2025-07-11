@@ -121,9 +121,9 @@ const Tasks = () => {
       task.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       task.description?.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesProject = !selectedProject || task.project_id === selectedProject;
-    const matchesStatus = !selectedStatus || task.status === selectedStatus;
-    const matchesPriority = !selectedPriority || task.priority === selectedPriority;
+    const matchesProject = !selectedProject || selectedProject === 'all' || task.project_id === selectedProject;
+    const matchesStatus = !selectedStatus || selectedStatus === 'all' || task.status === selectedStatus;
+    const matchesPriority = !selectedPriority || selectedPriority === 'all' || task.priority === selectedPriority;
 
     return matchesSearch && matchesProject && matchesStatus && matchesPriority;
   });
@@ -218,7 +218,7 @@ const Tasks = () => {
                   <SelectValue placeholder="All Projects" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Projects</SelectItem>
+                  <SelectItem value="all">All Projects</SelectItem>
                   {projects.map((project) => (
                     <SelectItem key={project.id} value={project.id}>
                       {project.name}
@@ -232,7 +232,7 @@ const Tasks = () => {
                   <SelectValue placeholder="All Status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Status</SelectItem>
+                  <SelectItem value="all">All Status</SelectItem>
                   <SelectItem value="todo">To Do</SelectItem>
                   <SelectItem value="in_progress">In Progress</SelectItem>
                   <SelectItem value="review">Review</SelectItem>
@@ -246,7 +246,7 @@ const Tasks = () => {
                   <SelectValue placeholder="All Priority" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Priority</SelectItem>
+                  <SelectItem value="all">All Priority</SelectItem>
                   <SelectItem value="low">Low</SelectItem>
                   <SelectItem value="medium">Medium</SelectItem>
                   <SelectItem value="high">High</SelectItem>
@@ -258,9 +258,9 @@ const Tasks = () => {
                 variant="outline" 
                 onClick={() => {
                   setSearchTerm('');
-                  setSelectedProject('');
-                  setSelectedStatus('');
-                  setSelectedPriority('');
+                  setSelectedProject('all');
+                  setSelectedStatus('all');
+                  setSelectedPriority('all');
                 }}
               >
                 Clear Filters

@@ -71,7 +71,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
       start_date: task?.start_date ? new Date(task.start_date) : undefined,
       end_date: task?.end_date ? new Date(task.end_date) : undefined,
       project_id: task?.project_id || projects[0]?.id || '',
-      assignee_id: task?.assignee_id || '',
+      assignee_id: task?.assignee_id || 'none',
     },
   });
 
@@ -164,7 +164,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="">No assignee</SelectItem>
+                        <SelectItem value="none">No assignee</SelectItem>
                         {teamMembers.map((member) => (
                           <SelectItem key={member.id} value={member.id}>
                             <div className="flex items-center gap-2">

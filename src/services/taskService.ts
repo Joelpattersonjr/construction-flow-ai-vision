@@ -37,12 +37,15 @@ export const taskService = {
   async createTask(task: Partial<Task>): Promise<Task> {
     const { data: user } = await supabase.auth.getUser();
     
+    const taskData = {
+      ...task,
+      created_by: user.user?.id,
+      assignee_id: task.assignee_id === 'none' ? null : task.assignee_id,
+    };
+    
     const { data, error } = await supabase
       .from('tasks')
-      .insert({
-        ...task,
-        created_by: user.user?.id,
-      })
+      .insert(taskData)
       .select()
       .single();
 
@@ -52,9 +55,14 @@ export const taskService = {
 
   // Update a task
   async updateTask(id: number, updates: Partial<Task>): Promise<Task> {
+    const updateData = {
+      ...updates,
+      assignee_id: updates.assignee_id === 'none' ? null : updates.assignee_id,
+    };
+    
     const { data, error } = await supabase
       .from('tasks')
-      .update(updates)
+      .update(updateData)
       .eq('id', id)
       .select()
       .single();
