@@ -40,70 +40,55 @@ export const useAuthActions = () => {
         }
       }
 
-      // Check if this is a temporary password
+      // Check if this is a temporary password using the validation function
       console.log('Checking temporary password:', password, 'for email:', email);
-      const { data: tempPasswordRecord, error: tempPasswordError } = await supabase
-        .from('admin_password_resets')
-        .select('*')
-        .eq('temporary_password', password)
-        .is('used_at', null)
-        .gt('expires_at', new Date().toISOString())
-        .maybeSingle();
-      
-      console.log('Temporary password lookup result:', { tempPasswordRecord, tempPasswordError });
+      const { data: validationResult, error: validationError } = await supabase.rpc('validate_temporary_password', {
+        temp_password: password,
+        user_email: email
+      });
 
-      if (tempPasswordRecord) {
-        console.log('Found temporary password record:', tempPasswordRecord);
+      console.log('Temporary password validation result:', { validationResult, validationError });
+
+      const result = validationResult as any;
+      if (result && result.valid) {
+        console.log('Valid temporary password found, proceeding with auth');
         
-        // Verify the profile exists for this user_id
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('id, email')
-          .eq('id', tempPasswordRecord.user_id)
-          .maybeSingle();
-
-        console.log('Profile lookup by user_id result:', { profile, profileError });
-
-        if (profile) {
-          console.log('Profile matches temporary password user_id, proceeding with temp password login');
-          
-          // First, try to create the user in auth.users if they don't exist
-          console.log('Creating/updating user with temporary password');
-          const { data: authUser, error: signUpError } = await supabase.auth.signUp({
-            email,
-            password: tempPasswordRecord.temporary_password,
-          });
-          
-          console.log('Sign up result:', { authUser, signUpError });
-          
-          if (signUpError && !signUpError.message.includes('User already registered')) {
-            console.error('Error creating user:', signUpError);
-            return { error: signUpError };
-          }
-          
-          // Now try to sign in with the temporary password
-          const { error: signInError } = await supabase.auth.signInWithPassword({
-            email,
-            password: tempPasswordRecord.temporary_password,
-          });
-          
-          console.log('Sign in result:', { signInError });
-          
-          if (!signInError) {
-            // Mark temporary password as used
-            await supabase
-              .from('admin_password_resets')
-              .update({ used_at: new Date().toISOString() })
-              .eq('id', tempPasswordRecord.id);
-            
-            toast({
-              title: "Temporary Password Used",
-              description: "Please update your password in your profile settings.",
-              variant: "default",
-            });
-          }
-          return { error: signInError };
+        // First, try to create the user in auth.users if they don't exist
+        console.log('Creating/updating user with temporary password');
+        const { data: authUser, error: signUpError } = await supabase.auth.signUp({
+          email,
+          password: result.temp_password,
+        });
+        
+        console.log('Sign up result:', { authUser, signUpError });
+        
+        if (signUpError && !signUpError.message.includes('User already registered')) {
+          console.error('Error creating user:', signUpError);
+          return { error: signUpError };
         }
+        
+        // Now try to sign in with the temporary password
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password: result.temp_password,
+        });
+        
+        console.log('Sign in result:', { signInError });
+        
+        if (!signInError) {
+          // Mark temporary password as used
+          await supabase
+            .from('admin_password_resets')
+            .update({ used_at: new Date().toISOString() })
+            .eq('id', result.temp_password_id);
+          
+          toast({
+            title: "Temporary Password Used",
+            description: "Please update your password in your profile settings.",
+            variant: "default",
+          });
+        }
+        return { error: signInError };
       }
 
       const { error } = await supabase.auth.signInWithPassword({
