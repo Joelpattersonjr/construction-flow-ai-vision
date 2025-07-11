@@ -167,7 +167,7 @@ const Tasks = () => {
   });
 
   // Group tasks by status for kanban view - use local state if available
-  const currentTasksByStatus = Object.keys(localTasksByStatus).length > 0 ? localTasksByStatus : {
+  const tasksByStatus = {
     todo: filteredTasks.filter(task => task.status === 'todo'),
     in_progress: filteredTasks.filter(task => task.status === 'in_progress'),
     review: filteredTasks.filter(task => task.status === 'review'),
@@ -175,14 +175,16 @@ const Tasks = () => {
     blocked: filteredTasks.filter(task => task.status === 'blocked'),
   };
 
+  const currentTasksByStatus = Object.keys(localTasksByStatus).length > 0 ? localTasksByStatus : tasksByStatus;
+
   // Debug logging
   console.log('Tasks debug:', {
     totalTasks: tasks.length,
     filteredTasks: filteredTasks.length,
-    tasksByStatus: currentTasksByStatus,
-    selectedProject,
-    selectedStatus,
-    selectedPriority
+    sampleTask: filteredTasks[0],
+    tasksByStatus,
+    currentTasksByStatus,
+    localTasksByStatusLength: Object.keys(localTasksByStatus).length
   });
 
   // Update local state when filtered tasks change
