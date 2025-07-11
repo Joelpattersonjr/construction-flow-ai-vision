@@ -4,11 +4,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ArrowLeft, FolderOpen, Search } from 'lucide-react';
+import { FolderOpen, Search } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import FileManager from '@/components/file-management/FileManager';
+import AppHeader from '@/components/navigation/AppHeader';
 
 interface Project {
   id: string;
@@ -119,29 +120,13 @@ const FileManagement = () => {
   }, [selectedProjectId, navigate]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center h-16">
-            <Button
-              variant="ghost"
-              onClick={() => navigate('/')}
-              className="mr-4"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Dashboard
-            </Button>
-            <h1 className="text-xl font-semibold text-gray-900">File Management</h1>
-          </div>
-        </div>
-      </nav>
+    <div className="min-h-screen bg-background">
+      <AppHeader />
 
-      <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+      <main className="container mx-auto py-6 px-4">
         <div className="mb-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            Project Documents
-          </h2>
-          <p className="text-gray-600">
+          <h1 className="text-3xl font-bold">File Management</h1>
+          <p className="text-muted-foreground">
             Upload, organize, and manage all your construction project files
           </p>
         </div>

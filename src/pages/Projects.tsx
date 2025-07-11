@@ -8,8 +8,9 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { Plus, Folder, Calendar, MapPin, FileText, Settings, ArrowLeft } from 'lucide-react';
+import { Plus, Folder, Calendar, MapPin, FileText, Settings } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import AppHeader from '@/components/navigation/AppHeader';
 
 interface Project {
   id: string;
@@ -208,17 +209,11 @@ const Projects: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
-      <Button 
-        variant="ghost" 
-        onClick={() => navigate('/')}
-        className="mb-4 flex items-center gap-2"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Back to Dashboard
-      </Button>
+    <div className="min-h-screen bg-background">
+      <AppHeader />
       
-      <div className="flex items-center justify-between">
+      <main className="container mx-auto py-6 px-4">
+        <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
             <Folder className="h-8 w-8" />
@@ -467,7 +462,8 @@ const Projects: React.FC = () => {
             </Card>
           ))}
         </div>
-      )}
+        )}
+      </main>
     </div>
   );
 };
