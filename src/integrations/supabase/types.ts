@@ -744,36 +744,83 @@ export type Database = {
           },
         ]
       }
+      task_labels: {
+        Row: {
+          created_at: string | null
+          id: string
+          label_color: string | null
+          label_name: string
+          task_id: number
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          label_color?: string | null
+          label_name: string
+          task_id: number
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          label_color?: string | null
+          label_name?: string
+          task_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_labels_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tasks: {
         Row: {
           assignee_id: string | null
-          dependency_id: number
+          created_at: string | null
+          created_by: string | null
+          dependency_id: number | null
+          description: string | null
           end_date: string | null
           id: number
+          priority: string | null
           project_id: string | null
           start_date: string | null
           status: string | null
           title: string | null
+          updated_at: string | null
         }
         Insert: {
           assignee_id?: string | null
-          dependency_id: number
+          created_at?: string | null
+          created_by?: string | null
+          dependency_id?: number | null
+          description?: string | null
           end_date?: string | null
           id?: number
+          priority?: string | null
           project_id?: string | null
           start_date?: string | null
           status?: string | null
           title?: string | null
+          updated_at?: string | null
         }
         Update: {
           assignee_id?: string | null
-          dependency_id?: number
+          created_at?: string | null
+          created_by?: string | null
+          dependency_id?: number | null
+          description?: string | null
           end_date?: string | null
           id?: number
+          priority?: string | null
           project_id?: string | null
           start_date?: string | null
           status?: string | null
           title?: string | null
+          updated_at?: string | null
         }
         Relationships: [
           {

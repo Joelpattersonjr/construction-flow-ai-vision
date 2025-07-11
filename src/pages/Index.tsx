@@ -51,7 +51,11 @@ const Index = () => {
               <p className="text-sm text-gray-600">
                 Manage tasks across all your projects with Gantt chart visualization.
               </p>
-              <Button className="mt-4" variant="outline">
+              <Button 
+                className="mt-4" 
+                variant="outline"
+                onClick={() => navigate('/tasks')}
+              >
                 View Tasks
               </Button>
             </CardContent>
