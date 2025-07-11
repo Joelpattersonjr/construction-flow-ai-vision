@@ -12,7 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import AppHeader from '@/components/navigation/AppHeader';
 import { TaskForm } from '@/components/tasks/TaskForm';
 import { TaskItem } from '@/components/tasks/TaskItem';
-import { DragDropKanban } from '@/components/tasks/DragDropKanban';
+import { SimpleKanban } from '@/components/tasks/SimpleKanban';
 import { taskService } from '@/services/taskService';
 import { TaskWithDetails, TaskStatus, TaskPriority } from '@/types/tasks';
 import { supabase } from '@/integrations/supabase/client';
@@ -346,12 +346,13 @@ const Tasks = () => {
           </TabsContent>
 
           <TabsContent value="kanban" className="mt-6">
-            <Card>
-              <CardContent className="text-center py-8">
-                <p className="text-muted-foreground">Kanban board disabled - debugging drag and drop issue</p>
-                <p className="text-sm text-muted-foreground mt-2">Tasks found: {filteredTasks.length}</p>
-              </CardContent>
-            </Card>
+            <SimpleKanban
+              tasks={filteredTasks}
+              onStatusChange={handleStatusChange}
+              onEditTask={setEditingTask}
+              onAddLabel={handleAddLabel}
+              onRemoveLabel={handleRemoveLabel}
+            />
           </TabsContent>
         </Tabs>
       </main>
