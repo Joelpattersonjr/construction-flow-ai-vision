@@ -67,26 +67,43 @@ export const useAuthActions = () => {
 
         if (profile && profile.id === tempPasswordRecord.user_id) {
           console.log('Profile matches temporary password user_id, proceeding with temp password login');
-          // Mark temporary password as used
-          await supabase
-            .from('admin_password_resets')
-            .update({ used_at: new Date().toISOString() })
-            .eq('id', tempPasswordRecord.id);
-
-          // Force user to change password by signing them in and prompting
-          const { error } = await supabase.auth.signInWithPassword({
+          
+          // First, try to create the user in auth.users if they don't exist
+          console.log('Creating/updating user with temporary password');
+          const { data: authUser, error: signUpError } = await supabase.auth.signUp({
             email,
-            password,
+            password: tempPasswordRecord.temporary_password,
           });
-
-          if (!error) {
+          
+          console.log('Sign up result:', { authUser, signUpError });
+          
+          if (signUpError && !signUpError.message.includes('User already registered')) {
+            console.error('Error creating user:', signUpError);
+            return { error: signUpError };
+          }
+          
+          // Now try to sign in with the temporary password
+          const { error: signInError } = await supabase.auth.signInWithPassword({
+            email,
+            password: tempPasswordRecord.temporary_password,
+          });
+          
+          console.log('Sign in result:', { signInError });
+          
+          if (!signInError) {
+            // Mark temporary password as used
+            await supabase
+              .from('admin_password_resets')
+              .update({ used_at: new Date().toISOString() })
+              .eq('id', tempPasswordRecord.id);
+            
             toast({
               title: "Temporary Password Used",
               description: "Please update your password in your profile settings.",
               variant: "default",
             });
           }
-          return { error };
+          return { error: signInError };
         }
       }
 
