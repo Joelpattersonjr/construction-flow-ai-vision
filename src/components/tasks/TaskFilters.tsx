@@ -30,15 +30,15 @@ export const TaskFilters: React.FC<TaskFiltersProps> = ({
 
   const clearFilters = () => {
     onFiltersChange({
-      status: '',
-      priority: '',
-      assignee: '',
-      project: '',
+      status: 'all',
+      priority: 'all',
+      assignee: 'all',
+      project: 'all',
       search: ''
     });
   };
 
-  const hasActiveFilters = Object.values(filters).some(value => value !== '');
+  const hasActiveFilters = Object.values(filters).some(value => value !== '' && value !== 'all');
 
   return (
     <Card className="mb-6">
@@ -62,7 +62,7 @@ export const TaskFilters: React.FC<TaskFiltersProps> = ({
               <SelectValue placeholder="All Projects" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Projects</SelectItem>
+              <SelectItem value="all">All Projects</SelectItem>
               {projects.map((project) => (
                 <SelectItem key={project.id} value={project.id}>
                   {project.name}
@@ -76,7 +76,7 @@ export const TaskFilters: React.FC<TaskFiltersProps> = ({
               <SelectValue placeholder="All Status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Status</SelectItem>
+              <SelectItem value="all">All Status</SelectItem>
               <SelectItem value="todo">To Do</SelectItem>
               <SelectItem value="in_progress">In Progress</SelectItem>
               <SelectItem value="review">Review</SelectItem>
@@ -90,7 +90,7 @@ export const TaskFilters: React.FC<TaskFiltersProps> = ({
               <SelectValue placeholder="All Priority" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Priority</SelectItem>
+              <SelectItem value="all">All Priority</SelectItem>
               <SelectItem value="low">Low</SelectItem>
               <SelectItem value="medium">Medium</SelectItem>
               <SelectItem value="high">High</SelectItem>
@@ -103,7 +103,7 @@ export const TaskFilters: React.FC<TaskFiltersProps> = ({
               <SelectValue placeholder="All Assignees" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Assignees</SelectItem>
+              <SelectItem value="all">All Assignees</SelectItem>
               <SelectItem value="unassigned">Unassigned</SelectItem>
               {teamMembers.map((member) => (
                 <SelectItem key={member.id} value={member.id}>

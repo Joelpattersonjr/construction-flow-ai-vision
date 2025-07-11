@@ -19,10 +19,10 @@ const Tasks = () => {
   const [editingTask, setEditingTask] = useState<TaskWithDetails | null>(null);
   const [selectedTasks, setSelectedTasks] = useState<number[]>([]);
   const [filters, setFilters] = useState({
-    status: '',
-    priority: '',
-    assignee: '',
-    project: '',
+    status: 'all',
+    priority: 'all',
+    assignee: 'all',
+    project: 'all',
     search: ''
   });
 
@@ -42,10 +42,10 @@ const Tasks = () => {
 
   // Filter tasks based on current filters
   const filteredTasks = tasks.filter(task => {
-    if (filters.status && task.status !== filters.status) return false;
-    if (filters.priority && task.priority !== filters.priority) return false;
-    if (filters.assignee && task.assignee_id !== filters.assignee) return false;
-    if (filters.project && task.project_id !== filters.project) return false;
+    if (filters.status && filters.status !== 'all' && task.status !== filters.status) return false;
+    if (filters.priority && filters.priority !== 'all' && task.priority !== filters.priority) return false;
+    if (filters.assignee && filters.assignee !== 'all' && task.assignee_id !== filters.assignee) return false;
+    if (filters.project && filters.project !== 'all' && task.project_id !== filters.project) return false;
     if (filters.search && !task.title?.toLowerCase().includes(filters.search.toLowerCase())) return false;
     return true;
   });
