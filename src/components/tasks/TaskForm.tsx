@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { CalendarIcon, UserIcon } from 'lucide-react';
+import { CalendarIcon, UserIcon, FileText } from 'lucide-react';
 import { format } from 'date-fns';
 
 import { Button } from '@/components/ui/button';
@@ -13,7 +13,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Task, TaskPriority, TaskStatus } from '@/types/tasks';
+import { TaskWithDetails, TaskPriority, TaskStatus } from '@/types/tasks';
+import { TaskDependencySelector } from './TaskDependencySelector';
+import { TaskTemplateDialog } from './TaskTemplateDialog';
 import { cn } from '@/lib/utils';
 
 const taskSchema = z.object({
@@ -25,12 +27,14 @@ const taskSchema = z.object({
   end_date: z.date().optional(),
   project_id: z.string().min(1, 'Project is required'),
   assignee_id: z.string().optional(),
+  dependency_id: z.number().optional(),
 });
 
 type TaskFormData = z.infer<typeof taskSchema>;
 
 interface TaskFormProps {
-  task?: Task | null;
+  task?: TaskWithDetails | null;
+  tasks?: TaskWithDetails[]; // All tasks for dependency selection
   projects: Array<{ id: string; name: string }>;
   teamMembers: Array<{ id: string; full_name: string; email: string }>;
   onSubmit: (data: TaskFormData) => Promise<void>;
@@ -54,12 +58,13 @@ const priorityOptions: { value: TaskPriority; label: string; color: string }[] =
 
 export const TaskForm: React.FC<TaskFormProps> = ({
   task,
+  tasks = [],
   projects,
   teamMembers,
   onSubmit,
   children,
 }) => {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
   
   const form = useForm<TaskFormData>({
     resolver: zodResolver(taskSchema),
@@ -72,8 +77,16 @@ export const TaskForm: React.FC<TaskFormProps> = ({
       end_date: task?.end_date ? new Date(task.end_date) : undefined,
       project_id: task?.project_id || projects[0]?.id || '',
       assignee_id: task?.assignee_id || 'none',
+      dependency_id: task?.dependency_id || undefined,
     },
   });
+
+  const handleTemplateSelect = (template: any) => {
+    form.setValue('title', template.title_template);
+    form.setValue('description', template.description_template || '');
+    form.setValue('priority', template.priority);
+    setOpen(true);
+  };
 
   const handleSubmit = async (data: TaskFormData) => {
     await onSubmit(data);
@@ -311,15 +324,36 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                   </FormItem>
                 )}
               />
+
+              {/* Dependency Selector */}
+              <div className="col-span-2">
+                <TaskDependencySelector
+                  tasks={tasks}
+                  currentTaskId={task?.id}
+                  selectedDependency={form.watch('dependency_id')}
+                  onDependencyChange={(id) => form.setValue('dependency_id', id)}
+                />
+              </div>
             </div>
 
-            <div className="flex justify-end gap-2">
-              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-                Cancel
-              </Button>
-              <Button type="submit">
-                {task ? 'Update Task' : 'Create Task'}
-              </Button>
+            {/* Template and Actions */}
+            <div className="flex justify-between items-center">
+              {!task && (
+                <TaskTemplateDialog onCreateFromTemplate={handleTemplateSelect}>
+                  <Button type="button" variant="outline" size="sm">
+                    <FileText className="h-4 w-4 mr-2" />
+                    Use Template
+                  </Button>
+                </TaskTemplateDialog>
+              )}
+               <div className="flex gap-2 ml-auto">
+                <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+                  Cancel
+                </Button>
+                <Button type="submit">
+                  {task ? 'Update Task' : 'Create Task'}
+                </Button>
+              </div>
             </div>
           </form>
         </Form>

@@ -9,6 +9,7 @@ import { TaskForm } from '@/components/tasks/TaskForm';
 import { TaskItem } from '@/components/tasks/TaskItem';
 import { SimpleKanban } from '@/components/tasks/SimpleKanban';
 import { TaskFilters } from '@/components/tasks/TaskFilters';
+import { BulkOperations } from '@/components/tasks/BulkOperations';
 import { TaskWithDetails } from '@/types/tasks';
 import { useTasks } from '@/hooks/useTasks';
 import { useTasksRealtime } from '@/hooks/useTasksRealtime';
@@ -18,6 +19,7 @@ const Tasks = () => {
   console.log('🔥 Tasks component rendering');
   
   const [editingTask, setEditingTask] = useState<TaskWithDetails | null>(null);
+  const [selectedTasks, setSelectedTasks] = useState<number[]>([]);
 
   console.log('✅ State initialized successfully');
 
@@ -72,6 +74,37 @@ const Tasks = () => {
     setEditingTask(task);
   };
 
+  // Bulk operations handlers
+  const handleTaskSelect = (taskId: number, selected: boolean) => {
+    setSelectedTasks(prev => 
+      selected 
+        ? [...prev, taskId]
+        : prev.filter(id => id !== taskId)
+    );
+  };
+
+  const handleBulkStatusChange = async (taskIds: number[], status: string) => {
+    await Promise.all(
+      taskIds.map(id => handleStatusChange(id, status as any))
+    );
+  };
+
+  const handleBulkDelete = async (taskIds: number[]) => {
+    await Promise.all(
+      taskIds.map(id => handleDeleteTask(id))
+    );
+  };
+
+  const clearSelection = () => {
+    setSelectedTasks([]);
+  };
+
+  // Helper to find dependency task
+  const getDependencyTask = (dependencyId: number | null) => {
+    if (!dependencyId) return null;
+    return tasks.find(t => t.id === dependencyId) || null;
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <AppHeader />
@@ -86,6 +119,7 @@ const Tasks = () => {
           </div>
           
           <TaskForm
+            tasks={tasks}
             projects={projects}
             teamMembers={teamMembers}
             onSubmit={handleFormSubmit}
@@ -145,10 +179,22 @@ const Tasks = () => {
                     onStatusChange={handleStatusChange}
                     onAddLabel={handleAddLabel}
                     onRemoveLabel={handleRemoveLabel}
+                    isSelected={selectedTasks.includes(task.id)}
+                    onSelect={handleTaskSelect}
+                    dependencyTask={getDependencyTask(task.dependency_id)}
                   />
                 ))}
               </div>
             )}
+            
+            {/* Bulk Operations */}
+            <BulkOperations
+              selectedTasks={selectedTasks}
+              tasks={filteredTasks}
+              onBulkStatusChange={handleBulkStatusChange}
+              onBulkDelete={handleBulkDelete}
+              onClearSelection={clearSelection}
+            />
           </TabsContent>
 
           <TabsContent value="kanban" className="mt-6">

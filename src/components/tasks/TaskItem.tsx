@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { format } from 'date-fns';
 import { 
   CalendarIcon, 
@@ -6,15 +6,24 @@ import {
   EditIcon, 
   TrashIcon,
   ClockIcon,
-  FlagIcon
+  FlagIcon,
+  MessageCircle,
+  Paperclip,
+  Link,
+  MoreHorizontal
 } from 'lucide-react';
 
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { TaskWithDetails, TaskPriority, TaskStatus } from '@/types/tasks';
 import { TaskLabels } from './TaskLabels';
+import { TaskComments } from './TaskComments';
+import { TaskActivityFeed } from './TaskActivityFeed';
+import { TaskFileAttachments } from './TaskFileAttachments';
 
 interface TaskItemProps {
   task: TaskWithDetails;
@@ -23,6 +32,11 @@ interface TaskItemProps {
   onStatusChange: (taskId: number, status: TaskStatus) => void;
   onAddLabel?: (taskId: number, name: string, color: string) => void;
   onRemoveLabel?: (labelId: string) => void;
+  // Bulk selection
+  isSelected?: boolean;
+  onSelect?: (taskId: number, selected: boolean) => void;
+  // Dependencies
+  dependencyTask?: TaskWithDetails | null;
 }
 
 const statusConfig = {
@@ -47,7 +61,11 @@ export const TaskItem: React.FC<TaskItemProps> = ({
   onStatusChange,
   onAddLabel,
   onRemoveLabel,
+  isSelected = false,
+  onSelect,
+  dependencyTask,
 }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
   // Safely handle status and priority with proper fallbacks
   const statusKey = task.status && typeof task.status === 'string' && task.status in statusConfig 
     ? task.status as TaskStatus 
@@ -67,36 +85,71 @@ export const TaskItem: React.FC<TaskItemProps> = ({
   const isOverdue = task.end_date && new Date(task.end_date) < new Date() && statusKey !== 'completed';
 
   return (
-    <Card className={`transition-all hover:shadow-md ${isOverdue ? 'border-red-200 bg-red-50' : ''}`}>
+    <Card className={`transition-all hover:shadow-md ${isOverdue ? 'border-red-200 bg-red-50' : ''} ${isSelected ? 'ring-2 ring-primary' : ''}`}>
       <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
+        <div className="flex items-start gap-3">
+          {/* Bulk selection checkbox */}
+          {onSelect && (
+            <Checkbox
+              checked={isSelected}
+              onCheckedChange={(checked) => onSelect(task.id, checked as boolean)}
+              className="mt-1"
+            />
+          )}
+          
           <div className="flex-1">
-            <h3 className="font-medium text-lg leading-tight">
-              {task.title || 'Untitled Task'}
-            </h3>
-            {task.description && (
-              <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                {task.description}
-              </p>
-            )}
-          </div>
-          <div className="flex items-center gap-1 ml-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onEdit(task)}
-              className="h-8 w-8 p-0"
-            >
-              <EditIcon className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onDelete(task.id)}
-              className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-            >
-              <TrashIcon className="h-4 w-4" />
-            </Button>
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <h3 className="font-medium text-lg leading-tight">
+                  {task.title || 'Untitled Task'}
+                </h3>
+                {task.description && (
+                  <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                    {task.description}
+                  </p>
+                )}
+                
+                {/* Dependency indicator */}
+                {dependencyTask && (
+                  <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
+                    <Link className="h-3 w-3" />
+                    <span>Depends on: {dependencyTask.title}</span>
+                  </div>
+                )}
+              </div>
+              
+              <div className="flex items-center gap-1 ml-4">
+                {/* Expand/collapse button for additional features */}
+                <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
+                  <CollapsibleTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0"
+                    >
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </CollapsibleTrigger>
+                </Collapsible>
+                
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onEdit(task)}
+                  className="h-8 w-8 p-0"
+                >
+                  <EditIcon className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onDelete(task.id)}
+                  className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                >
+                  <TrashIcon className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       </CardHeader>
@@ -118,6 +171,28 @@ export const TaskItem: React.FC<TaskItemProps> = ({
                 {task.project.name}
               </Badge>
             )}
+            
+            {/* Activity indicators */}
+            <div className="flex items-center gap-2 ml-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 px-2 text-xs"
+                onClick={() => setIsExpanded(!isExpanded)}
+              >
+                <MessageCircle className="h-3 w-3 mr-1" />
+                Comments
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 px-2 text-xs"
+                onClick={() => setIsExpanded(!isExpanded)}
+              >
+                <Paperclip className="h-3 w-3 mr-1" />
+                Files
+              </Button>
+            </div>
           </div>
 
           <div className="flex items-center gap-3 text-sm text-muted-foreground">
@@ -167,6 +242,15 @@ export const TaskItem: React.FC<TaskItemProps> = ({
             </div>
           </div>
         )}
+
+        {/* Collapsible sections for detailed features */}
+        <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
+          <CollapsibleContent className="space-y-4 mt-4">
+            <TaskComments taskId={task.id} />
+            <TaskActivityFeed taskId={task.id} />
+            <TaskFileAttachments taskId={task.id} />
+          </CollapsibleContent>
+        </Collapsible>
       </CardContent>
     </Card>
   );
