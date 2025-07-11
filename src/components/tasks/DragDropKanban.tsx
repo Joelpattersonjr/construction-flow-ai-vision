@@ -7,7 +7,6 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-  DragOverEvent,
   useDroppable,
 } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
@@ -28,18 +27,6 @@ interface DragDropKanbanProps {
   onRemoveLabel: (labelId: string) => void;
 }
 
-interface SortableTaskCardProps {
-  task: TaskWithDetails;
-  onEditTask: (task: TaskWithDetails) => void;
-  onAddLabel: (taskId: number, name: string, color: string) => void;
-  onRemoveLabel: (labelId: string) => void;
-}
-
-interface TaskCardProps extends SortableTaskCardProps {
-  isDragging?: boolean;
-  dragHandleProps?: any;
-}
-
 const statusColumns = [
   { id: 'todo', label: 'To Do', color: 'bg-gray-50' },
   { id: 'in_progress', label: 'In Progress', color: 'bg-blue-50' },
@@ -55,7 +42,15 @@ const priorityConfig = {
   critical: { label: 'Critical', color: 'text-red-600' },
 };
 
-function TaskCard({ task, onEditTask, onAddLabel, onRemoveLabel, isDragging = false, dragHandleProps }: TaskCardProps) {
+interface TaskCardProps {
+  task: TaskWithDetails;
+  onEditTask: (task: TaskWithDetails) => void;
+  onAddLabel: (taskId: number, name: string, color: string) => void;
+  onRemoveLabel: (labelId: string) => void;
+  isDragging?: boolean;
+}
+
+function TaskCard({ task, onEditTask, onAddLabel, onRemoveLabel, isDragging = false }: TaskCardProps) {
   const priority = priorityConfig[task.priority as keyof typeof priorityConfig] || priorityConfig.medium;
   
   return (
@@ -65,15 +60,7 @@ function TaskCard({ task, onEditTask, onAddLabel, onRemoveLabel, isDragging = fa
       }`}
     >
       <div className="flex items-start justify-between mb-2">
-        <div className="flex items-center gap-2 flex-1">
-          <div 
-            {...dragHandleProps}
-            className="cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground"
-          >
-            <GripVertical className="h-4 w-4" />
-          </div>
-          <h4 className="font-medium text-sm flex-1">{task.title}</h4>
-        </div>
+        <h4 className="font-medium text-sm flex-1">{task.title}</h4>
         <Button
           size="sm"
           variant="ghost"
@@ -85,23 +72,21 @@ function TaskCard({ task, onEditTask, onAddLabel, onRemoveLabel, isDragging = fa
       </div>
       
       {task.description && (
-        <p className="text-xs text-muted-foreground mb-2 line-clamp-2 ml-6">
+        <p className="text-xs text-muted-foreground mb-2 line-clamp-2">
           {task.description}
         </p>
       )}
       
       {task.labels && task.labels.length > 0 && (
-        <div className="ml-6">
-          <TaskLabels
-            labels={task.labels}
-            onAddLabel={(name, color) => onAddLabel(task.id, name, color)}
-            onRemoveLabel={onRemoveLabel}
-            className="mb-2"
-          />
-        </div>
+        <TaskLabels
+          labels={task.labels}
+          onAddLabel={(name, color) => onAddLabel(task.id, name, color)}
+          onRemoveLabel={onRemoveLabel}
+          className="mb-2"
+        />
       )}
       
-      <div className="flex items-center justify-between mt-2 ml-6">
+      <div className="flex items-center justify-between mt-2">
         <Badge variant="outline" className={priority.color}>
           {priority.label}
         </Badge>
@@ -115,6 +100,13 @@ function TaskCard({ task, onEditTask, onAddLabel, onRemoveLabel, isDragging = fa
   );
 }
 
+interface SortableTaskCardProps {
+  task: TaskWithDetails;
+  onEditTask: (task: TaskWithDetails) => void;
+  onAddLabel: (taskId: number, name: string, color: string) => void;
+  onRemoveLabel: (labelId: string) => void;
+}
+
 function SortableTaskCard(props: SortableTaskCardProps) {
   const {
     attributes,
@@ -123,7 +115,9 @@ function SortableTaskCard(props: SortableTaskCardProps) {
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: props.task.id });
+  } = useSortable({ 
+    id: props.task.id.toString() // Convert to string to ensure compatibility
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -135,8 +129,10 @@ function SortableTaskCard(props: SortableTaskCardProps) {
       ref={setNodeRef}
       style={style}
       {...attributes}
+      {...listeners}
+      className="cursor-grab active:cursor-grabbing touch-none"
     >
-      <TaskCard {...props} isDragging={isDragging} dragHandleProps={listeners} />
+      <TaskCard {...props} isDragging={isDragging} />
     </div>
   );
 }
@@ -156,7 +152,7 @@ function DroppableColumn({ column, tasks, onEditTask, onAddLabel, onRemoveLabel 
 
   return (
     <div ref={setNodeRef} className="h-full">
-      <Card className={`${column.color} border-dashed h-fit transition-colors ${isOver ? 'border-primary' : ''}`}>
+      <Card className={`${column.color} border-dashed h-fit transition-colors ${isOver ? 'border-primary border-2' : ''}`}>
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <CardTitle className="text-sm font-medium">
@@ -168,7 +164,7 @@ function DroppableColumn({ column, tasks, onEditTask, onAddLabel, onRemoveLabel 
           </div>
         </CardHeader>
         <CardContent className="space-y-3 min-h-[200px]">
-          <SortableContext items={tasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
+          <SortableContext items={tasks.map(t => t.id.toString())} strategy={verticalListSortingStrategy}>
             {tasks.map((task) => (
               <SortableTaskCard
                 key={task.id}
@@ -197,7 +193,7 @@ export function DragDropKanban({
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 3,
+        distance: 1,
       },
     })
   );
@@ -210,7 +206,8 @@ export function DragDropKanban({
 
   function handleDragStart(event: DragStartEvent) {
     console.log('Drag start:', event.active.id);
-    const task = tasks.find(t => t.id === event.active.id);
+    const taskId = parseInt(event.active.id.toString());
+    const task = tasks.find(t => t.id === taskId);
     setActiveTask(task || null);
   }
 
@@ -219,22 +216,32 @@ export function DragDropKanban({
     const { active, over } = event;
     setActiveTask(null);
 
-    if (!over) return;
+    if (!over) {
+      console.log('No drop target');
+      return;
+    }
 
-    const taskId = active.id as number;
+    const taskId = parseInt(active.id.toString());
     const newStatus = over.id as TaskStatus;
     
-    console.log('Status change:', taskId, 'from', tasks.find(t => t.id === taskId)?.status, 'to', newStatus);
+    console.log('Status change:', taskId, 'to', newStatus);
     
     // Find current task and check if status changed
     const task = tasks.find(t => t.id === taskId);
     if (task && task.status !== newStatus) {
+      console.log('Calling onStatusChange');
       onStatusChange(taskId, newStatus);
+    } else {
+      console.log('No status change needed');
     }
   }
 
   return (
-    <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+    <DndContext 
+      sensors={sensors} 
+      onDragStart={handleDragStart} 
+      onDragEnd={handleDragEnd}
+    >
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 min-h-[600px]">
         {statusColumns.map((column) => (
           <DroppableColumn
