@@ -22,7 +22,7 @@ const Index = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <Card>
             <CardHeader>
               <CardTitle>Projects</CardTitle>
@@ -49,7 +49,7 @@ const Index = () => {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-gray-600">
-                Manage tasks across all your projects with Gantt chart visualization.
+                Manage tasks across all your projects with Kanban board visualization.
               </p>
               <Button 
                 className="mt-4" 
@@ -57,6 +57,25 @@ const Index = () => {
                 onClick={() => navigate('/tasks')}
               >
                 View Tasks
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Calendar</CardTitle>
+              <CardDescription>Timeline view of task deadlines</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-gray-600">
+                View tasks by due dates with drag-and-drop calendar interface.
+              </p>
+              <Button 
+                className="mt-4" 
+                variant="outline"
+                onClick={() => navigate('/calendar')}
+              >
+                View Calendar
               </Button>
             </CardContent>
           </Card>

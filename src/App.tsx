@@ -15,6 +15,7 @@ import Projects from "./pages/Projects";
 import ProjectDetails from "./pages/ProjectDetails";
 import ProjectPermissions from "./pages/ProjectPermissions";
 import Tasks from "./pages/Tasks";
+import Calendar from "./pages/Calendar";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
@@ -89,7 +90,15 @@ const App = () => {
                 } 
               />
               <Route 
-                path="/profile" 
+                path="/calendar" 
+                element={
+                  <ProtectedRoute>
+                    <Calendar />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/profile"
                 element={
                   <ProtectedRoute>
                     <Profile />
