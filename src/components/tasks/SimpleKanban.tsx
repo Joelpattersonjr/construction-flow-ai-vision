@@ -15,11 +15,11 @@ interface SimpleKanbanProps {
 }
 
 const statusColumns = [
-  { id: 'todo', label: 'To Do', shortLabel: 'To Do', color: 'bg-gray-50' },
-  { id: 'in_progress', label: 'In Progress', shortLabel: 'Progress', color: 'bg-blue-50' },
-  { id: 'review', label: 'Review', shortLabel: 'Review', color: 'bg-yellow-50' },
-  { id: 'completed', label: 'Completed', shortLabel: 'Done', color: 'bg-green-50' },
-  { id: 'blocked', label: 'Blocked', shortLabel: 'Blocked', color: 'bg-red-50' },
+  { id: 'todo', label: 'To Do', color: 'bg-gray-50' },
+  { id: 'in_progress', label: 'In Progress', color: 'bg-blue-50' },
+  { id: 'review', label: 'Review', color: 'bg-yellow-50' },
+  { id: 'completed', label: 'Completed', color: 'bg-green-50' },
+  { id: 'blocked', label: 'Blocked', color: 'bg-red-50' },
 ];
 
 const priorityConfig = {
@@ -86,7 +86,7 @@ function SimpleTaskCard({ task, onEditTask, onStatusChange }: SimpleTaskCardProp
                 value={status.id}
                 className="text-xs cursor-pointer px-2 py-1"
               >
-                {status.shortLabel}
+                {status.label}
               </SelectItem>
             ))}
           </SelectContent>
