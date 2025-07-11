@@ -179,22 +179,10 @@ const Tasks = () => {
                     onStatusChange={handleStatusChange}
                     onAddLabel={handleAddLabel}
                     onRemoveLabel={handleRemoveLabel}
-                    isSelected={selectedTasks.includes(task.id)}
-                    onSelect={handleTaskSelect}
-                    dependencyTask={getDependencyTask(task.dependency_id)}
                   />
                 ))}
               </div>
             )}
-            
-            {/* Bulk Operations */}
-            <BulkOperations
-              selectedTasks={selectedTasks}
-              tasks={filteredTasks}
-              onBulkStatusChange={handleBulkStatusChange}
-              onBulkDelete={handleBulkDelete}
-              onClearSelection={clearSelection}
-            />
           </TabsContent>
 
           <TabsContent value="kanban" className="mt-6">
