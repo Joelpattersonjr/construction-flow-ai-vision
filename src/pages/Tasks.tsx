@@ -1,41 +1,56 @@
 import React, { useState, useEffect } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Search, Filter, ListIcon, Grid3X3Icon, EditIcon } from 'lucide-react';
+import { Plus, ListIcon, Grid3X3Icon } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { useToast } from '@/hooks/use-toast';
+import { Card, CardContent } from '@/components/ui/card';
 import AppHeader from '@/components/navigation/AppHeader';
 import { TaskForm } from '@/components/tasks/TaskForm';
 import { TaskItem } from '@/components/tasks/TaskItem';
 import { SimpleKanban } from '@/components/tasks/SimpleKanban';
-import { taskService } from '@/services/taskService';
-import { TaskWithDetails, TaskStatus, TaskPriority } from '@/types/tasks';
-import { supabase } from '@/integrations/supabase/client';
+import { TaskFilters } from '@/components/tasks/TaskFilters';
+import { TaskWithDetails } from '@/types/tasks';
+import { useTasks } from '@/hooks/useTasks';
+import { useTasksRealtime } from '@/hooks/useTasksRealtime';
+import { useTaskFilters } from '@/hooks/useTaskFilters';
 
 const Tasks = () => {
   console.log('🔥 Tasks component rendering');
   
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedProject, setSelectedProject] = useState<string>('all');
-  const [selectedStatus, setSelectedStatus] = useState<string>('all');
-  const [selectedPriority, setSelectedPriority] = useState<string>('all');
   const [editingTask, setEditingTask] = useState<TaskWithDetails | null>(null);
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
 
   console.log('✅ State initialized successfully');
 
-  // Fetch tasks with error handling
-  const { data: tasks = [], isLoading: tasksLoading, error: tasksError } = useQuery({
-    queryKey: ['tasks'],
-    queryFn: () => taskService.getCompanyTasks(),
-    retry: false,
-  });
+  const {
+    tasks,
+    projects,
+    teamMembers,
+    tasksLoading,
+    tasksError,
+    handleCreateTask,
+    handleUpdateTask,
+    handleDeleteTask,
+    handleStatusChange,
+    handleAddLabel,
+    handleRemoveLabel,
+  } = useTasks();
+
+  // Set up real-time subscriptions
+  useTasksRealtime();
+
+  // Set up filters
+  const {
+    searchTerm,
+    setSearchTerm,
+    selectedProject,
+    setSelectedProject,
+    selectedStatus,
+    setSelectedStatus,
+    selectedPriority,
+    setSelectedPriority,
+    filteredTasks,
+    clearFilters,
+  } = useTaskFilters(tasks);
 
   // Log any task loading errors
   React.useEffect(() => {
@@ -44,204 +59,17 @@ const Tasks = () => {
     }
   }, [tasksError]);
 
-  // Fetch projects
-  const { data: projects = [] } = useQuery({
-    queryKey: ['projects'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('projects')
-        .select('id, name')
-        .order('name');
-      if (error) throw error;
-      return data || [];
-    },
-  });
-
-  // Fetch team members
-  const { data: teamMembers = [] } = useQuery({
-    queryKey: ['team-members'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('id, full_name, email')
-        .order('full_name');
-      if (error) throw error;
-      return data || [];
-    },
-  });
-
-  // Set up real-time subscription for tasks
-  useEffect(() => {
-    const channel = supabase
-      .channel('schema-db-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'tasks'
-        },
-        (payload) => {
-          console.log('Real-time task update:', payload);
-          // Invalidate and refetch tasks when changes occur
-          queryClient.invalidateQueries({ queryKey: ['tasks'] });
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public', 
-          table: 'task_labels'
-        },
-        (payload) => {
-          console.log('Real-time task label update:', payload);
-          // Invalidate and refetch tasks when labels change
-          queryClient.invalidateQueries({ queryKey: ['tasks'] });
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [queryClient]);
-
-  // Create task mutation
-  const createTaskMutation = useMutation({
-    mutationFn: (taskData: any) => taskService.createTask({
-      ...taskData,
-      start_date: taskData.start_date?.toISOString().split('T')[0],
-      end_date: taskData.end_date?.toISOString().split('T')[0],
-    }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tasks'] });
-      toast({ title: 'Task created successfully!' });
-    },
-    onError: (error) => {
-      toast({
-        title: 'Error creating task',
-        description: error instanceof Error ? error.message : 'Unknown error',
-        variant: 'destructive',
-      });
-    },
-  });
-
-  // Update task mutation
-  const updateTaskMutation = useMutation({
-    mutationFn: ({ id, updates }: { id: number; updates: any }) => 
-      taskService.updateTask(id, {
-        ...updates,
-        start_date: updates.start_date?.toISOString().split('T')[0],
-        end_date: updates.end_date?.toISOString().split('T')[0],
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tasks'] });
-      toast({ title: 'Task updated successfully!' });
+  const handleFormSubmit = async (taskData: any) => {
+    if (editingTask) {
+      await handleUpdateTask(editingTask.id, taskData);
       setEditingTask(null);
-    },
-    onError: (error) => {
-      toast({
-        title: 'Error updating task',
-        description: error instanceof Error ? error.message : 'Unknown error',
-        variant: 'destructive',
-      });
-    },
-  });
-
-  // Delete task mutation
-  const deleteTaskMutation = useMutation({
-    mutationFn: (id: number) => taskService.deleteTask(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tasks'] });
-      toast({ title: 'Task deleted successfully!' });
-    },
-    onError: (error) => {
-      toast({
-        title: 'Error deleting task',
-        description: error instanceof Error ? error.message : 'Unknown error',
-        variant: 'destructive',
-      });
-    },
-  });
-
-  // Add label mutation
-  const addLabelMutation = useMutation({
-    mutationFn: ({ taskId, name, color }: { taskId: number; name: string; color: string }) =>
-      taskService.addTaskLabel(taskId, name, color),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tasks'] });
-      toast({ title: 'Label added successfully!' });
-    },
-    onError: (error) => {
-      toast({
-        title: 'Error adding label',
-        description: error instanceof Error ? error.message : 'Unknown error',
-        variant: 'destructive',
-      });
-    },
-  });
-
-  // Remove label mutation  
-  const removeLabelMutation = useMutation({
-    mutationFn: (labelId: string) => taskService.removeTaskLabel(labelId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tasks'] });
-      toast({ title: 'Label removed successfully!' });
-    },
-    onError: (error) => {
-      toast({
-        title: 'Error removing label',
-        description: error instanceof Error ? error.message : 'Unknown error',
-        variant: 'destructive',
-      });
-    },
-  });
-
-  // Filter tasks
-  const filteredTasks = tasks.filter((task) => {
-    const matchesSearch = !searchTerm || 
-      task.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      task.description?.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesProject = !selectedProject || selectedProject === 'all' || task.project_id === selectedProject;
-    const matchesStatus = !selectedStatus || selectedStatus === 'all' || task.status === selectedStatus;
-    const matchesPriority = !selectedPriority || selectedPriority === 'all' || task.priority === selectedPriority;
-
-    return matchesSearch && matchesProject && matchesStatus && matchesPriority;
-  });
-
-  const handleAddLabel = async (taskId: number, name: string, color: string) => {
-    await addLabelMutation.mutateAsync({ taskId, name, color });
-  };
-
-  const handleRemoveLabel = async (labelId: string) => {
-    await removeLabelMutation.mutateAsync(labelId);
-  };
-
-  const handleCreateTask = async (taskData: any) => {
-    await createTaskMutation.mutateAsync(taskData);
-  };
-
-  const handleUpdateTask = async (taskData: any) => {
-    if (!editingTask) return;
-    await updateTaskMutation.mutateAsync({
-      id: editingTask.id,
-      updates: taskData,
-    });
-  };
-
-  const handleDeleteTask = async (taskId: number) => {
-    if (confirm('Are you sure you want to delete this task?')) {
-      await deleteTaskMutation.mutateAsync(taskId);
+    } else {
+      await handleCreateTask(taskData);
     }
   };
 
-  const handleStatusChange = async (taskId: number, status: TaskStatus) => {
-    await updateTaskMutation.mutateAsync({
-      id: taskId,
-      updates: { status },
-    });
+  const handleEditTask = (task: TaskWithDetails) => {
+    setEditingTask(task);
   };
 
   return (
@@ -260,7 +88,7 @@ const Tasks = () => {
           <TaskForm
             projects={projects}
             teamMembers={teamMembers}
-            onSubmit={editingTask ? handleUpdateTask : handleCreateTask}
+            onSubmit={handleFormSubmit}
             task={editingTask}
           >
             <Button>
@@ -271,77 +99,18 @@ const Tasks = () => {
         </div>
 
         {/* Filters */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle>Filters</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search tasks..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-              
-              <Select value={selectedProject} onValueChange={setSelectedProject}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All Projects" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Projects</SelectItem>
-                  {projects.map((project) => (
-                    <SelectItem key={project.id} value={project.id}>
-                      {project.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="todo">To Do</SelectItem>
-                  <SelectItem value="in_progress">In Progress</SelectItem>
-                  <SelectItem value="review">Review</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
-                  <SelectItem value="blocked">Blocked</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Select value={selectedPriority} onValueChange={setSelectedPriority}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All Priority" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Priority</SelectItem>
-                  <SelectItem value="low">Low</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="high">High</SelectItem>
-                  <SelectItem value="critical">Critical</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Button 
-                variant="outline" 
-                onClick={() => {
-                  setSearchTerm('');
-                  setSelectedProject('all');
-                  setSelectedStatus('all');
-                  setSelectedPriority('all');
-                }}
-              >
-                Clear Filters
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        <TaskFilters
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          selectedProject={selectedProject}
+          setSelectedProject={setSelectedProject}
+          selectedStatus={selectedStatus}
+          setSelectedStatus={setSelectedStatus}
+          selectedPriority={selectedPriority}
+          setSelectedPriority={setSelectedPriority}
+          projects={projects}
+          onClearFilters={clearFilters}
+        />
 
         {/* Task Views */}
         <Tabs defaultValue="list" className="w-full">
@@ -371,7 +140,7 @@ const Tasks = () => {
                   <TaskItem
                     key={task.id}
                     task={task}
-                    onEdit={setEditingTask}
+                    onEdit={handleEditTask}
                     onDelete={handleDeleteTask}
                     onStatusChange={handleStatusChange}
                     onAddLabel={handleAddLabel}
@@ -386,7 +155,7 @@ const Tasks = () => {
             <SimpleKanban
               tasks={filteredTasks}
               onStatusChange={handleStatusChange}
-              onEditTask={setEditingTask}
+              onEditTask={handleEditTask}
               onAddLabel={handleAddLabel}
               onRemoveLabel={handleRemoveLabel}
             />
