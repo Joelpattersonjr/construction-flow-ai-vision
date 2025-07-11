@@ -229,24 +229,24 @@ const FileItemComponent: React.FC<FileItemProps> = ({
                 </TooltipContent>
               </Tooltip>
 
-              <MoveFileDialog
-                file={file}
-                projectId={projectId}
-                category={category}
-                currentPath={currentPath}
-                onFileMoved={onFileDeleted}
-              >
-                <Tooltip>
-                  <TooltipTrigger asChild>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <MoveFileDialog
+                    file={file}
+                    projectId={projectId}
+                    category={category}
+                    currentPath={currentPath}
+                    onFileMoved={onFileDeleted}
+                  >
                     <Button variant="outline" size="sm">
                       <FolderInput className="h-4 w-4" />
                     </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Move file</p>
-                  </TooltipContent>
-                </Tooltip>
-              </MoveFileDialog>
+                  </MoveFileDialog>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Move file</p>
+                </TooltipContent>
+              </Tooltip>
 
               <Tooltip>
                 <TooltipTrigger asChild>
