@@ -51,11 +51,12 @@ export const useAuthActions = () => {
 
       if (tempPasswordRecord) {
         console.log('Found temporary password record:', tempPasswordRecord);
+        console.log('Looking up profile for email:', email);
         
         // Get user by email to verify it matches
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
-          .select('id')
+          .select('id, email')
           .eq('email', email)
           .maybeSingle();
 
