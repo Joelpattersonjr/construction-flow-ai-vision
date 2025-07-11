@@ -14,6 +14,7 @@ import { useTasks } from '@/hooks/useTasks';
 import { TaskWithDetails, TaskStatus } from '@/types/tasks';
 
 const Tasks = () => {
+  console.log('Tasks page rendering...');
   const [showTaskForm, setShowTaskForm] = useState(false);
   const [showTemplateDialog, setShowTemplateDialog] = useState(false);
   const [editingTask, setEditingTask] = useState<TaskWithDetails | null>(null);
@@ -39,6 +40,14 @@ const Tasks = () => {
     handleAddLabel,
     handleRemoveLabel,
   } = useTasks();
+
+  console.log('Tasks page data:', { 
+    tasksCount: tasks?.length, 
+    projectsCount: projects?.length, 
+    teamMembersCount: teamMembers?.length,
+    tasksLoading,
+    tasksError: tasksError?.message
+  });
 
   // Filter tasks based on current filters
   const filteredTasks = tasks.filter(task => {
