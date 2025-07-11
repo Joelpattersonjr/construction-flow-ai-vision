@@ -14,8 +14,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { TaskWithDetails, TaskPriority, TaskStatus } from '@/types/tasks';
-// import { TaskDependencySelector } from './TaskDependencySelector';
-// import { TaskTemplateDialog } from './TaskTemplateDialog';
+import { TaskDependencySelector } from './TaskDependencySelector';
+import { TaskTemplateDialog } from './TaskTemplateDialog';
 import { cn } from '@/lib/utils';
 
 const taskSchema = z.object({
@@ -81,13 +81,12 @@ export const TaskForm: React.FC<TaskFormProps> = ({
     },
   });
 
-  // Template functionality temporarily disabled
-  // const handleTemplateSelect = (template: any) => {
-  //   form.setValue('title', template.title_template);
-  //   form.setValue('description', template.description_template || '');
-  //   form.setValue('priority', template.priority);
-  //   setOpen(true);
-  // };
+  const handleTemplateSelect = (template: any) => {
+    form.setValue('title', template.title_template);
+    form.setValue('description', template.description_template || '');
+    form.setValue('priority', template.priority);
+    setOpen(true);
+  };
 
   const handleSubmit = async (data: TaskFormData) => {
     await onSubmit(data);
@@ -326,21 +325,27 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                 )}
               />
 
-              {/* Dependency Selector - Coming Soon */}
-              {/* <div className="col-span-2">
-                Add dependency selector here when ready
-              </div> */}
+              {/* Dependency Selector */}
+              <div className="col-span-2">
+                <TaskDependencySelector
+                  tasks={tasks}
+                  currentTaskId={task?.id}
+                  selectedDependency={form.watch('dependency_id')}
+                  onDependencyChange={(id) => form.setValue('dependency_id', id)}
+                />
+              </div>
             </div>
 
             {/* Template and Actions */}
             <div className="flex justify-between items-center">
-              {/* Template Button - Coming Soon */}
-              {/* {!task && (
-                <Button type="button" variant="outline" size="sm">
-                  <FileText className="h-4 w-4 mr-2" />
-                  Use Template
-                </Button>
-              )} */}
+              {!task && (
+                <TaskTemplateDialog onCreateFromTemplate={handleTemplateSelect}>
+                  <Button type="button" variant="outline" size="sm">
+                    <FileText className="h-4 w-4 mr-2" />
+                    Use Template
+                  </Button>
+                </TaskTemplateDialog>
+              )}
                <div className="flex gap-2 ml-auto">
                 <Button type="button" variant="outline" onClick={() => setOpen(false)}>
                   Cancel
