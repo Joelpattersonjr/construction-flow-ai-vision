@@ -19,8 +19,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     loading, 
     profile: profile ? 'exists' : 'null/undefined',
     pathname: location.pathname,
-    shouldRedirect: !loading && !user,
-    hasCompanyId: profile?.company_id
+    shouldRedirect: !loading && !user 
   });
 
   if (loading) {

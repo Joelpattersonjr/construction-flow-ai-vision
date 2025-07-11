@@ -19,7 +19,6 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 const App = () => {
-  console.log('🔥 App component rendering at:', window.location.pathname);
   
   // Simple test to check if React is working
   const isTestMode = window.location.pathname === '/basic-test';
