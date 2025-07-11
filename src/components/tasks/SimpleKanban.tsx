@@ -103,11 +103,16 @@ export function SimpleKanban({
   onAddLabel, 
   onRemoveLabel 
 }: SimpleKanbanProps) {
+  console.log('🔍 SimpleKanban - Total tasks received:', tasks.length);
+  console.log('🔍 SimpleKanban - Tasks by status:', tasks.map(t => ({ id: t.id, title: t.title, status: t.status })));
+  
   // Group tasks by status
   const tasksByStatus = statusColumns.reduce((acc, column) => {
     acc[column.id] = tasks.filter(task => task.status === column.id);
     return acc;
   }, {} as Record<string, TaskWithDetails[]>);
+
+  console.log('🔍 SimpleKanban - Grouped tasks:', tasksByStatus);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 min-h-[600px]">
