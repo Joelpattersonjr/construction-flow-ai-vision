@@ -18,7 +18,7 @@ export const useAuthActions = () => {
           .from('account_lockouts')
           .select('unlock_at, lockout_count')
           .eq('email', email)
-          .single();
+          .maybeSingle();
 
         if (lockoutInfo) {
           const unlockTime = new Date(lockoutInfo.unlock_at);
@@ -41,23 +41,28 @@ export const useAuthActions = () => {
       }
 
       // Check if this is a temporary password
-      const { data: tempPasswordRecord } = await supabase
+      const { data: tempPasswordRecord, error: tempPasswordError } = await supabase
         .from('admin_password_resets')
         .select('*')
         .eq('temporary_password', password)
         .is('used_at', null)
         .gt('expires_at', new Date().toISOString())
-        .single();
+        .maybeSingle();
 
       if (tempPasswordRecord) {
+        console.log('Found temporary password record:', tempPasswordRecord);
+        
         // Get user by email to verify it matches
-        const { data: profile } = await supabase
+        const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('id')
           .eq('email', email)
-          .single();
+          .maybeSingle();
+
+        console.log('Profile lookup result:', { profile, profileError });
 
         if (profile && profile.id === tempPasswordRecord.user_id) {
+          console.log('Profile matches temporary password user_id, proceeding with temp password login');
           // Mark temporary password as used
           await supabase
             .from('admin_password_resets')
