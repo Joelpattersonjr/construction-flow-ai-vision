@@ -30,6 +30,7 @@ import { TaskWithDetails, TaskStatus, TaskPriority } from '@/types/tasks';
 import { supabase } from '@/integrations/supabase/client';
 import { KanbanColumn } from '@/components/tasks/KanbanColumn';
 import { KanbanTaskCard } from '@/components/tasks/KanbanTaskCard';
+import { ExportDialog } from '@/components/export/ExportDialog';
 
 const Tasks = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -341,6 +342,23 @@ const Tasks = () => {
           </div>
           
           <div className="flex gap-2">
+            <ExportDialog 
+              tasks={filteredTasks.map(task => ({
+                id: task.id,
+                title: task.title,
+                description: task.description,
+                status: task.status,
+                priority: task.priority,
+                assignee: task.assignee,
+                project: task.project,
+                start_date: task.start_date,
+                end_date: task.end_date,
+                created_at: task.created_at,
+                updated_at: task.updated_at,
+              }))}
+              title="Export Tasks"
+            />
+            
             <TaskForm
               projects={projects}
               teamMembers={teamMembers}

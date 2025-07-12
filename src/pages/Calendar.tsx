@@ -11,6 +11,7 @@ import { TaskCalendar } from '@/components/calendar/TaskCalendar';
 import { taskService } from '@/services/taskService';
 import { useToast } from '@/hooks/use-toast';
 import AppHeader from '@/components/navigation/AppHeader';
+import { ExportDialog } from '@/components/export/ExportDialog';
 
 export default function CalendarView() {
   const [tasks, setTasks] = useState<any[]>([]);
@@ -164,6 +165,23 @@ export default function CalendarView() {
           </div>
           
           <div className="flex items-center gap-3">
+            <ExportDialog 
+              tasks={filteredTasks.map(task => ({
+                id: task.id,
+                title: task.title,
+                description: task.description,
+                status: task.status,
+                priority: task.priority,
+                assignee: task.assignee,
+                project: task.project,
+                start_date: task.start_date,
+                end_date: task.end_date,
+                created_at: task.created_at,
+                updated_at: task.updated_at,
+              }))}
+              title="Export Calendar Tasks"
+            />
+            
             <div className="flex items-center border rounded-lg">
               <Button 
                 variant={viewMode === 'calendar' ? 'default' : 'ghost'} 

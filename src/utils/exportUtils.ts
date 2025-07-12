@@ -2,8 +2,16 @@ import { saveAs } from 'file-saver';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
+import { format } from 'date-fns';
 
-// Type definitions
+// Extend jsPDF type to include autoTable
+declare module 'jspdf' {
+  interface jsPDF {
+    autoTable: (options: any) => jsPDF;
+  }
+}
+
+// Type definitions for existing permissions exports
 interface ProjectMember {
   id: string;
   user_id: string;
@@ -41,6 +49,44 @@ interface AuditLogEntry {
   metadata?: any;
   profiles?: { full_name: string | null } | null;
   target_profiles?: { full_name: string | null } | null;
+}
+
+// New type definitions for comprehensive exports
+export interface TaskExportData {
+  id: number;
+  title: string;
+  description?: string;
+  status: string;
+  priority: string;
+  assignee?: {
+    full_name: string;
+  };
+  project?: {
+    name: string;
+  };
+  start_date?: string;
+  end_date?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface ProjectExportData {
+  id: string;
+  name: string;
+  project_number?: string;
+  address?: string;
+  status: string;
+  start_date?: string;
+  end_date?: string;
+  owner_name?: string;
+  owner_company?: string;
+  created_at: string;
+}
+
+export interface ExportOptions {
+  format: 'csv' | 'excel' | 'pdf';
+  filename?: string;
+  title?: string;
 }
 
 export const exportUtils = {
@@ -235,5 +281,351 @@ export const exportUtils = {
       default:
         return 'Activity logged';
     }
+  },
+
+  // === NEW COMPREHENSIVE EXPORT FUNCTIONS ===
+
+  // Helper function to format dates
+  formatDate(dateString?: string): string {
+    if (!dateString) return '';
+    try {
+      return format(new Date(dateString), 'yyyy-MM-dd');
+    } catch {
+      return dateString;
+    }
+  },
+
+  formatDateTime(dateString?: string): string {
+    if (!dateString) return '';
+    try {
+      return format(new Date(dateString), 'yyyy-MM-dd HH:mm');
+    } catch {
+      return dateString;
+    }
+  },
+
+  generateFilename(baseName: string, format: string): string {
+    const timestamp = new Date().toISOString().split('T')[0];
+    return `${baseName}_${timestamp}.${format}`;
+  },
+
+  // Export Tasks
+  exportTasks(tasks: TaskExportData[], options: ExportOptions): void {
+    const filename = options.filename || this.generateFilename('tasks', options.format);
+    
+    // Prepare data for export
+    const exportData = tasks.map(task => ({
+      'Task ID': task.id,
+      'Title': task.title,
+      'Description': task.description || '',
+      'Status': task.status.replace('_', ' ').toUpperCase(),
+      'Priority': task.priority.toUpperCase(),
+      'Assignee': task.assignee?.full_name || '',
+      'Project': task.project?.name || '',
+      'Start Date': this.formatDate(task.start_date),
+      'Due Date': this.formatDate(task.end_date),
+      'Created': this.formatDate(task.created_at),
+      'Updated': this.formatDate(task.updated_at),
+    }));
+
+    switch (options.format) {
+      case 'csv':
+        this.exportDataToCSV(exportData, filename);
+        break;
+      case 'excel':
+        this.exportDataToExcel(exportData, filename, 'Tasks');
+        break;
+      case 'pdf':
+        this.exportTasksToPDF(exportData, filename, options.title || 'Tasks Report');
+        break;
+    }
+  },
+
+  // Export Projects
+  exportProjects(projects: ProjectExportData[], options: ExportOptions): void {
+    const filename = options.filename || this.generateFilename('projects', options.format);
+    
+    const exportData = projects.map(project => ({
+      'Project ID': project.id,
+      'Name': project.name,
+      'Project Number': project.project_number || '',
+      'Address': project.address || '',
+      'Status': project.status.toUpperCase(),
+      'Start Date': this.formatDate(project.start_date),
+      'End Date': this.formatDate(project.end_date),
+      'Owner Name': project.owner_name || '',
+      'Owner Company': project.owner_company || '',
+      'Created': this.formatDate(project.created_at),
+    }));
+
+    switch (options.format) {
+      case 'csv':
+        this.exportDataToCSV(exportData, filename);
+        break;
+      case 'excel':
+        this.exportDataToExcel(exportData, filename, 'Projects');
+        break;
+      case 'pdf':
+        this.exportProjectsToPDF(exportData, filename, options.title || 'Projects Report');
+        break;
+    }
+  },
+
+  // Generic CSV Export
+  exportDataToCSV(data: any[], filename: string): void {
+    if (data.length === 0) return;
+
+    const csv = this.convertToCSV(data);
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    saveAs(blob, filename);
+  },
+
+  // Generic Excel Export
+  exportDataToExcel(data: any[], filename: string, sheetName: string): void {
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    
+    // Auto-size columns
+    if (data.length > 0) {
+      const colWidths = Object.keys(data[0]).map(key => ({
+        wch: Math.max(
+          key.length,
+          ...data.map(row => String(row[key] || '').length)
+        )
+      }));
+      worksheet['!cols'] = colWidths;
+    }
+
+    XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+    XLSX.writeFile(workbook, filename);
+  },
+
+  // PDF Export for Tasks
+  exportTasksToPDF(data: any[], filename: string, title: string): void {
+    const doc = new jsPDF();
+    
+    // Title
+    doc.setFontSize(18);
+    doc.text(title, 20, 20);
+    
+    // Subtitle with date
+    doc.setFontSize(12);
+    doc.text(`Generated on ${format(new Date(), 'PPP')}`, 20, 30);
+
+    // Table
+    if (data.length > 0) {
+      const headers = Object.keys(data[0]);
+      const rows = data.map(row => headers.map(header => row[header] || ''));
+
+      (doc as any).autoTable({
+        head: [headers],
+        body: rows,
+        startY: 40,
+        styles: { fontSize: 8 },
+        headStyles: { fillColor: [51, 122, 183] },
+        columnStyles: {
+          0: { cellWidth: 15 }, // Task ID
+          1: { cellWidth: 40 }, // Title
+          3: { cellWidth: 20 }, // Status
+          4: { cellWidth: 20 }, // Priority
+        },
+        didDrawPage: (data: any) => {
+          // Footer
+          doc.setFontSize(8);
+          doc.text(
+            `Page ${data.pageNumber}`,
+            doc.internal.pageSize.width - 20,
+            doc.internal.pageSize.height - 10
+          );
+        }
+      });
+    }
+
+    doc.save(filename);
+  },
+
+  // PDF Export for Projects
+  exportProjectsToPDF(data: any[], filename: string, title: string): void {
+    const doc = new jsPDF();
+    
+    // Title
+    doc.setFontSize(18);
+    doc.text(title, 20, 20);
+    
+    // Subtitle with date
+    doc.setFontSize(12);
+    doc.text(`Generated on ${format(new Date(), 'PPP')}`, 20, 30);
+
+    // Table
+    if (data.length > 0) {
+      const headers = Object.keys(data[0]);
+      const rows = data.map(row => headers.map(header => row[header] || ''));
+
+      (doc as any).autoTable({
+        head: [headers],
+        body: rows,
+        startY: 40,
+        styles: { fontSize: 8 },
+        headStyles: { fillColor: [51, 122, 183] },
+        columnStyles: {
+          1: { cellWidth: 35 }, // Name
+          3: { cellWidth: 30 }, // Address
+        },
+        didDrawPage: (data: any) => {
+          // Footer
+          doc.setFontSize(8);
+          doc.text(
+            `Page ${data.pageNumber}`,
+            doc.internal.pageSize.width - 20,
+            doc.internal.pageSize.height - 10
+          );
+        }
+      });
+    }
+
+    doc.save(filename);
+  },
+
+  // Combined Export (Tasks + Projects)
+  exportCombinedReport(
+    tasks: TaskExportData[], 
+    projects: ProjectExportData[], 
+    options: ExportOptions
+  ): void {
+    const filename = options.filename || this.generateFilename('combined_report', options.format);
+
+    switch (options.format) {
+      case 'excel':
+        this.exportCombinedToExcel(tasks, projects, filename);
+        break;
+      case 'pdf':
+        this.exportCombinedToPDF(tasks, projects, filename, options.title || 'Project Report');
+        break;
+      default:
+        // For CSV, export tasks and projects separately
+        this.exportTasks(tasks, { ...options, filename: filename.replace('.csv', '_tasks.csv') });
+        this.exportProjects(projects, { ...options, filename: filename.replace('.csv', '_projects.csv') });
+    }
+  },
+
+  exportCombinedToExcel(
+    tasks: TaskExportData[], 
+    projects: ProjectExportData[], 
+    filename: string
+  ): void {
+    const workbook = XLSX.utils.book_new();
+
+    // Tasks sheet
+    if (tasks.length > 0) {
+      const taskData = tasks.map(task => ({
+        'Task ID': task.id,
+        'Title': task.title,
+        'Description': task.description || '',
+        'Status': task.status.replace('_', ' ').toUpperCase(),
+        'Priority': task.priority.toUpperCase(),
+        'Assignee': task.assignee?.full_name || '',
+        'Project': task.project?.name || '',
+        'Start Date': this.formatDate(task.start_date),
+        'Due Date': this.formatDate(task.end_date),
+        'Created': this.formatDate(task.created_at),
+      }));
+      
+      const taskWorksheet = XLSX.utils.json_to_sheet(taskData);
+      XLSX.utils.book_append_sheet(workbook, taskWorksheet, 'Tasks');
+    }
+
+    // Projects sheet
+    if (projects.length > 0) {
+      const projectData = projects.map(project => ({
+        'Project ID': project.id,
+        'Name': project.name,
+        'Project Number': project.project_number || '',
+        'Address': project.address || '',
+        'Status': project.status.toUpperCase(),
+        'Start Date': this.formatDate(project.start_date),
+        'End Date': this.formatDate(project.end_date),
+        'Owner Name': project.owner_name || '',
+        'Owner Company': project.owner_company || '',
+        'Created': this.formatDate(project.created_at),
+      }));
+      
+      const projectWorksheet = XLSX.utils.json_to_sheet(projectData);
+      XLSX.utils.book_append_sheet(workbook, projectWorksheet, 'Projects');
+    }
+
+    XLSX.writeFile(workbook, filename);
+  },
+
+  exportCombinedToPDF(
+    tasks: TaskExportData[], 
+    projects: ProjectExportData[], 
+    filename: string, 
+    title: string
+  ): void {
+    const doc = new jsPDF();
+    
+    // Title page
+    doc.setFontSize(20);
+    doc.text(title, 20, 30);
+    doc.setFontSize(14);
+    doc.text(`Generated on ${format(new Date(), 'PPP')}`, 20, 45);
+
+    let yPosition = 70;
+
+    // Projects section
+    if (projects.length > 0) {
+      doc.setFontSize(16);
+      doc.text('Projects Summary', 20, yPosition);
+      yPosition += 10;
+
+      const projectHeaders = ['Name', 'Status', 'Start Date', 'End Date'];
+      const projectRows = projects.map(project => [
+        project.name,
+        project.status.toUpperCase(),
+        this.formatDate(project.start_date),
+        this.formatDate(project.end_date)
+      ]);
+
+      (doc as any).autoTable({
+        head: [projectHeaders],
+        body: projectRows,
+        startY: yPosition,
+        styles: { fontSize: 10 },
+        headStyles: { fillColor: [51, 122, 183] },
+      });
+
+      yPosition = (doc as any).lastAutoTable.finalY + 20;
+    }
+
+    // Tasks section
+    if (tasks.length > 0) {
+      if (yPosition > 200) {
+        doc.addPage();
+        yPosition = 20;
+      }
+
+      doc.setFontSize(16);
+      doc.text('Tasks Summary', 20, yPosition);
+      yPosition += 10;
+
+      const taskHeaders = ['Title', 'Status', 'Priority', 'Assignee', 'Due Date'];
+      const taskRows = tasks.map(task => [
+        task.title,
+        task.status.replace('_', ' ').toUpperCase(),
+        task.priority.toUpperCase(),
+        task.assignee?.full_name || '',
+        this.formatDate(task.end_date)
+      ]);
+
+      (doc as any).autoTable({
+        head: [taskHeaders],
+        body: taskRows,
+        startY: yPosition,
+        styles: { fontSize: 9 },
+        headStyles: { fillColor: [51, 122, 183] },
+      });
+    }
+
+    doc.save(filename);
   },
 };

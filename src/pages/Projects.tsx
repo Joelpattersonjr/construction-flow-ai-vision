@@ -11,6 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Plus, Folder, Calendar, MapPin, FileText, Settings } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import AppHeader from '@/components/navigation/AppHeader';
+import { ExportDialog } from '@/components/export/ExportDialog';
 
 interface Project {
   id: string;
@@ -20,6 +21,10 @@ interface Project {
   status: string;
   start_date: string;
   end_date: string;
+  owner_name?: string;
+  owner_company?: string;
+  owner_email?: string;
+  owner_phone?: string;
   created_at: string;
   fileCount?: number;
   recentFileActivity?: string;
@@ -214,27 +219,44 @@ const Projects: React.FC = () => {
       
       <main className="container mx-auto py-6 px-4">
         <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
-            <Folder className="h-8 w-8" />
-            Projects
-          </h1>
-          <p className="text-gray-600 mt-2">
-            {profile?.company_role === 'company_admin' 
-              ? 'Manage your construction projects and track progress'
-              : 'View and access your assigned projects'
-            }
-          </p>
-        </div>
-        
-        {profile?.company_role === 'company_admin' && (
-          <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              New Project
-            </Button>
-          </DialogTrigger>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
+              <Folder className="h-8 w-8" />
+              Projects
+            </h1>
+            <p className="text-gray-600 mt-2">
+              {profile?.company_role === 'company_admin' 
+                ? 'Manage your construction projects and track progress'
+                : 'View and access your assigned projects'
+              }
+            </p>
+          </div>
+          
+          <div className="flex gap-2">
+          <ExportDialog 
+            projects={projects.map(project => ({
+              id: project.id,
+              name: project.name,
+              project_number: project.project_number,
+              address: project.address,
+              status: project.status,
+              start_date: project.start_date,
+              end_date: project.end_date,
+              owner_name: project.owner_name,
+              owner_company: project.owner_company,
+              created_at: project.created_at,
+            }))}
+            title="Export Projects"
+          />
+          
+          {profile?.company_role === 'company_admin' && (
+            <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                New Project
+              </Button>
+            </DialogTrigger>
           <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Create New Project</DialogTitle>
@@ -363,7 +385,8 @@ const Projects: React.FC = () => {
           </DialogContent>
         </Dialog>
         )}
-      </div>
+        </div>
+        </div>
 
       {projects.length === 0 ? (
         <Card>
