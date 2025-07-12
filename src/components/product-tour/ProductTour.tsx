@@ -10,6 +10,13 @@ export function ProductTour({ isActive, onClose }: ProductTourProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [targetElement, setTargetElement] = useState<HTMLElement | null>(null);
 
+  // Reset tour to first step when activated
+  useEffect(() => {
+    if (isActive) {
+      setCurrentStep(0);
+    }
+  }, [isActive]);
+
   useEffect(() => {
     if (!isActive) return;
 
