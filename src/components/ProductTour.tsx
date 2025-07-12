@@ -53,18 +53,21 @@ export function ProductTour({ isActive, onClose }: ProductTourProps) {
   const [targetElement, setTargetElement] = useState<HTMLElement | null>(null);
 
   useEffect(() => {
+    console.log('ProductTour useEffect triggered, isActive:', isActive, 'currentStep:', currentStep);
     if (!isActive) return;
 
     // Small delay to ensure DOM is ready
     const timeout = setTimeout(() => {
       const target = document.querySelector(tourSteps[currentStep].target) as HTMLElement;
       console.log('Looking for target:', tourSteps[currentStep].target, 'Found:', target);
+      console.log('All elements with data-tour:', document.querySelectorAll('[data-tour]'));
       setTargetElement(target);
 
       if (target) {
         target.scrollIntoView({ behavior: 'smooth', block: 'center' });
         target.style.position = 'relative';
-        target.style.zIndex = '1001';
+        target.style.zIndex = '100';
+        console.log('Target element styled successfully');
       } else {
         console.warn('Tour target not found:', tourSteps[currentStep].target);
       }
@@ -143,32 +146,40 @@ export function ProductTour({ isActive, onClose }: ProductTourProps) {
 
   if (!isActive) return null;
 
+  console.log('ProductTour is active, currentStep:', currentStep);
+  console.log('targetElement:', targetElement);
+  console.log('tooltipPosition:', getTooltipPosition());
+
   const currentTourStep = tourSteps[currentStep];
 
   return (
     <>
       {/* Overlay */}
-      <div className="fixed inset-0 bg-black/50 z-1000 pointer-events-auto" />
+      <div className="fixed inset-0 bg-black/50 pointer-events-auto" style={{ zIndex: 50 }} />
       
       {/* Spotlight effect */}
       {targetElement && (
         <div
-          className="fixed pointer-events-none z-1001"
+          className="fixed pointer-events-none"
           style={{
             top: targetElement.getBoundingClientRect().top - 10,
             left: targetElement.getBoundingClientRect().left - 10,
             width: targetElement.getBoundingClientRect().width + 20,
             height: targetElement.getBoundingClientRect().height + 20,
             boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.5)',
-            borderRadius: '8px'
+            borderRadius: '8px',
+            zIndex: 51
           }}
         />
       )}
 
-      {/* Tour Card */}
+      {/* Tour Card - DEBUG: Added red border to make it visible */}
       <Card 
-        className="fixed z-1002 w-80 p-6 bg-card border-2 pointer-events-auto"
-        style={getTooltipPosition()}
+        className="fixed w-80 p-6 bg-white border-4 border-red-500 pointer-events-auto shadow-2xl"
+        style={{
+          ...getTooltipPosition(),
+          zIndex: 52
+        }}
       >
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1">
