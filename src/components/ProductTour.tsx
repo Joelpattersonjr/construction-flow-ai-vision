@@ -117,7 +117,7 @@ export function ProductTour({ isActive, onClose }: ProductTourProps) {
   return (
     <>
       {/* Overlay */}
-      <div className="fixed inset-0 bg-black/50 pointer-events-auto" style={{ zIndex: 50 }} />
+      <div className="fixed inset-0 bg-black/50 pointer-events-auto" style={{ zIndex: 9998 }} />
       
       {/* Spotlight effect */}
       {targetElement && (
@@ -130,7 +130,7 @@ export function ProductTour({ isActive, onClose }: ProductTourProps) {
             height: targetElement.getBoundingClientRect().height + 20,
             boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.5)',
             borderRadius: '8px',
-            zIndex: 51
+            zIndex: 9999
           }}
         />
       )}
@@ -140,7 +140,7 @@ export function ProductTour({ isActive, onClose }: ProductTourProps) {
         className="fixed w-80 p-6 bg-card border shadow-2xl pointer-events-auto animate-scale-in"
         style={{
           ...getTooltipPosition(),
-          zIndex: 52
+          zIndex: 10000
         }}
       >
         <div className="flex items-start justify-between mb-4">
