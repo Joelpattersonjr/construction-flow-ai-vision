@@ -73,14 +73,17 @@ export const KanbanTaskCard: React.FC<KanbanTaskCardProps> = ({ task, onEdit }) 
         </p>
       )}
 
-      {task.dependency?.id && (
-        <div className="mb-2 flex items-center gap-1 p-1.5 bg-muted/50 rounded text-xs">
-          <ArrowRight className="h-2.5 w-2.5 text-foreground" />
-          <span className="text-foreground truncate">
-            Depends on: <span className="font-medium">{task.dependency.title}</span>
-          </span>
-        </div>
-      )}
+      {(() => {
+        console.log(`Task "${task.title}" dependency:`, task.dependency);
+        return task.dependency?.id && (
+          <div className="mb-2 flex items-center gap-1 p-1.5 bg-muted/50 rounded text-xs">
+            <ArrowRight className="h-2.5 w-2.5 text-foreground" />
+            <span className="text-foreground truncate">
+              Depends on: <span className="font-medium">{task.dependency.title}</span>
+            </span>
+          </div>
+        );
+      })()}
       
       <div className="flex items-center justify-between">
         <Badge variant="outline" className={`text-xs ${priorityStyle.color}`}>
