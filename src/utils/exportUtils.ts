@@ -1,7 +1,7 @@
 import { saveAs } from 'file-saver';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 import { format } from 'date-fns';
 
 // Extend jsPDF type to include autoTable
@@ -213,7 +213,7 @@ export const exportUtils = {
     ]);
 
     // Create table
-    doc.autoTable({
+    autoTable(doc, {
       head: [['Date', 'Time', 'Action', 'Performed By', 'Target User', 'Details']],
       body: tableData,
       startY: 75,
@@ -417,7 +417,7 @@ export const exportUtils = {
       const headers = Object.keys(data[0]);
       const rows = data.map(row => headers.map(header => row[header] || ''));
 
-      doc.autoTable({
+      autoTable(doc, {
         head: [headers],
         body: rows,
         startY: 40,
@@ -461,7 +461,7 @@ export const exportUtils = {
       const headers = Object.keys(data[0]);
       const rows = data.map(row => headers.map(header => row[header] || ''));
 
-      doc.autoTable({
+      autoTable(doc, {
         head: [headers],
         body: rows,
         startY: 40,
@@ -586,7 +586,7 @@ export const exportUtils = {
         this.formatDate(project.end_date)
       ]);
 
-      doc.autoTable({
+      autoTable(doc, {
         head: [projectHeaders],
         body: projectRows,
         startY: yPosition,
@@ -617,7 +617,7 @@ export const exportUtils = {
         this.formatDate(task.end_date)
       ]);
 
-      doc.autoTable({
+      autoTable(doc, {
         head: [taskHeaders],
         body: taskRows,
         startY: yPosition,
