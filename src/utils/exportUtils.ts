@@ -306,7 +306,8 @@ export const exportUtils = {
 
   generateFilename(baseName: string, format: string): string {
     const timestamp = new Date().toISOString().split('T')[0];
-    return `${baseName}_${timestamp}.${format}`;
+    const extension = format === 'excel' ? 'xlsx' : format;
+    return `${baseName}_${timestamp}.${extension}`;
   },
 
   // Export Tasks
