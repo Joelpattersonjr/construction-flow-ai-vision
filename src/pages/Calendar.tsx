@@ -16,6 +16,7 @@ export default function CalendarView() {
   const [tasks, setTasks] = useState<any[]>([]);
   const [filteredTasks, setFilteredTasks] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [viewMode, setViewMode] = useState<'calendar' | 'list'>('calendar');
   const [showTaskForm, setShowTaskForm] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [newTaskDescription, setNewTaskDescription] = useState('');
@@ -95,6 +96,33 @@ export default function CalendarView() {
     }
   };
 
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case 'critical':
+      case 'high':
+        return 'bg-red-500';
+      case 'medium':
+        return 'bg-orange-500';
+      case 'low':
+        return 'bg-blue-500';
+      default:
+        return 'bg-gray-500';
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'completed':
+        return 'bg-green-500';
+      case 'in_progress':
+        return 'bg-yellow-500';
+      case 'blocked':
+        return 'bg-red-500';
+      default:
+        return 'bg-gray-500';
+    }
+  };
+
   const getTaskStats = () => {
     const total = tasks.length;
     const withDueDate = tasks.filter(task => task.end_date).length;
@@ -140,12 +168,26 @@ export default function CalendarView() {
           </div>
           
           <div className="flex items-center gap-3">
-            <Link to="/tasks">
-              <Button variant="outline" size="sm">
-                <List className="w-4 h-4 mr-2" />
-                List View
+            <div className="flex items-center border rounded-lg">
+              <Button 
+                variant={viewMode === 'calendar' ? 'default' : 'ghost'} 
+                size="sm"
+                onClick={() => setViewMode('calendar')}
+                className="rounded-r-none"
+              >
+                <Calendar className="w-4 h-4 mr-2" />
+                Calendar
               </Button>
-            </Link>
+              <Button 
+                variant={viewMode === 'list' ? 'default' : 'ghost'} 
+                size="sm"
+                onClick={() => setViewMode('list')}
+                className="rounded-l-none"
+              >
+                <List className="w-4 h-4 mr-2" />
+                List
+              </Button>
+            </div>
             <Button onClick={() => setShowTaskForm(true)}>
               <Plus className="w-4 h-4 mr-2" />
               New Task
@@ -285,13 +327,62 @@ export default function CalendarView() {
           </CardContent>
         </Card>
 
-        {/* Calendar */}
+        {/* Calendar or List View */}
         <Card>
           <CardContent className="p-6">
-            <TaskCalendar 
-              companyTasks={filteredTasks} 
-              onTaskUpdate={loadTasks}
-            />
+            {viewMode === 'calendar' ? (
+              <TaskCalendar 
+                companyTasks={filteredTasks} 
+                onTaskUpdate={loadTasks}
+              />
+            ) : (
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold mb-4">Task List View</h3>
+                {filteredTasks.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    No tasks found matching your filters.
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {filteredTasks.map(task => (
+                      <Card key={task.id} className="hover:shadow-md transition-shadow">
+                        <CardContent className="p-4">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <div className={`w-3 h-3 rounded-full ${getPriorityColor(task.priority)}`}></div>
+                              <div>
+                                <h4 className="font-medium">{task.title}</h4>
+                                <p className="text-sm text-muted-foreground">
+                                  {task.project?.name && <span className="font-medium">{task.project.name}</span>}
+                                  {task.assignee?.full_name && (
+                                    <span> • Assigned to {task.assignee.full_name}</span>
+                                  )}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Badge variant="outline" className={`${getStatusColor(task.status)} text-white border-none`}>
+                                {task.status.replace('_', ' ')}
+                              </Badge>
+                              {task.end_date && (
+                                <Badge variant="secondary">
+                                  Due: {new Date(task.end_date).toLocaleDateString()}
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                          {task.description && (
+                            <p className="text-sm text-muted-foreground mt-2 ml-6">
+                              {task.description}
+                            </p>
+                          )}
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
