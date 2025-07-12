@@ -22,6 +22,23 @@ export interface TaskLabel {
   created_at: string;
 }
 
+export interface TaskTimeEntry {
+  id: string;
+  task_id: number;
+  user_id: string;
+  start_time: string;
+  end_time: string | null;
+  duration_seconds: number | null;
+  description: string | null;
+  created_at: string;
+  updated_at: string;
+  user?: {
+    id: string;
+    full_name: string | null;
+    email: string | null;
+  };
+}
+
 export interface TaskWithDetails extends Task {
   assignee?: {
     id: string;
@@ -33,6 +50,12 @@ export interface TaskWithDetails extends Task {
     name: string | null;
   };
   labels?: TaskLabel[];
+  dependency?: {
+    id: number;
+    title: string | null;
+    status: string | null;
+  };
+  time_entries?: TaskTimeEntry[];
 }
 
 export type TaskStatus = 'todo' | 'in_progress' | 'review' | 'completed' | 'blocked';

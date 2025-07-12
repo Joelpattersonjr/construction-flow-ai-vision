@@ -25,6 +25,7 @@ import AppHeader from '@/components/navigation/AppHeader';
 import { TaskForm } from '@/components/tasks/TaskForm';
 import { TaskItem } from '@/components/tasks/TaskItem';
 import { TaskTemplateManager } from '@/components/tasks/TaskTemplateManager';
+import { TaskDetailsDialog } from '@/components/tasks/TaskDetailsDialog';
 import { taskService } from '@/services/taskService';
 import { TaskWithDetails, TaskStatus, TaskPriority } from '@/types/tasks';
 import { supabase } from '@/integrations/supabase/client';
@@ -43,6 +44,10 @@ const Tasks = () => {
 
   // State for edit dialog
   const [editDialogOpen, setEditDialogOpen] = React.useState(false);
+  
+  // State for task details dialog
+  const [selectedTask, setSelectedTask] = useState<TaskWithDetails | null>(null);
+  const [taskDetailsOpen, setTaskDetailsOpen] = useState(false);
   
   // Drag and drop state
   const [activeTask, setActiveTask] = useState<TaskWithDetails | null>(null);
@@ -214,6 +219,20 @@ const Tasks = () => {
     });
   };
 
+  const handleTaskDetailsUpdate = async (updates: any) => {
+    if (selectedTask) {
+      await updateTaskMutation.mutateAsync({
+        id: selectedTask.id,
+        updates,
+      });
+    }
+  };
+
+  const handleTaskView = (task: TaskWithDetails) => {
+    setSelectedTask(task);
+    setTaskDetailsOpen(true);
+  };
+
   const handleUseTemplate = (template: any) => {
     setEditingTask({
       id: 0, // Temporary ID for new task
@@ -362,6 +381,7 @@ const Tasks = () => {
             <TaskForm
               projects={projects}
               teamMembers={teamMembers}
+              availableTasks={tasks.map(t => ({ id: t.id, title: t.title || 'Untitled', status: t.status || 'todo' }))}
               onSubmit={handleCreateTask}
             >
               <Button>
@@ -377,6 +397,7 @@ const Tasks = () => {
           <TaskForm
             projects={projects}
             teamMembers={teamMembers}
+            availableTasks={tasks.map(t => ({ id: t.id, title: t.title || 'Untitled', status: t.status || 'todo' }))}
             onSubmit={editingTask?.id === 0 ? handleCreateTask : handleUpdateTask}
             task={editingTask?.id === 0 ? null : editingTask}
             open={editDialogOpen}
@@ -486,15 +507,16 @@ const Tasks = () => {
               </Card>
             ) : (
               <div className="grid gap-4">
-                {filteredTasks.map((task) => (
-                  <TaskItem
-                    key={task.id}
-                    task={task}
-                    onEdit={setEditingTask}
-                    onDelete={handleDeleteTask}
-                    onStatusChange={handleStatusChange}
-                  />
-                ))}
+                 {filteredTasks.map((task) => (
+                   <TaskItem
+                     key={task.id}
+                     task={task}
+                     onEdit={setEditingTask}
+                     onDelete={handleDeleteTask}
+                     onStatusChange={handleStatusChange}
+                     onView={handleTaskView}
+                   />
+                 ))}
               </div>
             )}
           </TabsContent>
@@ -528,6 +550,14 @@ const Tasks = () => {
             </DndContext>
           </TabsContent>
         </Tabs>
+
+        {/* Task Details Dialog */}
+        <TaskDetailsDialog
+          task={selectedTask}
+          open={taskDetailsOpen}
+          onOpenChange={setTaskDetailsOpen}
+          onTaskUpdate={handleTaskDetailsUpdate}
+        />
       </main>
     </div>
   );

@@ -25,6 +25,7 @@ interface TaskItemProps {
   onEdit: (task: TaskWithDetails) => void;
   onDelete: (taskId: number) => void;
   onStatusChange: (taskId: number, status: TaskStatus) => void;
+  onView?: (task: TaskWithDetails) => void;
 }
 
 const statusConfig = {
@@ -47,6 +48,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
   onEdit,
   onDelete,
   onStatusChange,
+  onView,
 }) => {
   const [showDetails, setShowDetails] = useState(false);
   const [labels, setLabels] = useState<TaskLabel[]>([]);
@@ -95,7 +97,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setShowDetails(true)}
+              onClick={() => onView ? onView(task) : setShowDetails(true)}
               className="h-8 w-8 p-0"
               title="View Details"
             >
@@ -205,11 +207,11 @@ export const TaskItem: React.FC<TaskItemProps> = ({
 
         {/* Quick Info Actions */}
         <div className="mt-3 pt-3 border-t flex items-center gap-4 text-xs text-muted-foreground">
-          <div className="flex items-center gap-1 cursor-pointer hover:text-foreground" onClick={() => setShowDetails(true)}>
+          <div className="flex items-center gap-1 cursor-pointer hover:text-foreground" onClick={() => onView ? onView(task) : setShowDetails(true)}>
             <MessageSquare className="h-3 w-3" />
             <span>Comments</span>
           </div>
-          <div className="flex items-center gap-1 cursor-pointer hover:text-foreground" onClick={() => setShowDetails(true)}>
+          <div className="flex items-center gap-1 cursor-pointer hover:text-foreground" onClick={() => onView ? onView(task) : setShowDetails(true)}>
             <Paperclip className="h-3 w-3" />
             <span>Files</span>
           </div>

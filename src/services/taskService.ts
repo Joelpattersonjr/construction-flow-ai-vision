@@ -11,7 +11,8 @@ export const taskService = {
       .select(`
         *,
         assignee:profiles!fk_tasks_assignee_id(id, full_name, email),
-        project:projects(id, name)
+        project:projects(id, name),
+        dependency:tasks!tasks_dependency_id_fkey(id, title, status)
       `)
       .eq('project_id', projectId)
       .order('created_at', { ascending: false });
@@ -27,7 +28,8 @@ export const taskService = {
       .select(`
         *,
         assignee:profiles!fk_tasks_assignee_id(id, full_name, email),
-        project:projects(id, name)
+        project:projects(id, name),
+        dependency:tasks!tasks_dependency_id_fkey(id, title, status)
       `)
       .order('created_at', { ascending: false });
 
@@ -43,6 +45,7 @@ export const taskService = {
       ...task,
       created_by: user.user?.id,
       assignee_id: task.assignee_id === 'none' ? null : task.assignee_id,
+      dependency_id: (task as any).dependency_id === 'none' ? null : parseInt((task as any).dependency_id) || null,
     };
     
     const { data, error } = await supabase
@@ -78,6 +81,7 @@ export const taskService = {
     const updateData = {
       ...updates,
       assignee_id: updates.assignee_id === 'none' ? null : updates.assignee_id,
+      dependency_id: (updates as any).dependency_id === 'none' ? null : parseInt((updates as any).dependency_id) || null,
     };
     
     const { data, error } = await supabase

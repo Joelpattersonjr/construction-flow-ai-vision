@@ -25,6 +25,7 @@ const taskSchema = z.object({
   end_date: z.date().optional(),
   project_id: z.string().min(1, 'Project is required'),
   assignee_id: z.string().optional(),
+  dependency_id: z.string().optional(),
 });
 
 type TaskFormData = z.infer<typeof taskSchema>;
@@ -33,6 +34,7 @@ interface TaskFormProps {
   task?: Task | null;
   projects: Array<{ id: string; name: string }>;
   teamMembers: Array<{ id: string; full_name: string; email: string }>;
+  availableTasks?: Array<{ id: number; title: string; status: string }>;
   onSubmit: (data: TaskFormData) => Promise<void>;
   children?: React.ReactNode;
   open?: boolean;
@@ -58,6 +60,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
   task,
   projects,
   teamMembers,
+  availableTasks = [],
   onSubmit,
   children,
   open: externalOpen,
@@ -80,6 +83,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
       end_date: undefined,
       project_id: projects[0]?.id || '',
       assignee_id: 'none',
+      dependency_id: 'none',
     },
   });
 
@@ -95,6 +99,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
         end_date: task?.end_date ? new Date(task.end_date) : undefined,
         project_id: task?.project_id || projects[0]?.id || '',
         assignee_id: task?.assignee_id || 'none',
+        dependency_id: task?.dependency_id?.toString() || 'none',
       };
       form.reset(formData);
     }
@@ -302,6 +307,34 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                         />
                       </PopoverContent>
                     </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="dependency_id"
+                render={({ field }) => (
+                  <FormItem className="col-span-2">
+                    <FormLabel>Dependencies</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a dependency (optional)" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="none">No dependency</SelectItem>
+                        {availableTasks
+                          .filter(t => t.id !== task?.id && t.status !== 'completed')
+                          .map((availableTask) => (
+                          <SelectItem key={availableTask.id} value={availableTask.id.toString()}>
+                            {availableTask.title} ({availableTask.status})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}

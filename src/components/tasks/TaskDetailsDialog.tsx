@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
-import { MessageSquare, Paperclip, Activity, Send, Download, Trash2, Tag, Eye, Upload } from 'lucide-react';
+import { MessageSquare, Paperclip, Activity, Send, Download, Trash2, Tag, Eye, Upload, Clock, GitBranch } from 'lucide-react';
 
 import { TaskLabelsManager } from './TaskLabelsManager';
 import { FileUploadDropzone } from './FileUploadDropzone';
 import { FilePreviewDialog } from './FilePreviewDialog';
+import { TaskTimeTracker } from './TaskTimeTracker';
+import { TaskDependencies } from './TaskDependencies';
 
 import {
   Dialog,
@@ -21,7 +23,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 
-import { TaskWithDetails, TaskLabel } from '@/types/tasks';
+import { Task, TaskWithDetails, TaskLabel } from '@/types/tasks';
 import { taskCommentsService, TaskComment } from '@/services/taskCommentsService';
 import { taskFilesService, TaskFile } from '@/services/taskFilesService';
 import { taskActivityService, TaskActivity } from '@/services/taskActivityService';
@@ -31,12 +33,14 @@ interface TaskDetailsDialogProps {
   task: TaskWithDetails | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onTaskUpdate?: (updates: Partial<Task>) => void;
 }
 
 export const TaskDetailsDialog: React.FC<TaskDetailsDialogProps> = ({
   task,
   open,
   onOpenChange,
+  onTaskUpdate,
 }) => {
   const [comments, setComments] = useState<TaskComment[]>([]);
   const [files, setFiles] = useState<TaskFile[]>([]);
@@ -154,9 +158,17 @@ export const TaskDetailsDialog: React.FC<TaskDetailsDialogProps> = ({
         </DialogHeader>
 
         <Tabs defaultValue="details" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="details">
-              Details & Labels
+              Details
+            </TabsTrigger>
+            <TabsTrigger value="dependencies" className="flex items-center gap-2">
+              <GitBranch className="h-4 w-4" />
+              Dependencies
+            </TabsTrigger>
+            <TabsTrigger value="time" className="flex items-center gap-2">
+              <Clock className="h-4 w-4" />
+              Time
             </TabsTrigger>
             <TabsTrigger value="comments" className="flex items-center gap-2">
               <MessageSquare className="h-4 w-4" />
@@ -233,6 +245,24 @@ export const TaskDetailsDialog: React.FC<TaskDetailsDialogProps> = ({
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="dependencies" className="space-y-4">
+            {task && onTaskUpdate && (
+              <TaskDependencies
+                task={task}
+                onTaskUpdate={onTaskUpdate}
+              />
+            )}
+          </TabsContent>
+
+          <TabsContent value="time" className="space-y-4">
+            {task && (
+              <TaskTimeTracker
+                taskId={task.id}
+                taskTitle={task.title || 'Untitled Task'}
+              />
+            )}
           </TabsContent>
 
           <TabsContent value="comments" className="space-y-4">
