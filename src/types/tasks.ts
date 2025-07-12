@@ -54,7 +54,7 @@ export interface TaskWithDetails extends Task {
     id: number;
     title: string | null;
     status: string | null;
-  };
+  } | null;
   time_entries?: TaskTimeEntry[];
 }
 
