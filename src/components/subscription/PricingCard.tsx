@@ -44,7 +44,7 @@ export const PricingCard: React.FC<PricingCardProps> = ({
           ))}
         </ul>
         <Button 
-          size="lg" 
+          size="lg"
           onClick={onClick}
           className="group w-full text-lg py-4 font-semibold relative overflow-hidden mt-4"
         >
