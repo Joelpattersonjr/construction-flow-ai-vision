@@ -8,6 +8,7 @@ export interface SubscriptionInfo {
     version_control: boolean;
     collaboration: boolean;
     advanced_analytics: boolean;
+    time_tracking: boolean;
   };
   limits: {
     max_versions_per_file: number;
@@ -77,6 +78,7 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
       'Unlimited versions per file',
       'Unlimited collaborators',
       'Unlimited version history',
+      'Advanced time tracking & reporting',
       'Advanced analytics & reporting',
       'Custom integrations',
       'Dedicated support',
@@ -112,6 +114,7 @@ export class SubscriptionService {
           version_control: false,
           collaboration: false,
           advanced_analytics: false,
+          time_tracking: false,
         },
         limits: (limitsData as any) || {
           max_versions_per_file: 5,
@@ -198,6 +201,7 @@ export class SubscriptionService {
         version_control: true,
         collaboration: true,
         advanced_analytics: true,
+        time_tracking: newTier === 'enterprise',
       };
 
       const { error } = await supabase
@@ -239,6 +243,7 @@ export class SubscriptionService {
       version_control: 'Advanced version control with unlimited history and rollback capabilities',
       collaboration: 'Real-time collaborative editing with live cursors and presence',
       advanced_analytics: 'Detailed analytics and reporting on file usage and team activity',
+      time_tracking: 'Advanced time tracking and reporting with detailed analytics',
     };
     return descriptions[featureName] || featureName;
   }

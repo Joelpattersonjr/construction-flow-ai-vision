@@ -13,6 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 
 import { taskTimeService } from '@/services/taskTimeService';
 import { TaskTimeEntry } from '@/types/tasks';
+import { FeatureGate } from '@/components/subscription/FeatureGate';
 
 export const TimeReportingDashboard: React.FC = () => {
   const [timeStats, setTimeStats] = useState<any>(null);
@@ -105,7 +106,11 @@ export const TimeReportingDashboard: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <FeatureGate 
+      feature="time_tracking"
+      upgradeMessage="Advanced time reporting and analytics are available exclusively to Enterprise subscribers. Get detailed insights into your team's productivity and time allocation."
+    >
+      <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">Time Reporting</h2>
@@ -317,5 +322,6 @@ export const TimeReportingDashboard: React.FC = () => {
         </Card>
       )}
     </div>
+    </FeatureGate>
   );
 };

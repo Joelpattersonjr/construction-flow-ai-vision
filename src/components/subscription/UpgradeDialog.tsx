@@ -12,6 +12,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Check, Crown, Zap, Star } from 'lucide-react';
 import { SUBSCRIPTION_PLANS, SubscriptionPlan } from '@/services/subscriptionService';
 import { useSubscription } from '@/hooks/useSubscription';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface UpgradeDialogProps {
   isOpen: boolean;
@@ -30,14 +32,27 @@ export const UpgradeDialog = ({
 }: UpgradeDialogProps) => {
   const [isUpgrading, setIsUpgrading] = useState<string | null>(null);
   const { upgradeSubscription, subscription } = useSubscription();
+  const { toast } = useToast();
 
   const handleUpgrade = async (planId: 'pro' | 'enterprise') => {
     setIsUpgrading(planId);
     try {
-      const success = await upgradeSubscription(planId);
-      if (success) {
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
+        body: { tier: planId },
+      });
+
+      if (error) throw error;
+
+      if (data?.url) {
+        window.open(data.url, '_blank');
         onClose();
       }
+    } catch (error) {
+      toast({
+        title: 'Error creating checkout session',
+        description: error instanceof Error ? error.message : 'Unknown error',
+        variant: 'destructive',
+      });
     } finally {
       setIsUpgrading(null);
     }

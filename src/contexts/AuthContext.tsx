@@ -1,8 +1,9 @@
 
-import React, { createContext, useContext } from 'react';
+import React, { createContext, useContext, useEffect } from 'react';
 import { AuthContextType } from '@/types/auth';
 import { useAuthState } from '@/hooks/useAuthState';
 import { useAuthActions } from '@/services/authService';
+import { supabase } from '@/integrations/supabase/client';
 
 console.log('AuthContext.tsx file loaded');
 
@@ -22,6 +23,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { signIn, signUp, signOut: authSignOut, clearAuthState } = useAuthActions();
 
   console.log('AuthProvider state:', { user: !!user, session: !!session, profile: !!profile, loading });
+
+  // Check subscription status when user logs in
+  useEffect(() => {
+    if (user && session) {
+      const checkSubscription = async () => {
+        try {
+          await supabase.functions.invoke('check-subscription');
+        } catch (error) {
+          console.error('Error checking subscription:', error);
+        }
+      };
+      checkSubscription();
+    }
+  }, [user, session]);
 
   const signOut = async () => {
     await authSignOut(setUser, setSession, setProfile);

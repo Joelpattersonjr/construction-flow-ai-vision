@@ -13,6 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 
 import { TaskTimeEntry } from '@/types/tasks';
 import { taskTimeService } from '@/services/taskTimeService';
+import { FeatureGate } from '@/components/subscription/FeatureGate';
 
 interface TaskTimeTrackerProps {
   taskId: number;
@@ -173,7 +174,11 @@ export const TaskTimeTracker: React.FC<TaskTimeTrackerProps> = ({
   const totalTime = timeEntries.reduce((sum, entry) => sum + (entry.duration_seconds || 0), 0) + currentTime;
 
   return (
-    <Card>
+    <FeatureGate 
+      feature="time_tracking"
+      upgradeMessage="Time tracking is available exclusively to Enterprise subscribers. Track your time, generate detailed reports, and gain insights into your productivity."
+    >
+      <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Clock className="h-5 w-5" />
@@ -302,5 +307,6 @@ export const TaskTimeTracker: React.FC<TaskTimeTrackerProps> = ({
         </div>
       </CardContent>
     </Card>
+    </FeatureGate>
   );
 };

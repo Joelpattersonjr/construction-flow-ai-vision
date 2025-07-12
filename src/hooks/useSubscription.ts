@@ -32,7 +32,7 @@ export const useSubscription = () => {
     return subscription?.subscription_features?.[featureName as keyof typeof subscription.subscription_features] || false;
   };
 
-  const isFeatureEnabled = (featureName: 'version_control' | 'collaboration' | 'advanced_analytics'): boolean => {
+  const isFeatureEnabled = (featureName: 'version_control' | 'collaboration' | 'advanced_analytics' | 'time_tracking'): boolean => {
     return hasFeature(featureName);
   };
 
