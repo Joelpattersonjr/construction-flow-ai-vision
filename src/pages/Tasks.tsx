@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Search, Filter, ListIcon, Grid3X3Icon, EditIcon, X, Tag } from 'lucide-react';
+import { Plus, Search, Filter, ListIcon, Grid3X3Icon, EditIcon, X, Tag, Clock, BarChart3 } from 'lucide-react';
 import { 
   DndContext, 
   DragEndEvent, 
@@ -28,6 +28,8 @@ import { TaskForm } from '@/components/tasks/TaskForm';
 import { TaskItem } from '@/components/tasks/TaskItem';
 import { TaskTemplateManager } from '@/components/tasks/TaskTemplateManager';
 import { TaskDetailsDialog } from '@/components/tasks/TaskDetailsDialog';
+import { TimeReportingDashboard } from '@/components/tasks/TimeReportingDashboard';
+import { AdvancedSearchFilters, AdvancedSearchFilters as AdvancedSearchFiltersType } from '@/components/tasks/AdvancedSearchFilters';
 import { taskService } from '@/services/taskService';
 import { TaskWithDetails, TaskStatus, TaskPriority } from '@/types/tasks';
 import { supabase } from '@/integrations/supabase/client';
@@ -36,12 +38,35 @@ import { KanbanTaskCard } from '@/components/tasks/KanbanTaskCard';
 import { ExportDialog } from '@/components/export/ExportDialog';
 
 const Tasks = () => {
+  // Advanced search filters state
+  const [advancedFilters, setAdvancedFilters] = useState<AdvancedSearchFiltersType>({
+    searchTerm: '',
+    searchFields: ['title', 'description'],
+    selectedProject: 'all',
+    selectedStatus: [],
+    selectedPriority: [],
+    selectedLabels: [],
+    selectedAssignee: 'all',
+    dueDateFrom: undefined,
+    dueDateTo: undefined,
+    createdDateFrom: undefined,
+    createdDateTo: undefined,
+    hasTimeLogged: null,
+    isOverdue: null,
+    quickFilters: [],
+  });
+  
+  // Legacy filter states for backward compatibility
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedProject, setSelectedProject] = useState<string>('all');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [selectedPriority, setSelectedPriority] = useState<string>('all');
   const [selectedLabels, setSelectedLabels] = useState<string[]>([]);
+  
   const [editingTask, setEditingTask] = useState<TaskWithDetails | null>(null);
+  const [savedSearches, setSavedSearches] = useState<Array<{ id: string; name: string; filters: AdvancedSearchFiltersType }>>([]);
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -185,24 +210,75 @@ const Tasks = () => {
     },
   });
 
-  // Filter tasks with labels
+  // Advanced filtering logic
   const filteredTasks = React.useMemo(() => {
     return tasks.filter((task) => {
-      const matchesSearch = !searchTerm || 
-        task.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        task.description?.toLowerCase().includes(searchTerm.toLowerCase());
+      // Text search across selected fields
+      const searchTermLower = advancedFilters.searchTerm.toLowerCase();
+      const matchesSearch = !advancedFilters.searchTerm || 
+        (advancedFilters.searchFields.includes('title') && task.title?.toLowerCase().includes(searchTermLower)) ||
+        (advancedFilters.searchFields.includes('description') && task.description?.toLowerCase().includes(searchTermLower));
       
-      const matchesProject = !selectedProject || selectedProject === 'all' || task.project_id === selectedProject;
-      const matchesStatus = !selectedStatus || selectedStatus === 'all' || task.status === selectedStatus;
-      const matchesPriority = !selectedPriority || selectedPriority === 'all' || task.priority === selectedPriority;
+      // Project filtering
+      const matchesProject = advancedFilters.selectedProject === 'all' || task.project_id === advancedFilters.selectedProject;
       
-      // Check label filtering
-      const matchesLabels = selectedLabels.length === 0 || 
-        (task.labels && task.labels.some(label => selectedLabels.includes(label.label_name)));
+      // Status filtering (multi-select)
+      const matchesStatus = advancedFilters.selectedStatus.length === 0 || 
+        advancedFilters.selectedStatus.includes(task.status || '');
+      
+      // Priority filtering (multi-select)
+      const matchesPriority = advancedFilters.selectedPriority.length === 0 || 
+        advancedFilters.selectedPriority.includes(task.priority || '');
+      
+      // Label filtering
+      const matchesLabels = advancedFilters.selectedLabels.length === 0 || 
+        (task.labels && task.labels.some(label => advancedFilters.selectedLabels.includes(label.label_name)));
 
-      return matchesSearch && matchesProject && matchesStatus && matchesPriority && matchesLabels;
+      // Assignee filtering
+      const matchesAssignee = advancedFilters.selectedAssignee === 'all' || 
+        (advancedFilters.selectedAssignee === 'unassigned' && !task.assignee_id) ||
+        task.assignee_id === advancedFilters.selectedAssignee;
+
+      // Date range filtering
+      const taskDueDate = task.end_date ? new Date(task.end_date) : null;
+      const taskCreateDate = new Date(task.created_at);
+      
+      const matchesDueDateRange = (!advancedFilters.dueDateFrom || !taskDueDate || taskDueDate >= advancedFilters.dueDateFrom) &&
+        (!advancedFilters.dueDateTo || !taskDueDate || taskDueDate <= advancedFilters.dueDateTo);
+      
+      const matchesCreateDateRange = (!advancedFilters.createdDateFrom || taskCreateDate >= advancedFilters.createdDateFrom) &&
+        (!advancedFilters.createdDateTo || taskCreateDate <= advancedFilters.createdDateTo);
+
+      // Quick filters
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const oneWeekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+      
+      const quickFilterMatches = advancedFilters.quickFilters.length === 0 || advancedFilters.quickFilters.every(filter => {
+        switch (filter) {
+          case 'my_tasks':
+            // This would need current user ID - implement based on your auth system
+            return true; // Placeholder
+          case 'overdue':
+            return taskDueDate && taskDueDate < today && task.status !== 'completed';
+          case 'due_today':
+            return taskDueDate && taskDueDate.toDateString() === today.toDateString();
+          case 'due_this_week':
+            return taskDueDate && taskDueDate >= today && taskDueDate <= oneWeekFromNow;
+          case 'no_assignee':
+            return !task.assignee_id;
+          case 'has_time_logged':
+            return task.time_entries && task.time_entries.length > 0;
+          default:
+            return true;
+        }
+      });
+
+      return matchesSearch && matchesProject && matchesStatus && matchesPriority && 
+             matchesLabels && matchesAssignee && matchesDueDateRange && 
+             matchesCreateDateRange && quickFilterMatches;
     });
-  }, [tasks, searchTerm, selectedProject, selectedStatus, selectedPriority, selectedLabels]);
+  }, [tasks, advancedFilters]);
 
   // Group tasks by status for kanban view - use local state if available
   const tasksByStatus = {
@@ -263,6 +339,25 @@ const Tasks = () => {
   const handleTaskView = (task: TaskWithDetails) => {
     setSelectedTask(task);
     setTaskDetailsOpen(true);
+  };
+
+  const handleSaveSearch = (name: string, filters: AdvancedSearchFiltersType) => {
+    const newSearch = {
+      id: Date.now().toString(),
+      name,
+      filters,
+    };
+    setSavedSearches(prev => [...prev, newSearch]);
+    // In a real app, this would save to the backend
+  };
+
+  const handleLoadSearch = (filters: AdvancedSearchFiltersType) => {
+    setAdvancedFilters(filters);
+  };
+
+  const handleDeleteSearch = (id: string) => {
+    setSavedSearches(prev => prev.filter(search => search.id !== id));
+    // In a real app, this would delete from the backend
   };
 
   const handleUseTemplate = (template: any) => {
@@ -442,10 +537,20 @@ const Tasks = () => {
           />
         </div>
 
-        {/* Filters */}
+        {/* Quick Filters */}
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle>Filters</CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle>Filters</CardTitle>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+              >
+                <Filter className="h-4 w-4 mr-2" />
+                {showAdvancedFilters ? 'Simple Filters' : 'Advanced Filters'}
+              </Button>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
@@ -453,13 +558,16 @@ const Tasks = () => {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Search tasks..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  value={advancedFilters.searchTerm}
+                  onChange={(e) => setAdvancedFilters(prev => ({ ...prev, searchTerm: e.target.value }))}
                   className="pl-10"
                 />
               </div>
               
-              <Select value={selectedProject} onValueChange={setSelectedProject}>
+              <Select 
+                value={advancedFilters.selectedProject} 
+                onValueChange={(value) => setAdvancedFilters(prev => ({ ...prev, selectedProject: value }))}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="All Projects" />
                 </SelectTrigger>
@@ -473,39 +581,67 @@ const Tasks = () => {
                 </SelectContent>
               </Select>
 
-              <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="todo">To Do</SelectItem>
-                  <SelectItem value="in_progress">In Progress</SelectItem>
-                  <SelectItem value="review">Review</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
-                  <SelectItem value="blocked">Blocked</SelectItem>
-                </SelectContent>
-              </Select>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="justify-start">
+                    {advancedFilters.selectedStatus.length === 0 ? 'All Status' : `${advancedFilters.selectedStatus.length} status`}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-64 p-3">
+                  <div className="space-y-2">
+                    {['todo', 'in_progress', 'review', 'completed', 'blocked'].map((status) => (
+                      <div key={status} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={status}
+                          checked={advancedFilters.selectedStatus.includes(status)}
+                          onCheckedChange={(checked) => {
+                            const newStatus = checked
+                              ? [...advancedFilters.selectedStatus, status]
+                              : advancedFilters.selectedStatus.filter(s => s !== status);
+                            setAdvancedFilters(prev => ({ ...prev, selectedStatus: newStatus }));
+                          }}
+                        />
+                        <label htmlFor={status} className="text-sm capitalize">
+                          {status.replace('_', ' ')}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </PopoverContent>
+              </Popover>
 
-              <Select value={selectedPriority} onValueChange={setSelectedPriority}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All Priority" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Priority</SelectItem>
-                  <SelectItem value="low">Low</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="high">High</SelectItem>
-                  <SelectItem value="critical">Critical</SelectItem>
-                </SelectContent>
-              </Select>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="justify-start">
+                    {advancedFilters.selectedPriority.length === 0 ? 'All Priority' : `${advancedFilters.selectedPriority.length} priority`}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-64 p-3">
+                  <div className="space-y-2">
+                    {['low', 'medium', 'high', 'critical'].map((priority) => (
+                      <div key={priority} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={priority}
+                          checked={advancedFilters.selectedPriority.includes(priority)}
+                          onCheckedChange={(checked) => {
+                            const newPriority = checked
+                              ? [...advancedFilters.selectedPriority, priority]
+                              : advancedFilters.selectedPriority.filter(p => p !== priority);
+                            setAdvancedFilters(prev => ({ ...prev, selectedPriority: newPriority }));
+                          }}
+                        />
+                        <label htmlFor={priority} className="text-sm capitalize">{priority}</label>
+                      </div>
+                    ))}
+                  </div>
+                </PopoverContent>
+              </Popover>
 
-              {/* Labels Multi-Select */}
               <Popover>
                 <PopoverTrigger asChild>
                   <Button variant="outline" className="justify-start">
                     <Tag className="h-4 w-4 mr-2" />
-                    {selectedLabels.length === 0 ? 'All Labels' : `${selectedLabels.length} label(s)`}
+                    {advancedFilters.selectedLabels.length === 0 ? 'All Labels' : `${advancedFilters.selectedLabels.length} labels`}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-64 p-0">
@@ -519,13 +655,12 @@ const Tasks = () => {
                           <div key={label.label_name} className="flex items-center space-x-2">
                             <Checkbox
                               id={label.label_name}
-                              checked={selectedLabels.includes(label.label_name)}
+                              checked={advancedFilters.selectedLabels.includes(label.label_name)}
                               onCheckedChange={(checked) => {
-                                if (checked) {
-                                  setSelectedLabels([...selectedLabels, label.label_name]);
-                                } else {
-                                  setSelectedLabels(selectedLabels.filter(l => l !== label.label_name));
-                                }
+                                const newLabels = checked
+                                  ? [...advancedFilters.selectedLabels, label.label_name]
+                                  : advancedFilters.selectedLabels.filter(l => l !== label.label_name);
+                                setAdvancedFilters(prev => ({ ...prev, selectedLabels: newLabels }));
                               }}
                             />
                             <label
@@ -548,52 +683,47 @@ const Tasks = () => {
 
               <Button 
                 variant="outline" 
-                onClick={() => {
-                  setSearchTerm('');
-                  setSelectedProject('all');
-                  setSelectedStatus('all');
-                  setSelectedPriority('all');
-                  setSelectedLabels([]);
-                }}
+                onClick={() => setAdvancedFilters({
+                  searchTerm: '',
+                  searchFields: ['title', 'description'],
+                  selectedProject: 'all',
+                  selectedStatus: [],
+                  selectedPriority: [],
+                  selectedLabels: [],
+                  selectedAssignee: 'all',
+                  dueDateFrom: undefined,
+                  dueDateTo: undefined,
+                  createdDateFrom: undefined,
+                  createdDateTo: undefined,
+                  hasTimeLogged: null,
+                  isOverdue: null,
+                  quickFilters: [],
+                })}
               >
-                Clear Filters
+                Clear All
               </Button>
             </div>
-            
-            {/* Selected Labels Display */}
-            {selectedLabels.length > 0 && (
-              <div className="mt-4 flex flex-wrap gap-2">
-                <span className="text-sm text-muted-foreground">Filtered by:</span>
-                {selectedLabels.map((label) => {
-                  const labelData = allLabels.find(l => l.label_name === label);
-                  return (
-                    <Badge 
-                      key={label} 
-                      variant="outline" 
-                      className="gap-1"
-                      style={{ borderColor: labelData?.label_color, color: labelData?.label_color }}
-                    >
-                      <Tag className="h-3 w-3" />
-                      {label}
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-4 w-4 p-0 ml-1 hover:bg-destructive hover:text-destructive-foreground"
-                        onClick={() => setSelectedLabels(selectedLabels.filter(l => l !== label))}
-                      >
-                        <X className="h-3 w-3" />
-                      </Button>
-                    </Badge>
-                  );
-                })}
-              </div>
-            )}
           </CardContent>
         </Card>
 
+        {/* Advanced Filters */}
+        {showAdvancedFilters && (
+          <AdvancedSearchFilters
+            filters={advancedFilters}
+            onFiltersChange={setAdvancedFilters}
+            projects={projects}
+            teamMembers={teamMembers}
+            allLabels={allLabels}
+            savedSearches={savedSearches}
+            onSaveSearch={handleSaveSearch}
+            onLoadSearch={handleLoadSearch}
+            onDeleteSearch={handleDeleteSearch}
+          />
+        )}
+
         {/* Task Views */}
         <Tabs defaultValue="list" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
+          <TabsList className="grid w-full grid-cols-3 lg:w-[600px]">
             <TabsTrigger value="list" className="flex items-center gap-2">
               <ListIcon className="h-4 w-4" />
               List View
@@ -601,6 +731,10 @@ const Tasks = () => {
             <TabsTrigger value="kanban" className="flex items-center gap-2">
               <Grid3X3Icon className="h-4 w-4" />
               Kanban Board
+            </TabsTrigger>
+            <TabsTrigger value="analytics" className="flex items-center gap-2">
+              <BarChart3 className="h-4 w-4" />
+              Time Analytics
             </TabsTrigger>
           </TabsList>
 
@@ -656,6 +790,10 @@ const Tasks = () => {
                 ) : null}
               </DragOverlay>
             </DndContext>
+          </TabsContent>
+
+          <TabsContent value="analytics" className="mt-6">
+            <TimeReportingDashboard />
           </TabsContent>
         </Tabs>
 
