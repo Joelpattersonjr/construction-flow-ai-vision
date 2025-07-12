@@ -65,7 +65,7 @@ export const SubscriptionSelectionPage: React.FC<SubscriptionSelectionPageProps>
 
             <PricingCard
               title="Pro"
-              price="$99.99"
+              price="$199.99"
               features={proFeatures}
               buttonText="Choose Pro"
               isPopular={true}
@@ -74,7 +74,7 @@ export const SubscriptionSelectionPage: React.FC<SubscriptionSelectionPageProps>
 
             <PricingCard
               title="Enterprise"
-              price="$199.99"
+              price="$499.99"
               features={enterpriseFeatures}
               buttonText="Choose Enterprise"
               onClick={() => onSubscriptionChoice('enterprise')}
