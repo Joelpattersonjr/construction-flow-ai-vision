@@ -49,9 +49,9 @@ serve(async (req) => {
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
     
     if (customers.data.length === 0) {
-      logStep("No customer found, updating unsubscribed state");
+      logStep("No customer found, checking trial status");
       
-      // Get user's company
+      // Get user's company and trial status
       const { data: profile } = await supabaseClient
         .from('profiles')
         .select('company_id')
@@ -59,26 +59,89 @@ serve(async (req) => {
         .single();
 
       if (profile?.company_id) {
-        await supabaseClient
-          .from('companies')
-          .update({
+        // Get trial status
+        const { data: trialStatus } = await supabaseClient
+          .rpc('get_trial_status', { company_id_param: profile.company_id });
+
+        logStep("Trial status retrieved", trialStatus);
+
+        if (trialStatus?.is_trial_active) {
+          // Active trial - update company with trial features
+          await supabaseClient
+            .from('companies')
+            .update({
+              subscription_tier: 'trial',
+              subscription_status: 'trial',
+              subscription_features: {
+                version_control: true,
+                collaboration: true,
+                advanced_analytics: false,
+                time_tracking: false,
+              },
+              subscription_expires_at: trialStatus.trial_ends_at,
+            })
+            .eq('id', profile.company_id);
+
+          return new Response(JSON.stringify({ 
+            subscribed: false,
+            subscription_tier: 'trial',
+            subscription_end: trialStatus.trial_ends_at,
+            trial_info: {
+              is_trial: true,
+              is_trial_active: true,
+              days_remaining: trialStatus.days_remaining,
+              trial_ends_at: trialStatus.trial_ends_at
+            }
+          }), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+            status: 200,
+          });
+        } else {
+          // Trial expired - update to free tier
+          await supabaseClient
+            .from('companies')
+            .update({
+              subscription_tier: 'free',
+              subscription_status: 'trial_expired',
+              subscription_features: {
+                version_control: false,
+                collaboration: false,
+                advanced_analytics: false,
+                time_tracking: false,
+              },
+              subscription_expires_at: null,
+            })
+            .eq('id', profile.company_id);
+
+          return new Response(JSON.stringify({ 
+            subscribed: false, 
             subscription_tier: 'free',
-            subscription_status: 'active',
-            subscription_features: {
-              version_control: false,
-              collaboration: false,
-              advanced_analytics: false,
-              time_tracking: false,
-            },
-            subscription_expires_at: null,
-          })
-          .eq('id', profile.company_id);
+            subscription_end: null,
+            trial_info: {
+              is_trial: false,
+              is_trial_active: false,
+              trial_expired: true,
+              days_remaining: 0,
+              trial_ends_at: trialStatus?.trial_ends_at
+            }
+          }), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+            status: 200,
+          });
+        }
       }
       
+      // Fallback for companies without trial data
       return new Response(JSON.stringify({ 
         subscribed: false, 
         subscription_tier: 'free',
-        subscription_end: null 
+        subscription_end: null,
+        trial_info: {
+          is_trial: false,
+          is_trial_active: false,
+          trial_expired: false,
+          days_remaining: 0
+        }
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
@@ -152,7 +215,13 @@ serve(async (req) => {
     return new Response(JSON.stringify({
       subscribed: hasActiveSub,
       subscription_tier: subscriptionTier,
-      subscription_end: subscriptionEnd
+      subscription_end: subscriptionEnd,
+      trial_info: {
+        is_trial: false,
+        is_trial_active: false,
+        trial_expired: false,
+        days_remaining: 0
+      }
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,

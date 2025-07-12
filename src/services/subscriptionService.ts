@@ -1,8 +1,16 @@
 import { supabase } from '@/integrations/supabase/client';
 
+export interface TrialInfo {
+  is_trial: boolean;
+  is_trial_active: boolean;
+  trial_expired?: boolean;
+  days_remaining: number;
+  trial_ends_at?: string;
+}
+
 export interface SubscriptionInfo {
-  subscription_tier: 'free' | 'pro' | 'enterprise';
-  subscription_status: 'active' | 'cancelled' | 'expired';
+  subscription_tier: 'free' | 'trial' | 'pro' | 'enterprise';
+  subscription_status: 'active' | 'trial' | 'trial_expired' | 'cancelled' | 'expired';
   subscription_expires_at: string | null;
   subscription_features: {
     version_control: boolean;
@@ -15,10 +23,11 @@ export interface SubscriptionInfo {
     max_collaborators: number;
     version_history_days: number;
   };
+  trial_info?: TrialInfo;
 }
 
 export interface SubscriptionPlan {
-  id: 'free' | 'pro' | 'enterprise';
+  id: 'free' | 'trial' | 'pro' | 'enterprise';
   name: string;
   price: string;
   features: string[];
@@ -31,6 +40,24 @@ export interface SubscriptionPlan {
 }
 
 export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
+  {
+    id: 'trial',
+    name: '30-Day Trial',
+    price: 'Free for 30 days',
+    features: [
+      'Full version control access',
+      'Team collaboration (up to 5 collaborators)',
+      'Real-time editing',
+      '90 days version history',
+      'All trial features',
+      'Standard Support',
+    ],
+    limits: {
+      max_versions_per_file: 50,
+      max_collaborators: 5,
+      version_history_days: 90,
+    },
+  },
   {
     id: 'free',
     name: 'Basic',
@@ -95,10 +122,18 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
 export class SubscriptionService {
   static async getCurrentSubscription(): Promise<SubscriptionInfo | null> {
     try {
-      const { data: tierData } = await supabase.rpc('get_user_subscription_tier');
+      // Get subscription info via check-subscription function which includes trial logic
+      const { data: subscriptionData, error } = await supabase.functions.invoke('check-subscription');
+      
+      if (error) {
+        console.error('Error fetching subscription:', error);
+        return null;
+      }
+
       const { data: limitsData } = await supabase.rpc('get_subscription_limits');
       
-      // Get detailed subscription info
+      
+      // Get detailed subscription info from companies table
       const { data: companyData } = await supabase
         .from('companies')
         .select('subscription_tier, subscription_status, subscription_expires_at, subscription_features')
@@ -108,8 +143,8 @@ export class SubscriptionService {
       if (!companyData) return null;
 
       return {
-        subscription_tier: (companyData.subscription_tier as 'free' | 'pro' | 'enterprise') || 'free',
-        subscription_status: (companyData.subscription_status as 'active' | 'cancelled' | 'expired') || 'active',
+        subscription_tier: (companyData.subscription_tier as 'free' | 'trial' | 'pro' | 'enterprise') || 'free',
+        subscription_status: (companyData.subscription_status as 'active' | 'trial' | 'trial_expired' | 'cancelled' | 'expired') || 'active',
         subscription_expires_at: companyData.subscription_expires_at,
         subscription_features: (companyData.subscription_features as any) || {
           version_control: false,
@@ -122,6 +157,12 @@ export class SubscriptionService {
           max_collaborators: 2,
           version_history_days: 30,
         },
+        trial_info: subscriptionData?.trial_info || {
+          is_trial: false,
+          is_trial_active: false,
+          trial_expired: false,
+          days_remaining: 0
+        }
       };
     } catch (error) {
       console.error('Error fetching subscription:', error);

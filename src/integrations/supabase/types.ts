@@ -142,6 +142,8 @@ export type Database = {
           subscription_features: Json | null
           subscription_status: string | null
           subscription_tier: string | null
+          trial_ends_at: string | null
+          trial_started_at: string | null
           updated_at: string | null
         }
         Insert: {
@@ -153,6 +155,8 @@ export type Database = {
           subscription_features?: Json | null
           subscription_status?: string | null
           subscription_tier?: string | null
+          trial_ends_at?: string | null
+          trial_started_at?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -164,6 +168,8 @@ export type Database = {
           subscription_features?: Json | null
           subscription_status?: string | null
           subscription_tier?: string | null
+          trial_ends_at?: string | null
+          trial_started_at?: string | null
           updated_at?: string | null
         }
         Relationships: []
@@ -1275,6 +1281,10 @@ export type Database = {
       }
       get_subscription_limits: {
         Args: Record<PropertyKey, never>
+        Returns: Json
+      }
+      get_trial_status: {
+        Args: { company_id_param: number }
         Returns: Json
       }
       get_user_company_from_jwt: {

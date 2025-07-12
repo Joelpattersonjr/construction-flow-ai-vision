@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
-type SubscriptionStatus = 'loading' | 'free' | 'subscribed' | 'needs_subscription';
-type SubscriptionTier = 'basic' | 'pro' | 'enterprise';
+type SubscriptionStatus = 'loading' | 'free' | 'trial' | 'subscribed' | 'needs_subscription';
+type SubscriptionTier = 'basic' | 'pro' | 'professional' | 'enterprise';
 
 export const useSubscriptionGate = () => {
   const [subscriptionStatus, setSubscriptionStatus] = useState<SubscriptionStatus>('loading');
@@ -25,9 +25,11 @@ export const useSubscriptionGate = () => {
         return;
       }
 
-      // Check if user has any subscription or if they're on free tier
+      // Check if user has any subscription or if they're on trial/free tier
       if (data?.subscribed) {
         setSubscriptionStatus('subscribed');
+      } else if (data?.trial_info?.is_trial_active) {
+        setSubscriptionStatus('trial');
       } else {
         // Check if this is a new user who hasn't chosen a subscription yet
         const { data: profile } = await supabase
@@ -43,7 +45,7 @@ export const useSubscriptionGate = () => {
             setSubscriptionStatus('needs_subscription');
             setShowSubscriptionSelection(true);
           } else {
-            // Existing user on free tier
+            // Existing user on free tier or expired trial
             setSubscriptionStatus('free');
           }
         } else {
