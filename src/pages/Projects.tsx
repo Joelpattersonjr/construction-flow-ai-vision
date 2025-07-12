@@ -453,33 +453,35 @@ const Projects: React.FC = () => {
                   </div>
                 )}
                 
-                <div className="flex space-x-2">
+                <div className="flex flex-col space-y-2">
                   <Button 
                     variant="default" 
                     size="sm"
                     onClick={() => navigate(`/projects/${project.id}`)}
-                    className="flex-1"
+                    className="w-full"
                   >
                     View Details
                   </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => navigate(`/files?project=${project.id}`)}
-                    className="flex items-center space-x-1"
-                  >
-                    <FileText className="h-4 w-4" />
-                    <span className="hidden sm:inline">Files</span>
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => navigate(`/projects/${project.id}/permissions`)}
-                    className="flex items-center space-x-1"
-                  >
-                    <Settings className="h-4 w-4" />
-                    <span className="hidden sm:inline">Permissions</span>
-                  </Button>
+                  <div className="flex space-x-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => navigate(`/files?project=${project.id}`)}
+                      className="flex-1 flex items-center justify-center space-x-1"
+                    >
+                      <FileText className="h-4 w-4" />
+                      <span>Files</span>
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => navigate(`/projects/${project.id}/permissions`)}
+                      className="flex-1 flex items-center justify-center space-x-1"
+                    >
+                      <Settings className="h-4 w-4" />
+                      <span>Permissions</span>
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>
