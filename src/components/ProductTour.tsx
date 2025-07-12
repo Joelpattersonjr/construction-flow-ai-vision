@@ -60,18 +60,18 @@ export function ProductTour({ isActive, onClose }: ProductTourProps) {
       setTargetElement(target);
 
       if (target) {
+        // Only scroll on initial setup, not during scroll events to prevent feedback loop
         target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        target.style.position = 'relative';
-        target.style.zIndex = '100';
       }
     };
 
     // Initial setup with delay
     const timeout = setTimeout(updateTarget, 100);
 
-    // Update position on scroll
+    // Update spotlight position on scroll without triggering new scrolls
     const handleScroll = () => {
-      updateTarget();
+      const target = document.querySelector(tourSteps[currentStep].target) as HTMLElement;
+      setTargetElement(target);
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -79,11 +79,6 @@ export function ProductTour({ isActive, onClose }: ProductTourProps) {
     return () => {
       clearTimeout(timeout);
       window.removeEventListener('scroll', handleScroll);
-      const target = document.querySelector(tourSteps[currentStep].target) as HTMLElement;
-      if (target) {
-        target.style.position = '';
-        target.style.zIndex = '';
-      }
     };
   }, [currentStep, isActive]);
 
