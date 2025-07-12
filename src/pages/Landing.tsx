@@ -475,12 +475,12 @@ const Landing = () => {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-10 max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 max-w-7xl mx-auto">
             {pricingPlans.map((plan, index) => (
-              <Card key={index} className={`group relative transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 cursor-pointer overflow-hidden ${plan.popular ? 'border-primary shadow-xl scale-105' : 'border-gray-200 hover:shadow-xl'}`}>
+              <Card key={index} className={`group relative transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 cursor-pointer overflow-hidden ${plan.popular ? 'border-primary shadow-lg' : 'border-gray-200 hover:shadow-xl'}`}>
                 {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                    <Badge className="bg-primary text-white">Most Popular</Badge>
+                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-10">
+                    <Badge className="bg-primary text-white px-3 py-1 text-xs">Most Popular</Badge>
                   </div>
                 )}
                 
