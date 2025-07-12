@@ -44,11 +44,12 @@ export const PricingCard: React.FC<PricingCardProps> = ({
           ))}
         </ul>
         <Button 
-          className="w-full mt-4" 
+          className="w-full mt-4 group relative overflow-hidden" 
           variant={buttonVariant}
           onClick={onClick}
         >
-          {buttonText}
+          <span className="relative z-10">{buttonText}</span>
+          <div className="absolute inset-0 bg-gradient-to-r from-primary to-blue-600 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-500"></div>
         </Button>
       </CardContent>
     </Card>
