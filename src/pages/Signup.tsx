@@ -39,10 +39,10 @@ const Signup = () => {
 
   const { user } = authContext;
 
-  // Redirect authenticated users to main page
+  // Redirect authenticated users to dashboard
   useEffect(() => {
     if (user) {
-      navigate('/');
+      navigate('/dashboard');
     }
   }, [user, navigate]);
 
@@ -156,7 +156,7 @@ const Signup = () => {
         title: "Welcome!",
         description: "Your account has been created successfully. You're on the Basic plan.",
       });
-      navigate('/');
+      navigate('/dashboard');
       return;
     }
 

@@ -35,8 +35,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   }
 
   if (!user) {
-    console.log('ProtectedRoute: no user, redirecting to /auth');
-    return <Navigate to="/auth" replace />;
+    console.log('ProtectedRoute: no user, redirecting to /landing');
+    return <Navigate to="/landing" replace />;
   }
 
   // Check if user needs to set up their company (first-time admin users)

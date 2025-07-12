@@ -159,7 +159,7 @@ const InviteAcceptance = () => {
           description: "Welcome to the team! You can now access the platform.",
         });
 
-        navigate('/');
+        navigate('/dashboard');
       }
     } catch (error: any) {
       console.error('Error creating account:', error);

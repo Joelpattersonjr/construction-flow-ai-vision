@@ -8,7 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 const AppHeader: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { profile } = useAuth();
+  const { profile, user } = useAuth();
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -16,8 +16,13 @@ const AppHeader: React.FC = () => {
     window.history.back();
   };
 
+  const handleLogoClick = () => {
+    // Navigate to dashboard if authenticated, landing if not
+    navigate(user ? '/dashboard' : '/');
+  };
+
   const navigationItems = [
-    { path: '/', label: 'Dashboard', icon: Home },
+    { path: '/dashboard', label: 'Dashboard', icon: Home },
     { path: '/projects', label: 'Projects', icon: Folder },
     { path: '/tasks', label: 'Tasks', icon: CheckSquare },
     { path: '/calendar', label: 'Calendar', icon: Calendar },
@@ -35,12 +40,12 @@ const AppHeader: React.FC = () => {
             <div className="flex items-center space-x-4">
               <h1 
                 className="text-xl font-semibold text-gray-900 cursor-pointer"
-                onClick={() => navigate('/')}
+                onClick={handleLogoClick}
               >
                 ProjectPulse
               </h1>
               
-              {location.pathname !== '/' && (
+              {location.pathname !== '/' && location.pathname !== '/dashboard' && (
                 <Button
                   variant="ghost"
                   size="sm"
