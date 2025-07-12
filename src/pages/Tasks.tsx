@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Search, Filter, ListIcon, Grid3X3Icon, EditIcon } from 'lucide-react';
+import { Plus, Search, Filter, ListIcon, Grid3X3Icon, EditIcon, X, Tag } from 'lucide-react';
 import { 
   DndContext, 
   DragEndEvent, 
@@ -20,6 +20,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import AppHeader from '@/components/navigation/AppHeader';
 import { TaskForm } from '@/components/tasks/TaskForm';
@@ -38,6 +40,7 @@ const Tasks = () => {
   const [selectedProject, setSelectedProject] = useState<string>('all');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [selectedPriority, setSelectedPriority] = useState<string>('all');
+  const [selectedLabels, setSelectedLabels] = useState<string[]>([]);
   const [editingTask, setEditingTask] = useState<TaskWithDetails | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -100,6 +103,29 @@ const Tasks = () => {
     },
   });
 
+  // Fetch all unique labels
+  const { data: allLabels = [] } = useQuery({
+    queryKey: ['task-labels'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('task_labels')
+        .select('label_name, label_color')
+        .order('label_name');
+      if (error) throw error;
+      
+      // Get unique labels
+      const uniqueLabels = data?.reduce((acc: any[], label) => {
+        const existing = acc.find(l => l.label_name === label.label_name);
+        if (!existing) {
+          acc.push(label);
+        }
+        return acc;
+      }, []) || [];
+      
+      return uniqueLabels;
+    },
+  });
+
   // Create task mutation
   const createTaskMutation = useMutation({
     mutationFn: (taskData: any) => taskService.createTask({
@@ -159,18 +185,24 @@ const Tasks = () => {
     },
   });
 
-  // Filter tasks
-  const filteredTasks = tasks.filter((task) => {
-    const matchesSearch = !searchTerm || 
-      task.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      task.description?.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesProject = !selectedProject || selectedProject === 'all' || task.project_id === selectedProject;
-    const matchesStatus = !selectedStatus || selectedStatus === 'all' || task.status === selectedStatus;
-    const matchesPriority = !selectedPriority || selectedPriority === 'all' || task.priority === selectedPriority;
+  // Filter tasks with labels
+  const filteredTasks = React.useMemo(() => {
+    return tasks.filter((task) => {
+      const matchesSearch = !searchTerm || 
+        task.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        task.description?.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      const matchesProject = !selectedProject || selectedProject === 'all' || task.project_id === selectedProject;
+      const matchesStatus = !selectedStatus || selectedStatus === 'all' || task.status === selectedStatus;
+      const matchesPriority = !selectedPriority || selectedPriority === 'all' || task.priority === selectedPriority;
+      
+      // Check label filtering
+      const matchesLabels = selectedLabels.length === 0 || 
+        (task.labels && task.labels.some(label => selectedLabels.includes(label.label_name)));
 
-    return matchesSearch && matchesProject && matchesStatus && matchesPriority;
-  });
+      return matchesSearch && matchesProject && matchesStatus && matchesPriority && matchesLabels;
+    });
+  }, [tasks, searchTerm, selectedProject, selectedStatus, selectedPriority, selectedLabels]);
 
   // Group tasks by status for kanban view - use local state if available
   const tasksByStatus = {
@@ -416,7 +448,7 @@ const Tasks = () => {
             <CardTitle>Filters</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -468,6 +500,52 @@ const Tasks = () => {
                 </SelectContent>
               </Select>
 
+              {/* Labels Multi-Select */}
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="justify-start">
+                    <Tag className="h-4 w-4 mr-2" />
+                    {selectedLabels.length === 0 ? 'All Labels' : `${selectedLabels.length} label(s)`}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-64 p-0">
+                  <div className="p-3">
+                    <h4 className="font-medium text-sm mb-3">Filter by Labels</h4>
+                    <div className="space-y-2 max-h-48 overflow-y-auto">
+                      {allLabels.length === 0 ? (
+                        <p className="text-sm text-muted-foreground">No labels found</p>
+                      ) : (
+                        allLabels.map((label) => (
+                          <div key={label.label_name} className="flex items-center space-x-2">
+                            <Checkbox
+                              id={label.label_name}
+                              checked={selectedLabels.includes(label.label_name)}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setSelectedLabels([...selectedLabels, label.label_name]);
+                                } else {
+                                  setSelectedLabels(selectedLabels.filter(l => l !== label.label_name));
+                                }
+                              }}
+                            />
+                            <label
+                              htmlFor={label.label_name}
+                              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center gap-2"
+                            >
+                              <div 
+                                className="w-3 h-3 rounded-full" 
+                                style={{ backgroundColor: label.label_color }}
+                              />
+                              {label.label_name}
+                            </label>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                </PopoverContent>
+              </Popover>
+
               <Button 
                 variant="outline" 
                 onClick={() => {
@@ -475,11 +553,41 @@ const Tasks = () => {
                   setSelectedProject('all');
                   setSelectedStatus('all');
                   setSelectedPriority('all');
+                  setSelectedLabels([]);
                 }}
               >
                 Clear Filters
               </Button>
             </div>
+            
+            {/* Selected Labels Display */}
+            {selectedLabels.length > 0 && (
+              <div className="mt-4 flex flex-wrap gap-2">
+                <span className="text-sm text-muted-foreground">Filtered by:</span>
+                {selectedLabels.map((label) => {
+                  const labelData = allLabels.find(l => l.label_name === label);
+                  return (
+                    <Badge 
+                      key={label} 
+                      variant="outline" 
+                      className="gap-1"
+                      style={{ borderColor: labelData?.label_color, color: labelData?.label_color }}
+                    >
+                      <Tag className="h-3 w-3" />
+                      {label}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-4 w-4 p-0 ml-1 hover:bg-destructive hover:text-destructive-foreground"
+                        onClick={() => setSelectedLabels(selectedLabels.filter(l => l !== label))}
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </Badge>
+                  );
+                })}
+              </div>
+            )}
           </CardContent>
         </Card>
 

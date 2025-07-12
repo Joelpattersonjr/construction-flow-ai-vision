@@ -8,6 +8,7 @@ import { FilePreviewDialog } from './FilePreviewDialog';
 import { FileVersionManager } from './FileVersionManager';
 import { TaskTimeTracker } from './TaskTimeTracker';
 import { TaskDependencies } from './TaskDependencies';
+import { TaskActivityTimeline } from './TaskActivityTimeline';
 
 import {
   Dialog,
@@ -283,7 +284,7 @@ export const TaskDetailsDialog: React.FC<TaskDetailsDialogProps> = ({
         </DialogHeader>
 
         <Tabs defaultValue="details" className="w-full">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="details">
               Details
             </TabsTrigger>
@@ -305,7 +306,7 @@ export const TaskDetailsDialog: React.FC<TaskDetailsDialogProps> = ({
             </TabsTrigger>
             <TabsTrigger value="activity" className="flex items-center gap-2">
               <Activity className="h-4 w-4" />
-              Activity ({activity.length})
+              Activity
             </TabsTrigger>
           </TabsList>
 
@@ -607,39 +608,7 @@ export const TaskDetailsDialog: React.FC<TaskDetailsDialogProps> = ({
           </TabsContent>
 
           <TabsContent value="activity" className="space-y-4">
-            <div className="space-y-2 max-h-96 overflow-y-auto">
-              {activity.map((item) => (
-                <Card key={item.id}>
-                  <CardContent className="pt-4">
-                    <div className="flex items-start gap-3">
-                      <Avatar className="h-8 w-8">
-                        <AvatarFallback className="text-xs">
-                          {getInitials(item.user?.full_name)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="font-medium text-sm">
-                            {item.user?.full_name || item.user?.email}
-                          </span>
-                          <span className="text-xs text-muted-foreground">
-                            {format(new Date(item.created_at), 'MMM d, HH:mm')}
-                          </span>
-                        </div>
-                        <p className="text-sm">
-                          {item.description || `${item.action_type} ${item.field_name || ''}`}
-                          {item.old_value && item.new_value && (
-                            <span className="text-muted-foreground">
-                              {' '}from "{item.old_value}" to "{item.new_value}"
-                            </span>
-                          )}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            <TaskActivityTimeline taskId={task.id} />
           </TabsContent>
         </Tabs>
         

@@ -11,6 +11,7 @@ interface KanbanColumnProps {
   title: string;
   tasks: TaskWithDetails[];
   color: string;
+  wipLimit?: number;
   onEditTask: (task: TaskWithDetails) => void;
 }
 
@@ -19,6 +20,7 @@ export const KanbanColumn: React.FC<KanbanColumnProps> = ({
   title,
   tasks,
   color,
+  wipLimit,
   onEditTask,
 }) => {
   const { setNodeRef, isOver } = useDroppable({
@@ -29,17 +31,34 @@ export const KanbanColumn: React.FC<KanbanColumnProps> = ({
     },
   });
 
+  const isWipLimitExceeded = wipLimit && tasks.length > wipLimit;
+
   return (
-    <Card className={`${color} border-dashed min-h-[600px] ${isOver ? 'border-primary' : ''}`}>
+    <Card className={`${color} border-dashed min-h-[600px] ${isOver ? 'border-primary' : ''} ${isWipLimitExceeded ? 'border-red-300 bg-red-50' : ''}`}>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-sm font-medium">
             {title}
           </CardTitle>
-          <Badge variant="secondary">
-            {tasks.length}
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Badge 
+              variant={isWipLimitExceeded ? "destructive" : "secondary"}
+              className={isWipLimitExceeded ? "bg-red-500 text-white" : ""}
+            >
+              {tasks.length}{wipLimit ? `/${wipLimit}` : ''}
+            </Badge>
+            {isWipLimitExceeded && (
+              <Badge variant="outline" className="text-red-600 border-red-300">
+                WIP Exceeded!
+              </Badge>
+            )}
+          </div>
         </div>
+        {wipLimit && (
+          <div className="text-xs text-muted-foreground">
+            WIP Limit: {wipLimit}
+          </div>
+        )}
       </CardHeader>
       <CardContent 
         ref={setNodeRef} 

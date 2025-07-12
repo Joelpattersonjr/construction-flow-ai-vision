@@ -13,8 +13,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Task, TaskPriority, TaskStatus } from '@/types/tasks';
+import { Task, TaskPriority, TaskStatus, TaskWithDetails } from '@/types/tasks';
 import { cn } from '@/lib/utils';
+import { TaskLabelsManager } from './TaskLabelsManager';
 
 const taskSchema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -31,7 +32,7 @@ const taskSchema = z.object({
 type TaskFormData = z.infer<typeof taskSchema>;
 
 interface TaskFormProps {
-  task?: Task | null;
+  task?: TaskWithDetails | null;
   projects: Array<{ id: string; name: string }>;
   teamMembers: Array<{ id: string; full_name: string; email: string }>;
   availableTasks?: Array<{ id: number; title: string; status: string }>;
@@ -372,6 +373,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                           onSelect={field.onChange}
                           disabled={(date) => date < new Date("1900-01-01")}
                           initialFocus
+                          className={cn("p-3 pointer-events-auto")}
                         />
                       </PopoverContent>
                     </Popover>
@@ -380,6 +382,23 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                 )}
               />
             </div>
+
+            {/* Labels Section */}
+            {task && (
+              <div className="col-span-2">
+                <label className="text-sm font-medium">Labels</label>
+                <div className="mt-2">
+                  <TaskLabelsManager
+                    taskId={task.id}
+                    labels={task.labels || []}
+                    onLabelsChange={(labels) => {
+                      // This updates the labels in real-time but doesn't affect form submission
+                      // Labels are managed separately through the TaskLabelsManager
+                    }}
+                  />
+                </div>
+              </div>
+            )}
 
             <div className="flex justify-end gap-2">
               <Button type="button" variant="outline" onClick={() => setOpen(false)}>
