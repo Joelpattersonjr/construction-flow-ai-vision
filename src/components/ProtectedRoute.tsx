@@ -3,6 +3,7 @@ import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Navigate, useLocation } from 'react-router-dom';
 import CompanySetup from './CompanySetup';
+import SubscriptionGate from './SubscriptionGate';
 
 console.log('ProtectedRoute.tsx file loaded');
 
@@ -46,8 +47,12 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     return <CompanySetup />;
   }
 
-  console.log('ProtectedRoute: user found, rendering children');
-  return <>{children}</>;
+  console.log('ProtectedRoute: user found, rendering children with subscription gate');
+  return (
+    <SubscriptionGate>
+      {children}
+    </SubscriptionGate>
+  );
 };
 
 export default ProtectedRoute;
