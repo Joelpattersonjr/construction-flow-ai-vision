@@ -189,7 +189,8 @@ const Tasks = () => {
 
   // Update local state when filtered tasks change
   React.useEffect(() => {
-    if (Object.keys(localTasksByStatus).length === 0) {
+    const totalLocalTasks = Object.values(localTasksByStatus).flat().length;
+    if (totalLocalTasks === 0 && filteredTasks.length > 0) {
       setLocalTasksByStatus({
         todo: filteredTasks.filter(task => task.status === 'todo'),
         in_progress: filteredTasks.filter(task => task.status === 'in_progress'),
