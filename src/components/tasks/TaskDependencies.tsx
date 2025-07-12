@@ -182,7 +182,7 @@ export const TaskDependencies: React.FC<TaskDependenciesProps> = ({
                 <SelectTrigger className="flex-1">
                   <SelectValue placeholder="Select a task this depends on..." />
                 </SelectTrigger>
-                <SelectContent className="bg-background border border-border">
+                <SelectContent className="bg-popover border border-border z-50 max-h-96 overflow-y-auto">
                   {availableTasks.map((availableTask) => (
                     <SelectItem key={availableTask.id} value={availableTask.id.toString()}>
                       <div className="flex items-center gap-2">
