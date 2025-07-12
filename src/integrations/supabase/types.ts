@@ -440,6 +440,53 @@ export type Database = {
           },
         ]
       }
+      knowledge_base: {
+        Row: {
+          answer: string
+          category: string
+          company_id: number | null
+          created_at: string
+          created_by: string
+          id: string
+          is_active: boolean
+          keywords: string[] | null
+          question: string
+          updated_at: string
+        }
+        Insert: {
+          answer: string
+          category: string
+          company_id?: number | null
+          created_at?: string
+          created_by: string
+          id?: string
+          is_active?: boolean
+          keywords?: string[] | null
+          question: string
+          updated_at?: string
+        }
+        Update: {
+          answer?: string
+          category?: string
+          company_id?: number | null
+          created_at?: string
+          created_by?: string
+          id?: string
+          is_active?: boolean
+          keywords?: string[] | null
+          question?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "knowledge_base_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       login_attempts: {
         Row: {
           attempted_at: string
