@@ -82,7 +82,7 @@ const CompanySetup = () => {
           </div>
           <CardTitle className="text-2xl">Set Up Your Company</CardTitle>
           <CardDescription>
-            Welcome to ProjectPulse! Let's get started by creating your company profile.
+            Welcome to ConexusPM! Let's get started by creating your company profile.
           </CardDescription>
         </CardHeader>
         <CardContent>

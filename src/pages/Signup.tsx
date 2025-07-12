@@ -193,7 +193,7 @@ const Signup = () => {
           <CardHeader className="text-center">
             <CardTitle className="text-2xl font-bold">Choose Your Plan</CardTitle>
             <CardDescription>
-              Select a subscription plan to get started with ProjectPulse
+              Select a subscription plan to get started with ConexusPM
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -303,7 +303,7 @@ const Signup = () => {
           <UserPlus className="mx-auto h-8 w-8 text-primary mb-4" />
           <CardTitle className="text-2xl font-bold">Create Account</CardTitle>
           <CardDescription>
-            Sign up to create your ProjectPulse company account
+            Sign up to create your ConexusPM company account
           </CardDescription>
         </CardHeader>
         <CardContent>

@@ -14,7 +14,7 @@ const Terms = () => {
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <Building2 className="h-8 w-8 text-primary" />
-            <span className="text-xl font-bold">ProjectPulse</span>
+            <span className="text-xl font-bold">ConexusPM</span>
           </div>
           <Button variant="ghost" onClick={() => navigate('/')}>
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -32,12 +32,12 @@ const Terms = () => {
           <CardContent className="prose prose-gray max-w-none">
             <h2>Acceptance of Terms</h2>
             <p>
-              By accessing and using ProjectPulse, you accept and agree to be bound by the terms and provision of this agreement.
+              By accessing and using ConexusPM, you accept and agree to be bound by the terms and provision of this agreement.
             </p>
 
             <h2>Use License</h2>
             <p>
-              Permission is granted to temporarily use ProjectPulse for personal, non-commercial transitory viewing only. 
+              Permission is granted to temporarily use ConexusPM for personal, non-commercial transitory viewing only. 
               This is the grant of a license, not a transfer of title.
             </p>
 
@@ -62,7 +62,7 @@ const Terms = () => {
             <h2>Intellectual Property</h2>
             <p>
               The service and its original content, features, and functionality are and will remain the exclusive property 
-              of ProjectPulse and its licensors.
+              of ConexusPM and its licensors.
             </p>
 
             <h2>Payment Terms</h2>
@@ -85,7 +85,7 @@ const Terms = () => {
 
             <h2>Limitation of Liability</h2>
             <p>
-              In no event shall ProjectPulse, nor its directors, employees, partners, agents, suppliers, or affiliates, 
+              In no event shall ConexusPM, nor its directors, employees, partners, agents, suppliers, or affiliates, 
               be liable for any indirect, incidental, special, consequential, or punitive damages.
             </p>
 
@@ -96,7 +96,7 @@ const Terms = () => {
 
             <h2>Contact Information</h2>
             <p>
-              If you have any questions about these Terms of Service, please contact us at legal@projectpulse.com
+              If you have any questions about these Terms of Service, please contact us at legal@conexuspm.com
             </p>
           </CardContent>
         </Card>

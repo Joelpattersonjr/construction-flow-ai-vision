@@ -59,7 +59,7 @@ const Landing = () => {
       name: "Sarah Johnson",
       role: "Project Manager",
       company: "BuildCorp Construction",
-      content: "ProjectPulse has transformed how we manage our construction projects. The real-time collaboration features are game-changing.",
+      content: "ConexusPM has transformed how we manage our construction projects. The real-time collaboration features are game-changing.",
       rating: 5
     },
     {
@@ -140,7 +140,7 @@ const Landing = () => {
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <Building2 className="h-8 w-8 text-primary" />
-            <span className="text-xl font-bold">ProjectPulse</span>
+            <span className="text-xl font-bold">ConexusPM</span>
           </div>
           <div className="flex items-center space-x-4">
             <Button variant="ghost" onClick={() => navigate('/auth')}>
@@ -166,7 +166,7 @@ const Landing = () => {
           </h1>
           
           <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-            ProjectPulse is the all-in-one project management platform designed specifically for construction teams. 
+            ConexusPM is the all-in-one project management platform designed specifically for construction teams. 
             Manage projects, collaborate in real-time, and track progress like never before.
           </p>
           
@@ -194,7 +194,7 @@ const Landing = () => {
               Everything You Need to Manage Construction Projects
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              From project planning to completion, ProjectPulse provides all the tools your construction team needs to succeed.
+              From project planning to completion, ConexusPM provides all the tools your construction team needs to succeed.
             </p>
           </div>
           
@@ -222,7 +222,7 @@ const Landing = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-                Why Construction Teams Choose ProjectPulse
+                Why Construction Teams Choose ConexusPM
               </h2>
               
               <div className="space-y-6">
@@ -263,7 +263,7 @@ const Landing = () => {
             <div className="bg-gradient-to-br from-primary/10 to-blue-100 p-8 rounded-lg">
               <div className="text-center">
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">Ready to Get Started?</h3>
-                <p className="text-gray-600 mb-6">Join thousands of construction professionals who trust ProjectPulse.</p>
+                <p className="text-gray-600 mb-6">Join thousands of construction professionals who trust ConexusPM.</p>
                 <Button size="lg" onClick={() => navigate('/signup')} className="w-full">
                   Start Your Free Trial
                 </Button>
@@ -281,7 +281,7 @@ const Landing = () => {
               What Our Customers Say
             </h2>
             <p className="text-xl text-gray-600">
-              Don't just take our word for it - hear from construction professionals who use ProjectPulse daily.
+              Don't just take our word for it - hear from construction professionals who use ConexusPM daily.
             </p>
           </div>
           
@@ -368,7 +368,7 @@ const Landing = () => {
             Ready to Transform Your Construction Projects?
           </h2>
           <p className="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
-            Join thousands of construction professionals who have streamlined their workflows with ProjectPulse.
+            Join thousands of construction professionals who have streamlined their workflows with ConexusPM.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" variant="secondary" onClick={() => navigate('/signup')} className="text-lg px-8 py-3">
@@ -389,7 +389,7 @@ const Landing = () => {
             <div>
               <div className="flex items-center space-x-2 mb-4">
                 <Building2 className="h-8 w-8 text-primary" />
-                <span className="text-xl font-bold">ProjectPulse</span>
+                <span className="text-xl font-bold">ConexusPM</span>
               </div>
               <p className="text-gray-400">
                 The leading project management platform for construction teams worldwide.
@@ -428,7 +428,7 @@ const Landing = () => {
           </div>
           
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 ProjectPulse. All rights reserved.</p>
+            <p>&copy; 2024 ConexusPM. All rights reserved.</p>
           </div>
         </div>
       </footer>

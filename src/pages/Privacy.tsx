@@ -14,7 +14,7 @@ const Privacy = () => {
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <Building2 className="h-8 w-8 text-primary" />
-            <span className="text-xl font-bold">ProjectPulse</span>
+            <span className="text-xl font-bold">ConexusPM</span>
           </div>
           <Button variant="ghost" onClick={() => navigate('/')}>
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -32,7 +32,7 @@ const Privacy = () => {
           <CardContent className="prose prose-gray max-w-none">
             <h2>Information We Collect</h2>
             <p>
-              ProjectPulse collects information you provide directly to us, such as when you create an account, 
+              ConexusPM collects information you provide directly to us, such as when you create an account, 
               use our services, or contact us for support.
             </p>
 
@@ -86,7 +86,7 @@ const Privacy = () => {
 
             <h2>Contact Us</h2>
             <p>
-              If you have any questions about this privacy policy, please contact us at privacy@projectpulse.com
+              If you have any questions about this privacy policy, please contact us at privacy@conexuspm.com
             </p>
           </CardContent>
         </Card>

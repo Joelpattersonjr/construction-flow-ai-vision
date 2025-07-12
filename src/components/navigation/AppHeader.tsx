@@ -42,7 +42,7 @@ const AppHeader: React.FC = () => {
                 className="text-xl font-semibold text-gray-900 cursor-pointer"
                 onClick={handleLogoClick}
               >
-                ProjectPulse
+                ConexusPM
               </h1>
               
               {location.pathname !== '/' && location.pathname !== '/dashboard' && (

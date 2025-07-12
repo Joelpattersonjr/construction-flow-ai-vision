@@ -57,7 +57,7 @@ const Auth = () => {
           <LogIn className="mx-auto h-8 w-8 text-primary mb-4" />
           <CardTitle className="text-2xl font-bold">Sign In</CardTitle>
           <CardDescription>
-            Sign in to your ProjectPulse account
+            Sign in to your ConexusPM account
           </CardDescription>
         </CardHeader>
         <CardContent>
