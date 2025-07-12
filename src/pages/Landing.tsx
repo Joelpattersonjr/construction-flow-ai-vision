@@ -28,20 +28,31 @@ const Landing = () => {
     // Intersection Observer for scroll animations
     const observerOptions = {
       threshold: 0.1,
-      rootMargin: '0px 0px -50px 0px'
+      rootMargin: '0px 0px -100px 0px'
     };
 
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           entry.target.classList.add('animate-fade-in-up');
+          
+          // Add staggered animations for child elements
+          const children = entry.target.querySelectorAll('[data-stagger]');
+          children.forEach((child, index) => {
+            setTimeout(() => {
+              child.classList.add('animate-fade-in-up');
+            }, index * 150);
+          });
         }
       });
     }, observerOptions);
 
-    // Observe all sections
+    // Observe all sections and elements
     const sections = document.querySelectorAll('section[data-animate]');
+    const staggerElements = document.querySelectorAll('[data-stagger-parent]');
+    
     sections.forEach(section => observer.observe(section));
+    staggerElements.forEach(element => observer.observe(element));
 
     return () => {
       observer.disconnect();
@@ -211,12 +222,25 @@ const Landing = () => {
               </p>
               
               <div className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start items-center animate-fade-in">
-                <Button size="lg" onClick={() => navigate('/signup')} className="text-lg px-10 py-4 bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl font-semibold">
-                  Start Free Trial
-                  <ArrowRight className="ml-2 h-5 w-5" />
+                <Button 
+                  size="lg" 
+                  onClick={() => navigate('/signup')} 
+                  className="group text-lg px-10 py-4 bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl font-semibold relative overflow-hidden"
+                >
+                  <span className="relative z-10 flex items-center">
+                    Start Free Trial
+                    <ArrowRight className="ml-2 h-5 w-5 transition-transform duration-300 group-hover:translate-x-1 group-hover:scale-110" />
+                  </span>
+                  <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500 skew-x-12"></div>
                 </Button>
-                <Button size="lg" variant="outline" onClick={() => navigate('/auth')} className="text-lg px-10 py-4 border-2 hover:bg-primary hover:text-white transition-all duration-300 transform hover:scale-105 font-semibold">
-                  Watch Demo
+                <Button 
+                  size="lg" 
+                  variant="outline" 
+                  onClick={() => navigate('/auth')} 
+                  className="group text-lg px-10 py-4 border-2 hover:bg-primary hover:text-white transition-all duration-300 transform hover:scale-105 font-semibold relative overflow-hidden"
+                >
+                  <span className="relative z-10">Watch Demo</span>
+                  <div className="absolute inset-0 bg-primary translate-y-[100%] group-hover:translate-y-0 transition-transform duration-300"></div>
                 </Button>
               </div>
               
@@ -262,16 +286,21 @@ const Landing = () => {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10" data-stagger-parent>
             {features.map((feature, index) => (
-              <Card key={index} className="group relative border-0 bg-white/50 backdrop-blur-sm shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 overflow-hidden">
+              <Card key={index} className="group relative border-0 bg-white/50 backdrop-blur-sm shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-4 hover:scale-105 overflow-hidden cursor-pointer" data-stagger>
                 {/* Gradient overlay that appears on hover */}
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-blue-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 
+                {/* Glow effect */}
+                <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-primary/10 to-blue-600/10 opacity-0 group-hover:opacity-100 blur-xl transition-all duration-500 -z-10"></div>
+                
                 <CardHeader className="relative z-10 pb-4 space-y-6">
                   <div className="relative">
-                    <feature.icon className="h-14 w-14 text-primary transition-all duration-300 group-hover:scale-110 group-hover:text-blue-600" />
-                    <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl opacity-0 group-hover:opacity-30 transition-opacity duration-500"></div>
+                    <div className="relative p-3 rounded-xl bg-gradient-to-br from-primary/10 to-blue-600/10 group-hover:from-primary/20 group-hover:to-blue-600/20 transition-all duration-300 w-fit">
+                      <feature.icon className="h-14 w-14 text-primary transition-all duration-300 group-hover:scale-110 group-hover:text-blue-600 group-hover:rotate-6" />
+                    </div>
+                    <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl opacity-0 group-hover:opacity-50 transition-opacity duration-500"></div>
                   </div>
                   <CardTitle className="text-2xl font-semibold group-hover:text-primary transition-colors duration-300 leading-tight">{feature.title}</CardTitle>
                 </CardHeader>
@@ -282,7 +311,10 @@ const Landing = () => {
                 </CardContent>
                 
                 {/* Animated border effect */}
-                <div className="absolute inset-0 border-2 border-transparent group-hover:border-primary/20 rounded-lg transition-all duration-500"></div>
+                <div className="absolute inset-0 border-2 border-transparent group-hover:border-primary/30 rounded-lg transition-all duration-500"></div>
+                
+                {/* Subtle shine effect */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
               </Card>
             ))}
           </div>
@@ -337,8 +369,13 @@ const Landing = () => {
               <div className="text-center space-y-6">
                 <h3 className="text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Ready to Get Started?</h3>
                 <p className="text-gray-600 text-lg lg:text-xl leading-relaxed">Join thousands of construction professionals who trust ConexusPM.</p>
-                <Button size="lg" onClick={() => navigate('/signup')} className="w-full text-lg py-4 font-semibold">
-                  Start Your Free Trial
+                <Button 
+                  size="lg" 
+                  onClick={() => navigate('/signup')} 
+                  className="group w-full text-lg py-4 font-semibold relative overflow-hidden"
+                >
+                  <span className="relative z-10">Start Your Free Trial</span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-primary to-blue-600 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-500"></div>
                 </Button>
               </div>
             </div>
@@ -360,20 +397,22 @@ const Landing = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-10">
             {testimonials.map((testimonial, index) => (
-              <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
-                <CardContent className="pt-8 space-y-6">
+              <Card key={index} className="group border-0 shadow-lg hover:shadow-xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 cursor-pointer relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-blue-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <CardContent className="pt-8 space-y-6 relative z-10">
                   <div className="flex">
                     {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="h-6 w-6 text-yellow-400 fill-current" />
+                      <Star key={i} className="h-6 w-6 text-yellow-400 fill-current transition-transform duration-300 group-hover:scale-110" style={{transitionDelay: `${i * 100}ms`}} />
                     ))}
                   </div>
-                  <p className="text-gray-600 text-lg leading-relaxed italic">"{testimonial.content}"</p>
+                  <p className="text-gray-600 text-lg leading-relaxed italic group-hover:text-gray-700 transition-colors duration-300">"{testimonial.content}"</p>
                   <div className="space-y-1">
-                    <p className="font-semibold text-lg text-gray-900">{testimonial.name}</p>
+                    <p className="font-semibold text-lg text-gray-900 group-hover:text-primary transition-colors duration-300">{testimonial.name}</p>
                     <p className="text-gray-500 font-medium">{testimonial.role}</p>
                     <p className="text-gray-500">{testimonial.company}</p>
                   </div>
                 </CardContent>
+                <div className="absolute inset-0 border-2 border-transparent group-hover:border-primary/20 rounded-lg transition-all duration-500"></div>
               </Card>
             ))}
           </div>
@@ -392,28 +431,30 @@ const Landing = () => {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-10 max-w-7xl mx-auto">
             {pricingPlans.map((plan, index) => (
-              <Card key={index} className={`relative ${plan.popular ? 'border-primary shadow-xl scale-105' : 'border-gray-200'}`}>
+              <Card key={index} className={`group relative transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 cursor-pointer overflow-hidden ${plan.popular ? 'border-primary shadow-xl scale-105' : 'border-gray-200 hover:shadow-xl'}`}>
                 {plan.popular && (
                   <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
                     <Badge className="bg-primary text-white">Most Popular</Badge>
                   </div>
                 )}
                 
-                <CardHeader className="text-center pb-8">
-                  <CardTitle className="text-2xl">{plan.name}</CardTitle>
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-blue-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                
+                <CardHeader className="text-center pb-8 relative z-10">
+                  <CardTitle className="text-2xl group-hover:text-primary transition-colors duration-300">{plan.name}</CardTitle>
                   <div className="mt-4">
-                    <span className="text-4xl font-bold">{plan.price}</span>
+                    <span className="text-4xl font-bold group-hover:scale-110 transition-transform duration-300 inline-block">{plan.price}</span>
                     <span className="text-gray-500">/{plan.period}</span>
                   </div>
                   <CardDescription className="mt-2">{plan.description}</CardDescription>
                 </CardHeader>
                 
-                <CardContent>
+                <CardContent className="relative z-10">
                   <ul className="space-y-3 mb-8">
                     {plan.features.map((feature, featureIndex) => (
-                      <li key={featureIndex} className="flex items-center space-x-3">
+                      <li key={featureIndex} className="flex items-center space-x-3 group-hover:translate-x-1 transition-transform duration-300" style={{transitionDelay: `${featureIndex * 50}ms`}}>
                         <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
                         <span className="text-gray-600">{feature}</span>
                       </li>
@@ -421,13 +462,18 @@ const Landing = () => {
                   </ul>
                   
                   <Button 
-                    className="w-full" 
+                    className="group/btn w-full relative overflow-hidden" 
                     variant={plan.popular ? "default" : "outline"}
                     onClick={() => navigate('/signup')}
                   >
-                    {plan.cta}
+                    <span className="relative z-10">{plan.cta}</span>
+                    {!plan.popular && (
+                      <div className="absolute inset-0 bg-primary translate-y-[100%] group-hover/btn:translate-y-0 transition-transform duration-300"></div>
+                    )}
                   </Button>
                 </CardContent>
+                
+                <div className="absolute inset-0 border-2 border-transparent group-hover:border-primary/20 rounded-lg transition-all duration-500"></div>
               </Card>
             ))}
           </div>
