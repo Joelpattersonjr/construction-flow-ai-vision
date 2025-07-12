@@ -73,7 +73,7 @@ export const KanbanTaskCard: React.FC<KanbanTaskCardProps> = ({ task, onEdit }) 
         </p>
       )}
 
-      {task.dependency && (
+      {task.dependency?.id && (
         <div className="mb-2 flex items-center gap-1 p-1.5 bg-muted/50 rounded text-xs">
           <ArrowRight className="h-2.5 w-2.5 text-foreground" />
           <span className="text-foreground truncate">
