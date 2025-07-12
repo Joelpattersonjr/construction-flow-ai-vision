@@ -21,6 +21,8 @@ import ProjectPermissions from "./pages/ProjectPermissions";
 import Tasks from "./pages/Tasks";
 import Calendar from "./pages/Calendar";
 import Profile from "./pages/Profile";
+import PaymentSuccess from "./pages/PaymentSuccess";
+import PaymentCancel from "./pages/PaymentCancel";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -113,6 +115,8 @@ const App = () => {
               />
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/terms" element={<Terms />} />
+              <Route path="/success" element={<PaymentSuccess />} />
+              <Route path="/cancel" element={<PaymentCancel />} />
               <Route path="/test" element={<div>TEST ROUTE WORKS</div>} />
               <Route path="/invite/:token" element={<InviteAcceptance />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
