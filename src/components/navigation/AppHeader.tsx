@@ -33,6 +33,13 @@ const AppHeader: React.FC = () => {
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center space-x-8">
             <div className="flex items-center space-x-4">
+              <h1 
+                className="text-xl font-semibold text-gray-900 cursor-pointer"
+                onClick={() => navigate('/')}
+              >
+                ProjectPulse
+              </h1>
+              
               {location.pathname !== '/' && (
                 <Button
                   variant="ghost"
@@ -44,13 +51,6 @@ const AppHeader: React.FC = () => {
                   <span className="hidden sm:inline">Back</span>
                 </Button>
               )}
-              
-              <h1 
-                className="text-xl font-semibold text-gray-900 cursor-pointer"
-                onClick={() => navigate('/')}
-              >
-                ProjectPulse
-              </h1>
             </div>
             
             <div className="hidden md:flex space-x-1">
