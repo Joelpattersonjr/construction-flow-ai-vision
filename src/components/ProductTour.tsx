@@ -110,29 +110,37 @@ export function ProductTour({ isActive, onClose }: ProductTourProps) {
     const rect = targetElement.getBoundingClientRect();
     const step = tourSteps[currentStep];
     
+    // Ensure the tooltip is always visible on screen
+    const viewportHeight = window.innerHeight;
+    const viewportWidth = window.innerWidth;
+    const tooltipWidth = 320; // 80 * 4 = w-80
+    const tooltipHeight = 200; // estimated height
+    
     switch (step.position) {
       case 'top':
+        const topPosition = rect.top - tooltipHeight - 20;
         return {
-          top: rect.top - 20,
-          left: rect.left + rect.width / 2,
-          transform: 'translate(-50%, -100%)'
+          top: Math.max(20, topPosition),
+          left: Math.min(Math.max(20, rect.left + rect.width / 2), viewportWidth - tooltipWidth - 20),
+          transform: 'translate(-50%, 0)'
         };
       case 'bottom':
+        const bottomPosition = rect.bottom + 20;
         return {
-          top: rect.bottom + 20,
-          left: rect.left + rect.width / 2,
+          top: Math.min(bottomPosition, viewportHeight - tooltipHeight - 20),
+          left: Math.min(Math.max(20, rect.left + rect.width / 2), viewportWidth - tooltipWidth - 20),
           transform: 'translate(-50%, 0)'
         };
       case 'left':
         return {
-          top: rect.top + rect.height / 2,
-          left: rect.left - 20,
-          transform: 'translate(-100%, -50%)'
+          top: Math.min(Math.max(20, rect.top + rect.height / 2), viewportHeight - tooltipHeight - 20),
+          left: Math.max(20, rect.left - tooltipWidth - 20),
+          transform: 'translate(0, -50%)'
         };
       case 'right':
         return {
-          top: rect.top + rect.height / 2,
-          left: rect.right + 20,
+          top: Math.min(Math.max(20, rect.top + rect.height / 2), viewportHeight - tooltipHeight - 20),
+          left: Math.min(rect.right + 20, viewportWidth - tooltipWidth - 20),
           transform: 'translate(0, -50%)'
         };
       default:
