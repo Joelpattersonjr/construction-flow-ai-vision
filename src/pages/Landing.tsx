@@ -154,34 +154,65 @@ const Landing = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="py-20 bg-gradient-to-br from-blue-50 to-indigo-100">
-        <div className="container mx-auto px-4 text-center">
-          <Badge variant="secondary" className="mb-4">
-            🚀 Trusted by 1000+ Construction Teams
-          </Badge>
-          
-          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-            Streamline Your
-            <span className="text-primary block">Construction Projects</span>
-          </h1>
-          
-          <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-            ConexusPM is the all-in-one project management platform designed specifically for construction teams. 
-            Manage projects, collaborate in real-time, and track progress like never before.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button size="lg" onClick={() => navigate('/signup')} className="text-lg px-8 py-3">
-              Start Free Trial
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-            <Button size="lg" variant="outline" onClick={() => navigate('/auth')} className="text-lg px-8 py-3">
-              Watch Demo
-            </Button>
-          </div>
-          
-          <div className="mt-12 text-sm text-gray-500">
-            No credit card required • 30-day free trial • Cancel anytime
+      <section className="relative py-20 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 overflow-hidden">
+        {/* Animated background elements */}
+        <div className="absolute inset-0 opacity-30">
+          <div className="absolute top-20 left-10 w-20 h-20 bg-primary/20 rounded-full animate-pulse"></div>
+          <div className="absolute top-40 right-20 w-32 h-32 bg-blue-300/20 rounded-full animate-bounce" style={{animationDelay: '0.5s'}}></div>
+          <div className="absolute bottom-20 left-1/4 w-16 h-16 bg-purple-300/20 rounded-full animate-pulse" style={{animationDelay: '1s'}}></div>
+        </div>
+        
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {/* Left side - Content */}
+            <div className="text-center lg:text-left">
+              <Badge variant="secondary" className="mb-6 animate-fade-in bg-white/80 backdrop-blur-sm">
+                🚀 Trusted by 1000+ Construction Teams
+              </Badge>
+              
+              <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 animate-fade-in">
+                Streamline Your
+                <span className="text-primary block bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
+                  Construction Projects
+                </span>
+              </h1>
+              
+              <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto lg:mx-0 animate-fade-in">
+                ConexusPM is the all-in-one project management platform designed specifically for construction teams. 
+                Manage projects, collaborate in real-time, and track progress like never before.
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center animate-fade-in">
+                <Button size="lg" onClick={() => navigate('/signup')} className="text-lg px-8 py-3 bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                  Start Free Trial
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+                <Button size="lg" variant="outline" onClick={() => navigate('/auth')} className="text-lg px-8 py-3 border-2 hover:bg-primary hover:text-white transition-all duration-300 transform hover:scale-105">
+                  Watch Demo
+                </Button>
+              </div>
+              
+              <div className="mt-8 text-sm text-gray-500 animate-fade-in">
+                No credit card required • 30-day free trial • Cancel anytime
+              </div>
+            </div>
+            
+            {/* Right side - Hero Image */}
+            <div className="relative animate-fade-in">
+              <div className="relative bg-white/20 backdrop-blur-sm rounded-2xl p-8 shadow-2xl border border-white/30">
+                <img 
+                  src="https://images.unsplash.com/photo-1605810230434-7631ac76ec81?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2340&q=80" 
+                  alt="ConexusPM Dashboard Preview" 
+                  className="w-full h-auto rounded-xl shadow-lg"
+                />
+                <div className="absolute -top-4 -right-4 bg-primary text-white p-3 rounded-full shadow-lg animate-bounce">
+                  <Zap className="h-6 w-6" />
+                </div>
+                <div className="absolute -bottom-4 -left-4 bg-green-500 text-white p-3 rounded-full shadow-lg animate-pulse">
+                  <CheckCircle className="h-6 w-6" />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -200,16 +231,25 @@ const Landing = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature, index) => (
-              <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-shadow">
-                <CardHeader>
-                  <feature.icon className="h-12 w-12 text-primary mb-4" />
-                  <CardTitle className="text-xl">{feature.title}</CardTitle>
+              <Card key={index} className="group relative border-0 bg-white/50 backdrop-blur-sm shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 overflow-hidden">
+                {/* Gradient overlay that appears on hover */}
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-blue-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                
+                <CardHeader className="relative z-10">
+                  <div className="relative">
+                    <feature.icon className="h-12 w-12 text-primary mb-4 transition-all duration-300 group-hover:scale-110 group-hover:text-blue-600" />
+                    <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl opacity-0 group-hover:opacity-30 transition-opacity duration-500"></div>
+                  </div>
+                  <CardTitle className="text-xl group-hover:text-primary transition-colors duration-300">{feature.title}</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <CardDescription className="text-gray-600 text-base">
+                <CardContent className="relative z-10">
+                  <CardDescription className="text-gray-600 text-base group-hover:text-gray-700 transition-colors duration-300">
                     {feature.description}
                   </CardDescription>
                 </CardContent>
+                
+                {/* Animated border effect */}
+                <div className="absolute inset-0 border-2 border-transparent group-hover:border-primary/20 rounded-lg transition-all duration-500"></div>
               </Card>
             ))}
           </div>
