@@ -7,6 +7,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Helper logging function for enhanced debugging
 const logStep = (step: string, details?: any) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
   console.log(`[CHECK-SUBSCRIPTION] ${step}${detailsStr}`);
@@ -17,6 +18,7 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Use the service role key to perform writes (upsert) in Supabase
   const supabaseClient = createClient(
     Deno.env.get("SUPABASE_URL") ?? "",
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
@@ -47,9 +49,9 @@ serve(async (req) => {
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
     
     if (customers.data.length === 0) {
-      logStep("No customer found, updating free tier");
+      logStep("No customer found, updating unsubscribed state");
       
-      // Get user's company ID
+      // Get user's company
       const { data: profile } = await supabaseClient
         .from('profiles')
         .select('company_id')
@@ -57,28 +59,26 @@ serve(async (req) => {
         .single();
 
       if (profile?.company_id) {
-        await supabaseClient.from("companies").update({
-          subscription_tier: 'free',
-          subscription_status: 'active',
-          subscription_features: {
-            version_control: false,
-            collaboration: false,
-            advanced_analytics: false,
-            time_tracking: false,
-          },
-          updated_at: new Date().toISOString(),
-        }).eq('id', profile.company_id);
+        await supabaseClient
+          .from('companies')
+          .update({
+            subscription_tier: 'free',
+            subscription_status: 'active',
+            subscription_features: {
+              version_control: false,
+              collaboration: false,
+              advanced_analytics: false,
+              time_tracking: false,
+            },
+            subscription_expires_at: null,
+          })
+          .eq('id', profile.company_id);
       }
       
       return new Response(JSON.stringify({ 
         subscribed: false, 
         subscription_tier: 'free',
-        subscription_features: {
-          version_control: false,
-          collaboration: false,
-          advanced_analytics: false,
-          time_tracking: false,
-        }
+        subscription_end: null 
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
@@ -106,13 +106,17 @@ serve(async (req) => {
       const priceId = subscription.items.data[0].price.id;
       const price = await stripe.prices.retrieve(priceId);
       const amount = price.unit_amount || 0;
-      if (amount >= 9999) {
+      
+      if (amount >= 39999) {
         subscriptionTier = "enterprise";
-      } else if (amount >= 2999) {
+      } else if (amount >= 9999) {
         subscriptionTier = "pro";
+      } else if (amount >= 6999) {
+        subscriptionTier = "free"; // This is actually Basic now
       } else {
         subscriptionTier = "free";
       }
+      
       logStep("Determined subscription tier", { priceId, amount, subscriptionTier });
     } else {
       logStep("No active subscription found");
@@ -127,33 +131,28 @@ serve(async (req) => {
 
     if (profile?.company_id) {
       const features = {
-        version_control: subscriptionTier !== 'free',
-        collaboration: subscriptionTier !== 'free',
-        advanced_analytics: subscriptionTier !== 'free',
-        time_tracking: subscriptionTier === 'enterprise', // Only enterprise gets time tracking
+        version_control: hasActiveSub,
+        collaboration: hasActiveSub,
+        advanced_analytics: hasActiveSub,
+        time_tracking: subscriptionTier === 'enterprise',
       };
 
-      await supabaseClient.from("companies").update({
-        subscription_tier: subscriptionTier,
-        subscription_status: hasActiveSub ? 'active' : 'expired',
-        subscription_features: features,
-        subscription_expires_at: subscriptionEnd,
-        updated_at: new Date().toISOString(),
-      }).eq('id', profile.company_id);
-
-      logStep("Updated company subscription info", { subscribed: hasActiveSub, subscriptionTier, features });
+      await supabaseClient
+        .from('companies')
+        .update({
+          subscription_tier: subscriptionTier,
+          subscription_status: hasActiveSub ? 'active' : 'cancelled',
+          subscription_features: features,
+          subscription_expires_at: subscriptionEnd,
+        })
+        .eq('id', profile.company_id);
     }
 
+    logStep("Updated database with subscription info", { subscribed: hasActiveSub, subscriptionTier });
     return new Response(JSON.stringify({
       subscribed: hasActiveSub,
       subscription_tier: subscriptionTier,
-      subscription_end: subscriptionEnd,
-      subscription_features: {
-        version_control: subscriptionTier !== 'free',
-        collaboration: subscriptionTier !== 'free',
-        advanced_analytics: subscriptionTier !== 'free',
-        time_tracking: subscriptionTier === 'enterprise',
-      }
+      subscription_end: subscriptionEnd
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
