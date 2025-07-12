@@ -43,14 +43,13 @@ export const PricingCard: React.FC<PricingCardProps> = ({
             <li key={index}>• {feature}</li>
           ))}
         </ul>
-        <Button 
-          size="lg"
+        <button 
           onClick={onClick}
-          className="group w-full text-lg py-4 font-semibold relative overflow-hidden mt-4"
+          className="group w-full text-lg py-4 font-semibold relative overflow-hidden mt-4 bg-primary text-primary-foreground rounded-md h-11 px-8 inline-flex items-center justify-center gap-2 whitespace-nowrap ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
         >
           <span className="relative z-10">{buttonText}</span>
           <div className="absolute inset-0 bg-gradient-to-r from-primary to-blue-600 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-500"></div>
-        </Button>
+        </button>
       </CardContent>
     </Card>
   );
