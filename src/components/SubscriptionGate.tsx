@@ -61,16 +61,7 @@ const SubscriptionGate: React.FC<SubscriptionGateProps> = ({ children }) => {
     }
   };
 
-  const handleSubscriptionChoice = async (tier: 'free' | 'pro' | 'enterprise') => {
-    if (tier === 'free') {
-      setSubscriptionStatus('free');
-      setShowSubscriptionSelection(false);
-      toast({
-        title: "Welcome!",
-        description: "You're now on the free plan. You can upgrade anytime from your profile.",
-      });
-      return;
-    }
+  const handleSubscriptionChoice = async (tier: 'basic' | 'pro' | 'enterprise') => {
 
     try {
       const { data, error } = await supabase.functions.invoke('create-checkout', {
@@ -118,11 +109,12 @@ const SubscriptionGate: React.FC<SubscriptionGateProps> = ({ children }) => {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Free Plan */}
+              {/* Basic Plan */}
               <Card className="relative border-2 hover:border-primary transition-colors">
                 <CardHeader>
-                  <CardTitle className="text-lg">Free</CardTitle>
-                  <div className="text-2xl font-bold">$0<span className="text-sm font-normal">/month</span></div>
+                  <CardTitle className="text-lg">Basic</CardTitle>
+                  <div className="text-2xl font-bold">$69.99<span className="text-sm font-normal">/month</span></div>
+                  <div className="text-sm text-muted-foreground">30-day free trial</div>
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-2 text-sm">
@@ -135,9 +127,9 @@ const SubscriptionGate: React.FC<SubscriptionGateProps> = ({ children }) => {
                   <Button 
                     className="w-full mt-4" 
                     variant="outline"
-                    onClick={() => handleSubscriptionChoice('free')}
+                    onClick={() => handleSubscriptionChoice('basic')}
                   >
-                    Start Free
+                    Start 30-Day Trial
                   </Button>
                 </CardContent>
               </Card>
@@ -208,7 +200,7 @@ const SubscriptionGate: React.FC<SubscriptionGateProps> = ({ children }) => {
                   setSubscriptionStatus('free');
                 }}
               >
-                Skip for now (Free Plan)
+                Skip for now
               </Button>
             </div>
           </CardContent>
