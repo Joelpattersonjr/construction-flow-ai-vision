@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Folder, Files, Users, Home, CheckSquare } from 'lucide-react';
+import { Folder, Files, Users, Home, CheckSquare, Calendar, ArrowLeft } from 'lucide-react';
 import UserProfilePopover from './UserProfilePopover';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -12,10 +12,15 @@ const AppHeader: React.FC = () => {
 
   const isActive = (path: string) => location.pathname === path;
 
+  const handleBack = () => {
+    window.history.back();
+  };
+
   const navigationItems = [
     { path: '/', label: 'Dashboard', icon: Home },
     { path: '/projects', label: 'Projects', icon: Folder },
     { path: '/tasks', label: 'Tasks', icon: CheckSquare },
+    { path: '/calendar', label: 'Calendar', icon: Calendar },
     { path: '/files', label: 'Files', icon: Files },
     ...(profile?.company_role === 'company_admin' ? [
       { path: '/admin', label: 'Admin', icon: Users }
@@ -27,12 +32,26 @@ const AppHeader: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center space-x-8">
-            <h1 
-              className="text-xl font-semibold text-gray-900 cursor-pointer"
-              onClick={() => navigate('/')}
-            >
-              ProjectPulse
-            </h1>
+            <div className="flex items-center space-x-4">
+              {location.pathname !== '/' && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleBack}
+                  className="flex items-center space-x-2"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                  <span className="hidden sm:inline">Back</span>
+                </Button>
+              )}
+              
+              <h1 
+                className="text-xl font-semibold text-gray-900 cursor-pointer"
+                onClick={() => navigate('/')}
+              >
+                ProjectPulse
+              </h1>
+            </div>
             
             <div className="hidden md:flex space-x-1">
               {navigationItems.map((item) => {
