@@ -33,25 +33,26 @@ export interface SubscriptionPlan {
 export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
   {
     id: 'free',
-    name: 'Free',
-    price: '$0/month',
+    name: 'Basic',
+    price: '$69.99/month',
     features: [
-      'Basic file management',
-      'Up to 5 versions per file',
-      '2 collaborators max',
-      '30 days version history',
-      'Standard file storage',
+      'File Management & Storage',
+      'Version Control (5 versions per file)',
+      'Team Collaboration (up to 5 collaborators)',
+      '90 days version history',
+      'Basic File Sharing',
+      'Standard Support',
     ],
     limits: {
       max_versions_per_file: 5,
-      max_collaborators: 2,
-      version_history_days: 30,
+      max_collaborators: 5,
+      version_history_days: 90,
     },
   },
   {
     id: 'pro',
-    name: 'Pro',
-    price: '$29/month',
+    name: 'Premium',
+    price: '$99.99/month',
     features: [
       'Advanced version control',
       'Real-time collaboration',
@@ -71,7 +72,7 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
   {
     id: 'enterprise',
     name: 'Enterprise',
-    price: '$99/month',
+    price: '$399.99/month',
     features: [
       'Unlimited version control',
       'Unlimited collaboration',
