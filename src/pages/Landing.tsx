@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { PricingCard } from '@/components/subscription/PricingCard';
 import { 
   CheckCircle, 
   ArrowRight, 
@@ -423,6 +424,91 @@ const Landing = () => {
                 </Button>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing Section - For Testing */}
+      <section className="py-24 lg:py-32 bg-gray-50" data-animate>
+        <div className="container mx-auto px-6 lg:px-8">
+          <div className="text-center mb-20 lg:mb-24 space-y-6">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight">
+              Choose Your Plan
+            </h2>
+            <p className="text-xl lg:text-2xl text-gray-600 leading-relaxed">
+              Select the plan that best fits your construction management needs
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
+            <PricingCard
+              title="Basic"
+              price="$69.99"
+              subtitle="30-day free trial"
+              features={[
+                'Basic File Management',
+                '5 Projects',
+                '5 Team Members',
+                'Basic Support',
+                'Limited Storage (1GB)',
+              ]}
+              buttonText="Start 30-Day Trial"
+              onClick={() => navigate('/signup')}
+            />
+            
+            <PricingCard
+              title="Pro"
+              price="$199.99"
+              features={[
+                'Advanced File Management',
+                '10 Projects',
+                '50 Team Members',
+                'Real-time Collaboration',
+                'Version Control (50 versions)',
+                'Priority Support',
+                'Advanced Analytics',
+                '100GB Storage',
+              ]}
+              buttonText="Choose Pro"
+              isPopular={true}
+              onClick={() => navigate('/signup')}
+            />
+            
+            <PricingCard
+              title="Professional"
+              price="$399.99"
+              features={[
+                'Advanced File Management',
+                '20 Projects',
+                '50 Team Members',
+                'Real-time Collaboration',
+                'Version Control (50 versions)',
+                'Priority Support',
+                'Advanced Analytics',
+                '100GB Storage',
+                '50 Collaborators Max',
+                '2 Years Version History',
+              ]}
+              buttonText="Choose Professional"
+              onClick={() => navigate('/signup')}
+            />
+            
+            <PricingCard
+              title="Enterprise"
+              price="$499.99"
+              features={[
+                'Everything in Professional',
+                'Unlimited Team Members',
+                'Unlimited Storage',
+                'Advanced Security',
+                'Custom Integrations',
+                'Dedicated Support',
+                'Custom Branding',
+                'SLA Guarantee',
+              ]}
+              buttonText="Choose Enterprise"
+              onClick={() => navigate('/signup')}
+            />
           </div>
         </div>
       </section>
