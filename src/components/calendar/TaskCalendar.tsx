@@ -85,6 +85,7 @@ export const TaskCalendar: React.FC<TaskCalendarProps> = ({
           }
           
           switch (priority) {
+            case 'critical':
             case 'high':
               return {
                 backgroundColor: '#ef4444',
