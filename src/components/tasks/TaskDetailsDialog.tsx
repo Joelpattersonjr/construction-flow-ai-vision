@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
-import { MessageSquare, Paperclip, Activity, Send, Download, Trash2, Tag, Eye, Upload, Clock, GitBranch } from 'lucide-react';
+import { MessageSquare, Paperclip, Activity, Send, Download, Trash2, Tag, Eye, Upload, Clock, GitBranch, Edit2, Check, X, History } from 'lucide-react';
 
 import { TaskLabelsManager } from './TaskLabelsManager';
 import { FileUploadDropzone } from './FileUploadDropzone';
 import { FilePreviewDialog } from './FilePreviewDialog';
+import { FileVersionManager } from './FileVersionManager';
 import { TaskTimeTracker } from './TaskTimeTracker';
 import { TaskDependencies } from './TaskDependencies';
 
@@ -28,6 +29,7 @@ import { taskCommentsService, TaskComment } from '@/services/taskCommentsService
 import { taskFilesService, TaskFile } from '@/services/taskFilesService';
 import { taskActivityService, TaskActivity } from '@/services/taskActivityService';
 import { taskService } from '@/services/taskService';
+import { supabase } from '@/integrations/supabase/client';
 
 interface TaskDetailsDialogProps {
   task: TaskWithDetails | null;
@@ -49,11 +51,87 @@ export const TaskDetailsDialog: React.FC<TaskDetailsDialogProps> = ({
   const [newComment, setNewComment] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [previewFile, setPreviewFile] = useState<TaskFile | null>(null);
+  const [editingComment, setEditingComment] = useState<string | null>(null);
+  const [editContent, setEditContent] = useState('');
+  const [versionManagerFile, setVersionManagerFile] = useState<TaskFile | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
     if (task && open) {
       loadTaskData();
+      
+      // Set up real-time comments subscription
+      const commentsChannel = supabase
+        .channel(`task-comments-${task.id}`)
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'task_comments',
+            filter: `task_id=eq.${task.id}`
+          },
+          async (payload) => {
+            // Fetch the new comment with user details
+            const { data: newComment } = await supabase
+              .from('task_comments')
+              .select(`
+                *,
+                user:profiles(id, full_name, email)
+              `)
+              .eq('id', payload.new.id)
+              .single();
+            
+            if (newComment) {
+              setComments(prev => [...prev, newComment as TaskComment]);
+            }
+          }
+        )
+        .on(
+          'postgres_changes',
+          {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'task_comments',
+            filter: `task_id=eq.${task.id}`
+          },
+          async (payload) => {
+            // Fetch the updated comment with user details
+            const { data: updatedComment } = await supabase
+              .from('task_comments')
+              .select(`
+                *,
+                user:profiles(id, full_name, email)
+              `)
+              .eq('id', payload.new.id)
+              .single();
+            
+            if (updatedComment) {
+              setComments(prev => 
+                prev.map(comment => 
+                  comment.id === payload.new.id ? updatedComment as TaskComment : comment
+                )
+              );
+            }
+          }
+        )
+        .on(
+          'postgres_changes',
+          {
+            event: 'DELETE',
+            schema: 'public',
+            table: 'task_comments',
+            filter: `task_id=eq.${task.id}`
+          },
+          (payload) => {
+            setComments(prev => prev.filter(comment => comment.id !== payload.old.id));
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(commentsChannel);
+      };
     }
   }, [task, open]);
 
@@ -86,8 +164,8 @@ export const TaskDetailsDialog: React.FC<TaskDetailsDialogProps> = ({
     
     setIsLoading(true);
     try {
-      const comment = await taskCommentsService.createComment(task.id, newComment.trim());
-      setComments([...comments, comment]);
+      // Don't update state here - let real-time subscription handle it
+      await taskCommentsService.createComment(task.id, newComment.trim());
       setNewComment('');
       toast({ title: 'Comment added successfully' });
     } catch (error) {
@@ -98,6 +176,53 @@ export const TaskDetailsDialog: React.FC<TaskDetailsDialogProps> = ({
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleEditComment = async (commentId: string) => {
+    if (!editContent.trim()) return;
+    
+    try {
+      await taskCommentsService.updateComment(commentId, editContent.trim());
+      setEditingComment(null);
+      setEditContent('');
+      toast({ title: 'Comment updated successfully' });
+    } catch (error) {
+      toast({
+        title: 'Error updating comment',
+        description: error instanceof Error ? error.message : 'Unknown error',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleDeleteComment = async (commentId: string) => {
+    try {
+      await taskCommentsService.deleteComment(commentId);
+      toast({ title: 'Comment deleted successfully' });
+    } catch (error) {
+      toast({
+        title: 'Error deleting comment',
+        description: error instanceof Error ? error.message : 'Unknown error',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const startEditing = (comment: TaskComment) => {
+    setEditingComment(comment.id);
+    setEditContent(comment.content);
+  };
+
+  const cancelEditing = () => {
+    setEditingComment(null);
+    setEditContent('');
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent, action: () => void) => {
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault();
+      action();
     }
   };
 
@@ -268,7 +393,7 @@ export const TaskDetailsDialog: React.FC<TaskDetailsDialogProps> = ({
           <TabsContent value="comments" className="space-y-4">
             <div className="space-y-4 max-h-96 overflow-y-auto">
               {comments.map((comment) => (
-                <Card key={comment.id}>
+                <Card key={comment.id} className="group">
                   <CardContent className="pt-4">
                     <div className="flex items-start gap-3">
                       <Avatar className="h-8 w-8">
@@ -277,37 +402,119 @@ export const TaskDetailsDialog: React.FC<TaskDetailsDialogProps> = ({
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="font-medium text-sm">
-                            {comment.user?.full_name || comment.user?.email}
-                          </span>
-                          <span className="text-xs text-muted-foreground">
-                            {format(new Date(comment.created_at), 'MMM d, HH:mm')}
-                          </span>
+                        <div className="flex items-center justify-between mb-1">
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium text-sm">
+                              {comment.user?.full_name || comment.user?.email}
+                            </span>
+                            <span className="text-xs text-muted-foreground">
+                              {format(new Date(comment.created_at), 'MMM d, HH:mm')}
+                            </span>
+                            {comment.updated_at !== comment.created_at && (
+                              <span className="text-xs text-muted-foreground italic">
+                                (edited)
+                              </span>
+                            )}
+                          </div>
+                          
+                          {/* Comment Actions - show on hover or when editing */}
+                          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            {editingComment !== comment.id && (
+                              <>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => startEditing(comment)}
+                                  className="h-6 w-6 p-0"
+                                  title="Edit comment"
+                                >
+                                  <Edit2 className="h-3 w-3" />
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => handleDeleteComment(comment.id)}
+                                  className="h-6 w-6 p-0 text-red-600 hover:text-red-700"
+                                  title="Delete comment"
+                                >
+                                  <Trash2 className="h-3 w-3" />
+                                </Button>
+                              </>
+                            )}
+                          </div>
                         </div>
-                        <p className="text-sm">{comment.content}</p>
+                        
+                        {editingComment === comment.id ? (
+                          <div className="space-y-2">
+                            <Textarea
+                              value={editContent}
+                              onChange={(e) => setEditContent(e.target.value)}
+                              onKeyDown={(e) => handleKeyDown(e, () => handleEditComment(comment.id))}
+                              className="text-sm resize-none"
+                              rows={2}
+                              placeholder="Edit your comment..."
+                            />
+                            <div className="flex gap-2">
+                              <Button
+                                size="sm"
+                                onClick={() => handleEditComment(comment.id)}
+                                disabled={!editContent.trim()}
+                                className="h-7"
+                              >
+                                <Check className="h-3 w-3 mr-1" />
+                                Save
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={cancelEditing}
+                                className="h-7"
+                              >
+                                <X className="h-3 w-3 mr-1" />
+                                Cancel
+                              </Button>
+                            </div>
+                          </div>
+                        ) : (
+                          <p className="text-sm whitespace-pre-wrap">{comment.content}</p>
+                        )}
                       </div>
                     </div>
                   </CardContent>
                 </Card>
               ))}
+              
+              {comments.length === 0 && (
+                <div className="text-center py-8 text-muted-foreground">
+                  <MessageSquare className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                  <p>No comments yet</p>
+                  <p className="text-sm">Start the conversation by adding a comment</p>
+                </div>
+              )}
             </div>
 
-            <div className="flex gap-2">
+            <div className="space-y-2">
               <Textarea
-                placeholder="Add a comment..."
+                placeholder="Add a comment... (Ctrl+Enter to send)"
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
+                onKeyDown={(e) => handleKeyDown(e, handleAddComment)}
                 className="resize-none"
                 rows={3}
               />
-              <Button 
-                onClick={handleAddComment} 
-                disabled={!newComment.trim() || isLoading}
-                size="sm"
-              >
-                <Send className="h-4 w-4" />
-              </Button>
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-muted-foreground">
+                  Press Ctrl+Enter to send
+                </span>
+                <Button 
+                  onClick={handleAddComment} 
+                  disabled={!newComment.trim() || isLoading}
+                  size="sm"
+                >
+                  <Send className="h-4 w-4 mr-1" />
+                  {isLoading ? 'Sending...' : 'Send'}
+                </Button>
+              </div>
             </div>
           </TabsContent>
 
@@ -316,6 +523,8 @@ export const TaskDetailsDialog: React.FC<TaskDetailsDialogProps> = ({
               <FileUploadDropzone
                 taskId={task.id}
                 onFileUploaded={handleFileUploaded}
+                allowMultiple={true}
+                maxSize={100}
               />
             )}
 
@@ -354,24 +563,33 @@ export const TaskDetailsDialog: React.FC<TaskDetailsDialogProps> = ({
                             <Eye className="h-4 w-4" />
                           </Button>
                         )}
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => handleDownloadFile(file)}
-                          className="h-8 w-8 p-0"
-                          title="Download"
-                        >
-                          <Download className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => handleDeleteFile(file)}
-                          className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
-                          title="Delete"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                         <Button
+                           size="sm"
+                           variant="ghost"
+                           onClick={() => setVersionManagerFile(file)}
+                           className="h-8 w-8 p-0"
+                           title="Version History"
+                         >
+                           <History className="h-4 w-4" />
+                         </Button>
+                         <Button
+                           size="sm"
+                           variant="ghost"
+                           onClick={() => handleDownloadFile(file)}
+                           className="h-8 w-8 p-0"
+                           title="Download"
+                         >
+                           <Download className="h-4 w-4" />
+                         </Button>
+                         <Button
+                           size="sm"
+                           variant="ghost"
+                           onClick={() => handleDeleteFile(file)}
+                           className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
+                           title="Delete"
+                         >
+                           <Trash2 className="h-4 w-4" />
+                         </Button>
                       </div>
                     </div>
                   </CardContent>
@@ -429,6 +647,16 @@ export const TaskDetailsDialog: React.FC<TaskDetailsDialogProps> = ({
           file={previewFile}
           open={!!previewFile}
           onOpenChange={(open) => !open && setPreviewFile(null)}
+        />
+        
+        <FileVersionManager
+          file={versionManagerFile}
+          open={!!versionManagerFile}
+          onOpenChange={(open) => !open && setVersionManagerFile(null)}
+          onNewVersion={(newVersion) => {
+            setFiles(prev => [newVersion, ...prev]);
+            setVersionManagerFile(null);
+          }}
         />
       </DialogContent>
     </Dialog>

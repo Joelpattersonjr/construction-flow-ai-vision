@@ -9,14 +9,18 @@ import { taskFilesService } from '@/services/taskFilesService';
 interface FileUploadDropzoneProps {
   taskId: number;
   onFileUploaded: (file: any) => void;
+  onFilesUploaded?: (files: any[]) => void;
   maxSize?: number; // in MB
   acceptedTypes?: string[];
+  allowMultiple?: boolean;
 }
 
 export const FileUploadDropzone: React.FC<FileUploadDropzoneProps> = ({
   taskId,
   onFileUploaded,
+  onFilesUploaded,
   maxSize = 50,
+  allowMultiple = false,
   acceptedTypes = [
     'image/*',
     'application/pdf',
@@ -155,6 +159,7 @@ export const FileUploadDropzone: React.FC<FileUploadDropzoneProps> = ({
         className="hidden"
         onChange={handleFileInputChange}
         accept={acceptedTypes.join(',')}
+        multiple={allowMultiple}
       />
       
       <Card
