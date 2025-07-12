@@ -65,7 +65,7 @@ export const SubscriptionSelectionPage: React.FC<SubscriptionSelectionPageProps>
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 pt-4">
             <PricingCard
               title="Basic"
               price="$69.99"

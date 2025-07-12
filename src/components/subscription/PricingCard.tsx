@@ -24,10 +24,10 @@ export const PricingCard: React.FC<PricingCardProps> = ({
   onClick,
 }) => {
   return (
-    <Card className={`relative border-2 ${isPopular ? 'border-primary' : 'hover:border-primary'} transition-colors`}>
+    <Card className={`relative border-2 ${isPopular ? 'border-primary' : 'hover:border-primary'} transition-colors ${isPopular ? 'mt-4' : ''}`}>
       {isPopular && (
-        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-          <span className="bg-primary text-primary-foreground text-xs px-3 py-1 rounded-full">
+        <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
+          <span className="bg-primary text-primary-foreground text-xs px-3 py-1 rounded-full whitespace-nowrap shadow-md">
             Most Popular
           </span>
         </div>
