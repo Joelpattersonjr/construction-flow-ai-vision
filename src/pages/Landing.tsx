@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { PricingCard } from '@/components/subscription/PricingCard';
 import { 
   CheckCircle, 
   ArrowRight, 
@@ -150,7 +149,7 @@ const Landing = () => {
         "Standard Support"
       ],
       popular: false,
-      cta: "Get Started"
+      cta: "Start Basic Plan"
     },
     {
       name: "Premium",
@@ -168,7 +167,7 @@ const Landing = () => {
         "Priority support"
       ],
       popular: true,
-      cta: "Choose Premium"
+      cta: "Start Premium Plan"
     },
     {
       name: "Professional",
@@ -188,7 +187,7 @@ const Landing = () => {
         "Team performance insights"
       ],
       popular: false,
-      cta: "Choose Professional"
+      cta: "Start Professional Plan"
     },
     {
       name: "Enterprise",
@@ -208,7 +207,7 @@ const Landing = () => {
         "Dedicated support"
       ],
       popular: false,
-      cta: "Choose Enterprise"
+      cta: "Start Enterprise Plan"
     }
   ];
 
@@ -428,91 +427,6 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* Pricing Section - For Testing */}
-      <section className="py-24 lg:py-32 bg-gray-50" data-animate>
-        <div className="container mx-auto px-6 lg:px-8">
-          <div className="text-center mb-20 lg:mb-24 space-y-6">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight">
-              Choose Your Plan
-            </h2>
-            <p className="text-xl lg:text-2xl text-gray-600 leading-relaxed">
-              Select the plan that best fits your construction management needs
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
-            <PricingCard
-              title="Basic"
-              price="$69.99"
-              subtitle="30-day free trial"
-              features={[
-                'Basic File Management',
-                '5 Projects',
-                '5 Team Members',
-                'Basic Support',
-                'Limited Storage (1GB)',
-              ]}
-              buttonText="Start 30-Day Trial"
-              onClick={() => navigate('/signup')}
-            />
-            
-            <PricingCard
-              title="Pro"
-              price="$199.99"
-              features={[
-                'Advanced File Management',
-                '10 Projects',
-                '50 Team Members',
-                'Real-time Collaboration',
-                'Version Control (50 versions)',
-                'Priority Support',
-                'Advanced Analytics',
-                '100GB Storage',
-              ]}
-              buttonText="Choose Pro"
-              isPopular={true}
-              onClick={() => navigate('/signup')}
-            />
-            
-            <PricingCard
-              title="Professional"
-              price="$399.99"
-              features={[
-                'Advanced File Management',
-                '20 Projects',
-                '50 Team Members',
-                'Real-time Collaboration',
-                'Version Control (50 versions)',
-                'Priority Support',
-                'Advanced Analytics',
-                '100GB Storage',
-                '50 Collaborators Max',
-                '2 Years Version History',
-              ]}
-              buttonText="Choose Professional"
-              onClick={() => navigate('/signup')}
-            />
-            
-            <PricingCard
-              title="Enterprise"
-              price="$499.99"
-              features={[
-                'Everything in Professional',
-                'Unlimited Team Members',
-                'Unlimited Storage',
-                'Advanced Security',
-                'Custom Integrations',
-                'Dedicated Support',
-                'Custom Branding',
-                'SLA Guarantee',
-              ]}
-              buttonText="Choose Enterprise"
-              onClick={() => navigate('/signup')}
-            />
-          </div>
-        </div>
-      </section>
-
       {/* Testimonials Section */}
       <section className="py-24 lg:py-32 bg-white" data-animate data-tour="testimonials">
         <div className="container mx-auto px-6 lg:px-8">
@@ -563,36 +477,47 @@ const Landing = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 max-w-7xl mx-auto">
             {pricingPlans.map((plan, index) => (
-              <Card key={index} className={`relative border-2 ${plan.popular ? 'border-primary' : 'hover:border-primary'} transition-colors ${plan.popular ? 'mt-6' : ''}`}>
+              <Card key={index} className={`group relative transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 cursor-pointer overflow-hidden ${plan.popular ? 'border-primary shadow-lg' : 'border-gray-200 hover:shadow-xl'}`}>
                 {plan.popular && (
-                  <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 z-10">
-                    <span className="bg-primary text-primary-foreground text-xs px-4 py-2 rounded-full whitespace-nowrap shadow-lg">
-                      Most Popular
-                    </span>
+                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-10">
+                    <Badge className="bg-primary text-white px-3 py-1 text-xs">Most Popular</Badge>
                   </div>
                 )}
                 
-                <CardHeader>
-                  <CardTitle className="text-lg">{plan.name}</CardTitle>
-                  <div className="text-2xl font-bold">{plan.price}<span className="text-sm font-normal">/{plan.period}</span></div>
-                  <div className="text-sm text-muted-foreground">{plan.description}</div>
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-blue-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                
+                <CardHeader className="text-center pb-8 relative z-10">
+                  <CardTitle className="text-2xl group-hover:text-primary transition-colors duration-300">{plan.name}</CardTitle>
+                  <div className="mt-4">
+                    <span className="text-4xl font-bold group-hover:scale-110 transition-transform duration-300 inline-block">{plan.price}</span>
+                    <span className="text-gray-500">/{plan.period}</span>
+                  </div>
+                  <CardDescription className="mt-2">{plan.description}</CardDescription>
                 </CardHeader>
                 
-                <CardContent>
-                  <ul className="space-y-2 text-sm">
+                <CardContent className="relative z-10">
+                  <ul className="space-y-3 mb-8">
                     {plan.features.map((feature, featureIndex) => (
-                      <li key={featureIndex}>• {feature}</li>
+                      <li key={featureIndex} className="flex items-center space-x-3 group-hover:translate-x-1 transition-transform duration-300" style={{transitionDelay: `${featureIndex * 50}ms`}}>
+                        <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
+                        <span className="text-gray-600">{feature}</span>
+                      </li>
                     ))}
                   </ul>
                   
-                  <button 
+                  <Button 
+                    className="group/btn w-full relative overflow-hidden" 
+                    variant={plan.popular ? "default" : "outline"}
                     onClick={() => navigate('/signup')}
-                    className="group w-full text-lg py-4 font-semibold relative overflow-hidden mt-4 bg-primary text-primary-foreground rounded-md h-11 px-8 inline-flex items-center justify-center gap-2 whitespace-nowrap ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
                   >
                     <span className="relative z-10">{plan.cta}</span>
-                    <div className="absolute inset-0 bg-gradient-to-r from-primary to-blue-600 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-500"></div>
-                  </button>
+                    {!plan.popular && (
+                      <div className="absolute inset-0 bg-primary translate-y-[100%] group-hover/btn:translate-y-0 transition-transform duration-300"></div>
+                    )}
+                  </Button>
                 </CardContent>
+                
+                <div className="absolute inset-0 border-2 border-transparent group-hover:border-primary/20 rounded-lg transition-all duration-500"></div>
               </Card>
             ))}
           </div>
