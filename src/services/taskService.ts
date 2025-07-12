@@ -11,8 +11,7 @@ export const taskService = {
       .select(`
         *,
         assignee:profiles!fk_tasks_assignee_id(id, full_name, email),
-        project:projects(id, name),
-        dependency:tasks!tasks_dependency_id_fkey(id, title, status)
+        project:projects(id, name)
       `)
       .eq('project_id', projectId)
       .order('created_at', { ascending: false });
@@ -28,8 +27,7 @@ export const taskService = {
       .select(`
         *,
         assignee:profiles!fk_tasks_assignee_id(id, full_name, email),
-        project:projects(id, name),
-        dependency:tasks!tasks_dependency_id_fkey(id, title, status)
+        project:projects(id, name)
       `)
       .order('created_at', { ascending: false });
 
