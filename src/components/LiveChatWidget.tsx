@@ -130,7 +130,7 @@ export function LiveChatWidget() {
       {!isOpen && (
         <Button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-4 right-4 z-50 rounded-full w-14 h-14 shadow-lg bg-primary hover:bg-primary/90 relative overflow-hidden"
+          className="fixed bottom-4 left-4 z-50 rounded-full w-16 h-16 shadow-lg bg-primary hover:bg-primary/90 relative overflow-hidden"
         >
           <MessageCircle className="h-6 w-6" />
           {hasNewMessages && (
@@ -145,7 +145,7 @@ export function LiveChatWidget() {
       {/* Chat Window */}
       {isOpen && (
         <Card className={cn(
-          "fixed bottom-4 right-4 z-50 transition-all duration-300 ease-in-out",
+          "fixed bottom-4 left-4 z-50 transition-all duration-300 ease-in-out",
           isMinimized ? "w-80 h-14" : "w-80 h-96",
           "flex flex-col shadow-xl border-2"
         )}>
