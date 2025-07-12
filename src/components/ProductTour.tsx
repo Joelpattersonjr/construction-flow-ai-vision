@@ -112,10 +112,6 @@ export function ProductTour({ isActive, onClose }: ProductTourProps) {
 
   if (!isActive) return null;
 
-  console.log('ProductTour is active, currentStep:', currentStep);
-  console.log('targetElement:', targetElement);
-  console.log('tooltipPosition:', getTooltipPosition());
-
   const currentTourStep = tourSteps[currentStep];
 
   return (
@@ -139,9 +135,9 @@ export function ProductTour({ isActive, onClose }: ProductTourProps) {
         />
       )}
 
-      {/* Tour Card - DEBUG: Added red border to make it visible */}
+      {/* Tour Card */}
       <Card 
-        className="fixed w-80 p-6 bg-white border-4 border-red-500 pointer-events-auto shadow-2xl"
+        className="fixed w-80 p-6 bg-card border shadow-2xl pointer-events-auto animate-scale-in"
         style={{
           ...getTooltipPosition(),
           zIndex: 52
