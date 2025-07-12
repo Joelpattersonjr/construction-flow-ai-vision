@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { MessageCircle, X, Send, Minimize2, Maximize2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Message {
   id: string;
@@ -22,13 +23,26 @@ const initialMessages: Message[] = [
   }
 ];
 
-const autoResponses = [
-  "Thanks for your message! Our team will get back to you shortly.",
-  "I'd be happy to help you with that. Let me connect you with a specialist.",
-  "That's a great question! You can find more information in our documentation, or I can help you directly.",
-  "I'm here to assist you. What specific feature would you like to know more about?",
-  "Feel free to ask me anything about ConexusPM. I'm here to help!"
-];
+const getAIResponse = async (message: string, conversationHistory: Message[]) => {
+  try {
+    const { data, error } = await supabase.functions.invoke('ai-chat', {
+      body: {
+        message,
+        conversationHistory: conversationHistory.slice(-10) // Keep last 10 messages for context
+      }
+    });
+
+    if (error) {
+      console.error('Error calling AI chat:', error);
+      return "I'm sorry, I'm having trouble responding right now. Please try again or contact our support team.";
+    }
+
+    return data.response;
+  } catch (error) {
+    console.error('Error in AI chat:', error);
+    return "I'm sorry, I'm having trouble responding right now. Please try again or contact our support team.";
+  }
+};
 
 export function LiveChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
@@ -53,7 +67,7 @@ export function LiveChatWidget() {
     }
   }, [isOpen]);
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (!newMessage.trim()) return;
 
     const userMessage: Message = {
@@ -64,26 +78,39 @@ export function LiveChatWidget() {
     };
 
     setMessages(prev => [...prev, userMessage]);
+    const currentMessage = newMessage;
     setNewMessage('');
-    setIsTyping(true);
 
-    // Simulate typing delay and auto-response
-    setTimeout(() => {
-      const randomResponse = autoResponses[Math.floor(Math.random() * autoResponses.length)];
+    // Get AI response
+    setIsTyping(true);
+    
+    try {
+      const aiResponse = await getAIResponse(currentMessage, messages);
       const botMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        text: randomResponse,
+        id: Date.now().toString() + '_bot',
+        text: aiResponse,
         isUser: false,
         timestamp: new Date()
       };
-
-      setMessages(prev => [...prev, botMessage]);
-      setIsTyping(false);
       
-      if (!isOpen) {
+      setMessages(prev => [...prev, botMessage]);
+      
+      // Show notification if chat is minimized
+      if (isMinimized) {
         setHasNewMessages(true);
       }
-    }, 1500 + Math.random() * 1000);
+    } catch (error) {
+      console.error('Error getting AI response:', error);
+      const errorMessage: Message = {
+        id: Date.now().toString() + '_error',
+        text: "I'm sorry, I'm having trouble responding right now. Please try again.",
+        isUser: false,
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsTyping(false);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -126,7 +153,7 @@ export function LiveChatWidget() {
           <div className="flex items-center justify-between p-4 border-b bg-muted/50">
             <div className="flex items-center space-x-2">
               <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" />
-              <span className="font-medium text-sm">Live Support</span>
+              <span className="font-medium text-sm">AI Support</span>
             </div>
             <div className="flex items-center space-x-1">
               <Button
