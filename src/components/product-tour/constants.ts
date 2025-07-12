@@ -3,7 +3,7 @@ import { TourStep } from './types';
 export const tourSteps: TourStep[] = [
   {
     id: 'hero',
-    title: 'Welcome to ProjectSync',
+    title: 'Welcome to ConexusPM',
     content: 'Transform your project management with our comprehensive solution designed for modern teams.',
     target: '[data-tour="hero"]',
     position: 'bottom'
@@ -18,7 +18,7 @@ export const tourSteps: TourStep[] = [
   {
     id: 'testimonials',
     title: 'Customer Success',
-    content: 'See what our customers say about their experience with ProjectSync.',
+    content: 'See what our customers say about their experience with ConexusPM.',
     target: '[data-tour="testimonials"]',
     position: 'top'
   },

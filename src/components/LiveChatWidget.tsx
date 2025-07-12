@@ -16,7 +16,7 @@ interface Message {
 const initialMessages: Message[] = [
   {
     id: '1',
-    text: 'Hello! Welcome to ProjectSync. How can I help you today?',
+    text: 'Hello! Welcome to ConexusPM. How can I help you today?',
     isUser: false,
     timestamp: new Date()
   }
@@ -27,7 +27,7 @@ const autoResponses = [
   "I'd be happy to help you with that. Let me connect you with a specialist.",
   "That's a great question! You can find more information in our documentation, or I can help you directly.",
   "I'm here to assist you. What specific feature would you like to know more about?",
-  "Feel free to ask me anything about ProjectSync. I'm here to help!"
+  "Feel free to ask me anything about ConexusPM. I'm here to help!"
 ];
 
 export function LiveChatWidget() {
