@@ -152,7 +152,7 @@ const Landing = () => {
     },
     {
       name: "Premium",
-      price: "$99.99", 
+      price: "$199.99", 
       period: "per month",
       description: "Advanced features for professional teams",
       features: [
@@ -169,8 +169,8 @@ const Landing = () => {
     },
     {
       name: "Enterprise",
-      price: "$399.99",
-      period: "per month", 
+      price: "$499.99",
+      period: "per month",
       description: "Complete solution for large organizations",
       features: [
         "Unlimited version control",
