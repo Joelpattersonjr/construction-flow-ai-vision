@@ -168,6 +168,25 @@ const Landing = () => {
       cta: "Start Premium Plan"
     },
     {
+      name: "Professional",
+      price: "$399.99",
+      period: "per month",
+      description: "Enhanced features for growing teams",
+      features: [
+        "Advanced version control",
+        "Real-time collaboration",
+        "Up to 50 versions per file",
+        "50 collaborators max",
+        "2 years version history",
+        "Advanced analytics",
+        "Priority support",
+        "Enhanced file management",
+        "Team performance insights"
+      ],
+      popular: false,
+      cta: "Start Professional Plan"
+    },
+    {
       name: "Enterprise",
       price: "$499.99",
       period: "per month",

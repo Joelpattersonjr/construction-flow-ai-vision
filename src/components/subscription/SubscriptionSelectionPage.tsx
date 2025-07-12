@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { PricingCard } from './PricingCard';
 
 interface SubscriptionSelectionPageProps {
-  onSubscriptionChoice: (tier: 'basic' | 'pro' | 'enterprise') => void;
+  onSubscriptionChoice: (tier: 'basic' | 'pro' | 'professional' | 'enterprise') => void;
   onSkip: () => void;
 }
 
@@ -31,8 +31,21 @@ export const SubscriptionSelectionPage: React.FC<SubscriptionSelectionPageProps>
     '100GB Storage',
   ];
 
+  const professionalFeatures = [
+    'Advanced File Management',
+    'Unlimited Projects',
+    '50 Team Members',
+    'Real-time Collaboration',
+    'Version Control (50 versions)',
+    'Priority Support',
+    'Advanced Analytics',
+    '100GB Storage',
+    '50 Collaborators Max',
+    '2 Years Version History',
+  ];
+
   const enterpriseFeatures = [
-    'Everything in Pro',
+    'Everything in Professional',
     'Unlimited Team Members',
     'Unlimited Storage',
     'Advanced Security',
@@ -52,7 +65,7 @@ export const SubscriptionSelectionPage: React.FC<SubscriptionSelectionPageProps>
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <PricingCard
               title="Basic"
               price="$69.99"
@@ -70,6 +83,14 @@ export const SubscriptionSelectionPage: React.FC<SubscriptionSelectionPageProps>
               buttonText="Choose Pro"
               isPopular={true}
               onClick={() => onSubscriptionChoice('pro')}
+            />
+
+            <PricingCard
+              title="Professional"
+              price="$399.99"
+              features={professionalFeatures}
+              buttonText="Choose Professional"
+              onClick={() => onSubscriptionChoice('professional')}
             />
 
             <PricingCard
