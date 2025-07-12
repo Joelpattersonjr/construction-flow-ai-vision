@@ -17,6 +17,16 @@ import {
   Globe,
   Star
 } from 'lucide-react';
+import { TourTrigger } from '@/components/ProductTour';
+import { LiveChatWidget } from '@/components/LiveChatWidget';
+import { 
+  TaskManagementTooltip, 
+  CollaborationTooltip, 
+  AnalyticsTooltip,
+  SecurityTooltip,
+  IntegrationsTooltip,
+  MobileTooltip 
+} from '@/components/FeatureTooltips';
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -64,32 +74,38 @@ const Landing = () => {
     {
       icon: Building2,
       title: "Project Management",
-      description: "Comprehensive project tracking with timelines, milestones, and progress monitoring."
+      description: "Comprehensive project tracking with timelines, milestones, and progress monitoring.",
+      tooltip: TaskManagementTooltip
     },
     {
       icon: Users,
       title: "Team Collaboration",
-      description: "Real-time collaboration with team members, file sharing, and permission management."
+      description: "Real-time collaboration with team members, file sharing, and permission management.",
+      tooltip: CollaborationTooltip
     },
     {
       icon: FileText,
       title: "Document Management",
-      description: "Version control, file storage, and collaborative editing for all project documents."
+      description: "Version control, file storage, and collaborative editing for all project documents.",
+      tooltip: SecurityTooltip
     },
     {
       icon: Clock,
       title: "Time Tracking",
-      description: "Built-in time tracking with detailed reporting and analytics for better productivity."
+      description: "Built-in time tracking with detailed reporting and analytics for better productivity.",
+      tooltip: AnalyticsTooltip
     },
     {
       icon: Calendar,
       title: "Scheduling",
-      description: "Integrated calendar with task scheduling, deadlines, and automated reminders."
+      description: "Integrated calendar with task scheduling, deadlines, and automated reminders.",
+      tooltip: IntegrationsTooltip
     },
     {
       icon: BarChart3,
       title: "Analytics & Reporting",
-      description: "Advanced analytics and customizable reports to track project performance."
+      description: "Advanced analytics and customizable reports to track project performance.",
+      tooltip: MobileTooltip
     }
   ];
 
@@ -193,7 +209,7 @@ const Landing = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-24 lg:pt-40 lg:pb-32 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 overflow-hidden" data-animate>
+      <section className="relative pt-32 pb-24 lg:pt-40 lg:pb-32 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 overflow-hidden" data-animate data-tour="hero">
         {/* Animated background elements */}
         <div className="absolute inset-0 opacity-30">
           <div className="absolute top-20 left-10 w-20 h-20 bg-primary/20 rounded-full animate-pulse"></div>
@@ -274,7 +290,7 @@ const Landing = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-24 lg:py-32 bg-white" data-animate>
+      <section className="py-24 lg:py-32 bg-white" data-animate data-tour="features">
         <div className="container mx-auto px-6 lg:px-8">
           <div className="text-center mb-20 lg:mb-24 space-y-6">
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
@@ -287,36 +303,41 @@ const Landing = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10" data-stagger-parent>
-            {features.map((feature, index) => (
-              <Card key={index} className="group relative border-0 bg-white/50 backdrop-blur-sm shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-4 hover:scale-105 overflow-hidden cursor-pointer" data-stagger>
-                {/* Gradient overlay that appears on hover */}
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-blue-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                
-                {/* Glow effect */}
-                <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-primary/10 to-blue-600/10 opacity-0 group-hover:opacity-100 blur-xl transition-all duration-500 -z-10"></div>
-                
-                <CardHeader className="relative z-10 pb-4 space-y-6">
-                  <div className="relative">
-                    <div className="relative p-3 rounded-xl bg-gradient-to-br from-primary/10 to-blue-600/10 group-hover:from-primary/20 group-hover:to-blue-600/20 transition-all duration-300 w-fit">
-                      <feature.icon className="h-14 w-14 text-primary transition-all duration-300 group-hover:scale-110 group-hover:text-blue-600 group-hover:rotate-6" />
-                    </div>
-                    <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl opacity-0 group-hover:opacity-50 transition-opacity duration-500"></div>
-                  </div>
-                  <CardTitle className="text-2xl font-semibold group-hover:text-primary transition-colors duration-300 leading-tight">{feature.title}</CardTitle>
-                </CardHeader>
-                <CardContent className="relative z-10 pt-0">
-                  <CardDescription className="text-gray-600 text-lg group-hover:text-gray-700 transition-colors duration-300 leading-relaxed">
-                    {feature.description}
-                  </CardDescription>
-                </CardContent>
-                
-                {/* Animated border effect */}
-                <div className="absolute inset-0 border-2 border-transparent group-hover:border-primary/30 rounded-lg transition-all duration-500"></div>
-                
-                {/* Subtle shine effect */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-              </Card>
-            ))}
+            {features.map((feature, index) => {
+              const TooltipComponent = feature.tooltip;
+              return (
+                <TooltipComponent key={index}>
+                  <Card className="group relative border-0 bg-white/50 backdrop-blur-sm shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-4 hover:scale-105 overflow-hidden cursor-pointer" data-stagger>
+                    {/* Gradient overlay that appears on hover */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-blue-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    
+                    {/* Glow effect */}
+                    <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-primary/10 to-blue-600/10 opacity-0 group-hover:opacity-100 blur-xl transition-all duration-500 -z-10"></div>
+                    
+                    <CardHeader className="relative z-10 pb-4 space-y-6">
+                      <div className="relative">
+                        <div className="relative p-3 rounded-xl bg-gradient-to-br from-primary/10 to-blue-600/10 group-hover:from-primary/20 group-hover:to-blue-600/20 transition-all duration-300 w-fit">
+                          <feature.icon className="h-14 w-14 text-primary transition-all duration-300 group-hover:scale-110 group-hover:text-blue-600 group-hover:rotate-6" />
+                        </div>
+                        <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl opacity-0 group-hover:opacity-50 transition-opacity duration-500"></div>
+                      </div>
+                      <CardTitle className="text-2xl font-semibold group-hover:text-primary transition-colors duration-300 leading-tight">{feature.title}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="relative z-10 pt-0">
+                      <CardDescription className="text-gray-600 text-lg group-hover:text-gray-700 transition-colors duration-300 leading-relaxed">
+                        {feature.description}
+                      </CardDescription>
+                    </CardContent>
+                    
+                    {/* Animated border effect */}
+                    <div className="absolute inset-0 border-2 border-transparent group-hover:border-primary/30 rounded-lg transition-all duration-500"></div>
+                    
+                    {/* Subtle shine effect */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                  </Card>
+                </TooltipComponent>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -384,7 +405,7 @@ const Landing = () => {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-24 lg:py-32 bg-white" data-animate>
+      <section className="py-24 lg:py-32 bg-white" data-animate data-tour="testimonials">
         <div className="container mx-auto px-6 lg:px-8">
           <div className="text-center mb-20 lg:mb-24 space-y-6">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight">
@@ -420,7 +441,7 @@ const Landing = () => {
       </section>
 
       {/* Pricing Section */}
-      <section className="py-24 lg:py-32 bg-gray-50" data-animate>
+      <section className="py-24 lg:py-32 bg-gray-50" data-animate data-tour="pricing">
         <div className="container mx-auto px-6 lg:px-8">
           <div className="text-center mb-20 lg:mb-24 space-y-6">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight">
@@ -551,6 +572,10 @@ const Landing = () => {
           </div>
         </div>
       </footer>
+
+      {/* Interactive Demo Components */}
+      <TourTrigger />
+      <LiveChatWidget />
     </div>
   );
 };
