@@ -22,18 +22,7 @@ export const taskTimeService = {
     const { data: user } = await supabase.auth.getUser();
     if (!user.user) throw new Error('User not authenticated');
 
-    // Check if there's already an active timer for this user
-    const { data: activeEntry } = await supabase
-      .from('task_time_entries')
-      .select('*')
-      .eq('user_id', user.user.id)
-      .is('end_time', null)
-      .single();
-
-    if (activeEntry) {
-      throw new Error('You already have an active timer running. Please stop it first.');
-    }
-
+    // Note: Multiple timers can now run simultaneously
     const { data, error } = await supabase
       .from('task_time_entries')
       .insert({
@@ -96,10 +85,10 @@ export const taskTimeService = {
     if (error) throw error;
   },
 
-  // Get active time entry for current user
-  async getActiveTimeEntry(): Promise<TaskTimeEntry | null> {
+  // Get all active time entries for current user
+  async getActiveTimeEntries(): Promise<TaskTimeEntry[]> {
     const { data: user } = await supabase.auth.getUser();
-    if (!user.user) return null;
+    if (!user.user) return [];
 
     const { data, error } = await supabase
       .from('task_time_entries')
@@ -110,10 +99,10 @@ export const taskTimeService = {
       `)
       .eq('user_id', user.user.id)
       .is('end_time', null)
-      .maybeSingle();
+      .order('start_time', { ascending: false });
 
     if (error) throw error;
-    return data as unknown as TaskTimeEntry;
+    return (data || []) as unknown as TaskTimeEntry[];
   },
 
   // Format duration from seconds to readable string

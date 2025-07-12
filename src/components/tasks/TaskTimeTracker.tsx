@@ -68,11 +68,13 @@ export const TaskTimeTracker: React.FC<TaskTimeTrackerProps> = ({
 
   const checkActiveTimer = async () => {
     try {
-      const active = await taskTimeService.getActiveTimeEntry();
-      if (active && active.task_id === taskId) {
-        setActiveEntry(active);
+      const activeEntries = await taskTimeService.getActiveTimeEntries();
+      const activeForThisTask = activeEntries.find(entry => entry.task_id === taskId);
+      
+      if (activeForThisTask) {
+        setActiveEntry(activeForThisTask);
         const now = new Date().getTime();
-        const start = new Date(active.start_time).getTime();
+        const start = new Date(activeForThisTask.start_time).getTime();
         setCurrentTime(Math.floor((now - start) / 1000));
       } else {
         setActiveEntry(null);
