@@ -141,6 +141,7 @@ const Landing = () => {
       description: "Perfect for small teams and growing businesses",
       features: [
         "File Management & Storage",
+        "5 Projects",
         "Version Control (5 versions per file)",
         "Team Collaboration (up to 5 collaborators)",
         "90 days version history",
@@ -157,6 +158,7 @@ const Landing = () => {
       description: "Advanced features for professional teams",
       features: [
         "Advanced version control",
+        "10 Projects",
         "Real-time collaboration",
         "Up to 50 versions per file",
         "10 collaborators max",
@@ -174,6 +176,7 @@ const Landing = () => {
       description: "Enhanced features for growing teams",
       features: [
         "Advanced version control",
+        "20 Projects",
         "Real-time collaboration",
         "Up to 50 versions per file",
         "50 collaborators max",
@@ -193,6 +196,7 @@ const Landing = () => {
       description: "Complete solution for large organizations",
       features: [
         "Unlimited version control",
+        "Unlimited Projects",
         "Unlimited collaboration",
         "Unlimited versions per file",
         "Unlimited collaborators",

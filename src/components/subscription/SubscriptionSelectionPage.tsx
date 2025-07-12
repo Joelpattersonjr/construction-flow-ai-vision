@@ -14,7 +14,7 @@ export const SubscriptionSelectionPage: React.FC<SubscriptionSelectionPageProps>
 }) => {
   const basicFeatures = [
     'Basic File Management',
-    '3 Projects',
+    '5 Projects',
     '5 Team Members',
     'Basic Support',
     'Limited Storage (1GB)',
@@ -22,7 +22,7 @@ export const SubscriptionSelectionPage: React.FC<SubscriptionSelectionPageProps>
 
   const proFeatures = [
     'Advanced File Management',
-    'Unlimited Projects',
+    '10 Projects',
     '50 Team Members',
     'Real-time Collaboration',
     'Version Control (50 versions)',
@@ -33,7 +33,7 @@ export const SubscriptionSelectionPage: React.FC<SubscriptionSelectionPageProps>
 
   const professionalFeatures = [
     'Advanced File Management',
-    'Unlimited Projects',
+    '20 Projects',
     '50 Team Members',
     'Real-time Collaboration',
     'Version Control (50 versions)',
