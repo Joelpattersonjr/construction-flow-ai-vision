@@ -53,28 +53,32 @@ export function ProductTour({ isActive, onClose }: ProductTourProps) {
   const [targetElement, setTargetElement] = useState<HTMLElement | null>(null);
 
   useEffect(() => {
-    console.log('ProductTour useEffect triggered, isActive:', isActive, 'currentStep:', currentStep);
     if (!isActive) return;
 
-    // Small delay to ensure DOM is ready
-    const timeout = setTimeout(() => {
+    const updateTarget = () => {
       const target = document.querySelector(tourSteps[currentStep].target) as HTMLElement;
-      console.log('Looking for target:', tourSteps[currentStep].target, 'Found:', target);
-      console.log('All elements with data-tour:', document.querySelectorAll('[data-tour]'));
       setTargetElement(target);
 
       if (target) {
         target.scrollIntoView({ behavior: 'smooth', block: 'center' });
         target.style.position = 'relative';
         target.style.zIndex = '100';
-        console.log('Target element styled successfully');
-      } else {
-        console.warn('Tour target not found:', tourSteps[currentStep].target);
       }
-    }, 100);
+    };
+
+    // Initial setup with delay
+    const timeout = setTimeout(updateTarget, 100);
+
+    // Update position on scroll
+    const handleScroll = () => {
+      updateTarget();
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
 
     return () => {
       clearTimeout(timeout);
+      window.removeEventListener('scroll', handleScroll);
       const target = document.querySelector(tourSteps[currentStep].target) as HTMLElement;
       if (target) {
         target.style.position = '';
@@ -98,58 +102,12 @@ export function ProductTour({ isActive, onClose }: ProductTourProps) {
   };
 
   const getTooltipPosition = () => {
-    if (!targetElement) {
-      // Fallback to center of screen if no target element
-      return {
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)'
-      };
-    }
-
-    const rect = targetElement.getBoundingClientRect();
-    const step = tourSteps[currentStep];
-    
-    // Ensure the tooltip is always visible on screen
-    const viewportHeight = window.innerHeight;
-    const viewportWidth = window.innerWidth;
-    const tooltipWidth = 320; // 80 * 4 = w-80
-    const tooltipHeight = 200; // estimated height
-    
-    switch (step.position) {
-      case 'top':
-        const topPosition = rect.top - tooltipHeight - 20;
-        return {
-          top: Math.max(20, topPosition),
-          left: Math.min(Math.max(20, rect.left + rect.width / 2), viewportWidth - tooltipWidth - 20),
-          transform: 'translate(-50%, 0)'
-        };
-      case 'bottom':
-        const bottomPosition = rect.bottom + 20;
-        return {
-          top: Math.min(bottomPosition, viewportHeight - tooltipHeight - 20),
-          left: Math.min(Math.max(20, rect.left + rect.width / 2), viewportWidth - tooltipWidth - 20),
-          transform: 'translate(-50%, 0)'
-        };
-      case 'left':
-        return {
-          top: Math.min(Math.max(20, rect.top + rect.height / 2), viewportHeight - tooltipHeight - 20),
-          left: Math.max(20, rect.left - tooltipWidth - 20),
-          transform: 'translate(0, -50%)'
-        };
-      case 'right':
-        return {
-          top: Math.min(Math.max(20, rect.top + rect.height / 2), viewportHeight - tooltipHeight - 20),
-          left: Math.min(rect.right + 20, viewportWidth - tooltipWidth - 20),
-          transform: 'translate(0, -50%)'
-        };
-      default:
-        return {
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)'
-        };
-    }
+    // Always center the tour card on screen for better stability during scrolling
+    return {
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)'
+    };
   };
 
   if (!isActive) return null;
