@@ -10,7 +10,8 @@ import {
   MessageSquare,
   Paperclip,
   Eye,
-  Tag
+  Tag,
+  ArrowRight
 } from 'lucide-react';
 
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -174,6 +175,19 @@ export const TaskItem: React.FC<TaskItemProps> = ({
             </div>
           </div>
         </div>
+
+        {/* Task Dependencies */}
+        {task.dependency && (
+          <div className="mt-3 flex items-center gap-2 p-2 bg-muted/50 rounded-md">
+            <ArrowRight className="h-3 w-3 text-muted-foreground" />
+            <span className="text-xs text-muted-foreground">
+              Depends on: <span className="font-medium text-foreground">{task.dependency.title}</span>
+            </span>
+            <Badge variant="outline" className="text-xs">
+              {task.dependency.status}
+            </Badge>
+          </div>
+        )}
 
         {/* Task Labels */}
         {labels.length > 0 && (
