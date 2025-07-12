@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -20,6 +20,34 @@ import {
 
 const Landing = () => {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Add smooth scrolling behavior
+    document.documentElement.style.scrollBehavior = 'smooth';
+    
+    // Intersection Observer for scroll animations
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate-fade-in-up');
+        }
+      });
+    }, observerOptions);
+
+    // Observe all sections
+    const sections = document.querySelectorAll('section[data-animate]');
+    sections.forEach(section => observer.observe(section));
+
+    return () => {
+      observer.disconnect();
+      document.documentElement.style.scrollBehavior = 'auto';
+    };
+  }, []);
 
   const features = [
     {
@@ -136,17 +164,17 @@ const Landing = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+      <header className="fixed top-0 left-0 right-0 z-50 border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
+        <div className="container mx-auto px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <Building2 className="h-8 w-8 text-primary" />
-            <span className="text-xl font-bold">ConexusPM</span>
+            <span className="text-xl font-bold tracking-tight">ConexusPM</span>
           </div>
           <div className="flex items-center space-x-4">
-            <Button variant="ghost" onClick={() => navigate('/auth')}>
+            <Button variant="ghost" onClick={() => navigate('/auth')} className="font-medium">
               Sign In
             </Button>
-            <Button onClick={() => navigate('/signup')}>
+            <Button onClick={() => navigate('/signup')} className="font-medium">
               Get Started
             </Button>
           </div>
@@ -154,7 +182,7 @@ const Landing = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="relative py-20 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 overflow-hidden">
+      <section className="relative pt-32 pb-24 lg:pt-40 lg:pb-32 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 overflow-hidden" data-animate>
         {/* Animated background elements */}
         <div className="absolute inset-0 opacity-30">
           <div className="absolute top-20 left-10 w-20 h-20 bg-primary/20 rounded-full animate-pulse"></div>
@@ -162,38 +190,42 @@ const Landing = () => {
           <div className="absolute bottom-20 left-1/4 w-16 h-16 bg-purple-300/20 rounded-full animate-pulse" style={{animationDelay: '1s'}}></div>
         </div>
         
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div className="container mx-auto px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-20 items-center">
             {/* Left side - Content */}
-            <div className="text-center lg:text-left">
-              <Badge variant="secondary" className="mb-6 animate-fade-in bg-white/80 backdrop-blur-sm">
+            <div className="text-center lg:text-left space-y-8">
+              <Badge variant="secondary" className="animate-fade-in bg-white/80 backdrop-blur-sm font-medium">
                 🚀 Trusted by 1000+ Construction Teams
               </Badge>
               
-              <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 animate-fade-in">
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight animate-fade-in">
                 Streamline Your
-                <span className="text-primary block bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
+                <span className="block bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent mt-2">
                   Construction Projects
                 </span>
               </h1>
               
-              <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto lg:mx-0 animate-fade-in">
+              <p className="text-xl lg:text-2xl text-gray-600 leading-relaxed max-w-2xl mx-auto lg:mx-0 animate-fade-in">
                 ConexusPM is the all-in-one project management platform designed specifically for construction teams. 
                 Manage projects, collaborate in real-time, and track progress like never before.
               </p>
               
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center animate-fade-in">
-                <Button size="lg" onClick={() => navigate('/signup')} className="text-lg px-8 py-3 bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
+              <div className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start items-center animate-fade-in">
+                <Button size="lg" onClick={() => navigate('/signup')} className="text-lg px-10 py-4 bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl font-semibold">
                   Start Free Trial
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
-                <Button size="lg" variant="outline" onClick={() => navigate('/auth')} className="text-lg px-8 py-3 border-2 hover:bg-primary hover:text-white transition-all duration-300 transform hover:scale-105">
+                <Button size="lg" variant="outline" onClick={() => navigate('/auth')} className="text-lg px-10 py-4 border-2 hover:bg-primary hover:text-white transition-all duration-300 transform hover:scale-105 font-semibold">
                   Watch Demo
                 </Button>
               </div>
               
-              <div className="mt-8 text-sm text-gray-500 animate-fade-in">
-                No credit card required • 30-day free trial • Cancel anytime
+              <div className="text-sm text-gray-500 animate-fade-in space-x-4 font-medium">
+                <span>No credit card required</span>
+                <span>•</span>
+                <span>30-day free trial</span>
+                <span>•</span>
+                <span>Cancel anytime</span>
               </div>
             </div>
             
@@ -218,32 +250,33 @@ const Landing = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Everything You Need to Manage Construction Projects
+      <section className="py-24 lg:py-32 bg-white" data-animate>
+        <div className="container mx-auto px-6 lg:px-8">
+          <div className="text-center mb-20 lg:mb-24 space-y-6">
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
+              Everything You Need to Manage
+              <span className="block text-primary">Construction Projects</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl lg:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
               From project planning to completion, ConexusPM provides all the tools your construction team needs to succeed.
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
             {features.map((feature, index) => (
               <Card key={index} className="group relative border-0 bg-white/50 backdrop-blur-sm shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 overflow-hidden">
                 {/* Gradient overlay that appears on hover */}
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-blue-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 
-                <CardHeader className="relative z-10">
+                <CardHeader className="relative z-10 pb-4 space-y-6">
                   <div className="relative">
-                    <feature.icon className="h-12 w-12 text-primary mb-4 transition-all duration-300 group-hover:scale-110 group-hover:text-blue-600" />
+                    <feature.icon className="h-14 w-14 text-primary transition-all duration-300 group-hover:scale-110 group-hover:text-blue-600" />
                     <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl opacity-0 group-hover:opacity-30 transition-opacity duration-500"></div>
                   </div>
-                  <CardTitle className="text-xl group-hover:text-primary transition-colors duration-300">{feature.title}</CardTitle>
+                  <CardTitle className="text-2xl font-semibold group-hover:text-primary transition-colors duration-300 leading-tight">{feature.title}</CardTitle>
                 </CardHeader>
-                <CardContent className="relative z-10">
-                  <CardDescription className="text-gray-600 text-base group-hover:text-gray-700 transition-colors duration-300">
+                <CardContent className="relative z-10 pt-0">
+                  <CardDescription className="text-gray-600 text-lg group-hover:text-gray-700 transition-colors duration-300 leading-relaxed">
                     {feature.description}
                   </CardDescription>
                 </CardContent>
@@ -257,54 +290,54 @@ const Landing = () => {
       </section>
 
       {/* Benefits Section */}
-      <section className="py-20 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+      <section className="py-24 lg:py-32 bg-gray-50" data-animate>
+        <div className="container mx-auto px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-20 items-center">
+            <div className="space-y-8">
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight">
                 Why Construction Teams Choose ConexusPM
               </h2>
               
-              <div className="space-y-6">
-                <div className="flex items-start space-x-4">
-                  <CheckCircle className="h-6 w-6 text-green-500 mt-1 flex-shrink-0" />
-                  <div>
-                    <h3 className="font-semibold text-lg">Built for Construction</h3>
-                    <p className="text-gray-600">Designed specifically for construction workflows, not generic project management.</p>
+              <div className="space-y-8">
+                <div className="flex items-start space-x-6">
+                  <CheckCircle className="h-7 w-7 text-green-500 mt-1 flex-shrink-0" />
+                  <div className="space-y-2">
+                    <h3 className="font-semibold text-xl">Built for Construction</h3>
+                    <p className="text-gray-600 text-lg leading-relaxed">Designed specifically for construction workflows, not generic project management.</p>
                   </div>
                 </div>
                 
-                <div className="flex items-start space-x-4">
-                  <CheckCircle className="h-6 w-6 text-green-500 mt-1 flex-shrink-0" />
-                  <div>
-                    <h3 className="font-semibold text-lg">Real-Time Collaboration</h3>
-                    <p className="text-gray-600">Keep your entire team in sync with live updates and instant notifications.</p>
+                <div className="flex items-start space-x-6">
+                  <CheckCircle className="h-7 w-7 text-green-500 mt-1 flex-shrink-0" />
+                  <div className="space-y-2">
+                    <h3 className="font-semibold text-xl">Real-Time Collaboration</h3>
+                    <p className="text-gray-600 text-lg leading-relaxed">Keep your entire team in sync with live updates and instant notifications.</p>
                   </div>
                 </div>
                 
-                <div className="flex items-start space-x-4">
-                  <CheckCircle className="h-6 w-6 text-green-500 mt-1 flex-shrink-0" />
-                  <div>
-                    <h3 className="font-semibold text-lg">Enterprise Security</h3>
-                    <p className="text-gray-600">Bank-level security with role-based permissions and audit trails.</p>
+                <div className="flex items-start space-x-6">
+                  <CheckCircle className="h-7 w-7 text-green-500 mt-1 flex-shrink-0" />
+                  <div className="space-y-2">
+                    <h3 className="font-semibold text-xl">Enterprise Security</h3>
+                    <p className="text-gray-600 text-lg leading-relaxed">Bank-level security with role-based permissions and audit trails.</p>
                   </div>
                 </div>
                 
-                <div className="flex items-start space-x-4">
-                  <CheckCircle className="h-6 w-6 text-green-500 mt-1 flex-shrink-0" />
-                  <div>
-                    <h3 className="font-semibold text-lg">Scalable Solution</h3>
-                    <p className="text-gray-600">Grows with your business from small teams to enterprise organizations.</p>
+                <div className="flex items-start space-x-6">
+                  <CheckCircle className="h-7 w-7 text-green-500 mt-1 flex-shrink-0" />
+                  <div className="space-y-2">
+                    <h3 className="font-semibold text-xl">Scalable Solution</h3>
+                    <p className="text-gray-600 text-lg leading-relaxed">Grows with your business from small teams to enterprise organizations.</p>
                   </div>
                 </div>
               </div>
             </div>
             
-            <div className="bg-gradient-to-br from-primary/10 to-blue-100 p-8 rounded-lg">
-              <div className="text-center">
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">Ready to Get Started?</h3>
-                <p className="text-gray-600 mb-6">Join thousands of construction professionals who trust ConexusPM.</p>
-                <Button size="lg" onClick={() => navigate('/signup')} className="w-full">
+            <div className="bg-gradient-to-br from-primary/10 to-blue-100 p-10 lg:p-12 rounded-2xl">
+              <div className="text-center space-y-6">
+                <h3 className="text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Ready to Get Started?</h3>
+                <p className="text-gray-600 text-lg lg:text-xl leading-relaxed">Join thousands of construction professionals who trust ConexusPM.</p>
+                <Button size="lg" onClick={() => navigate('/signup')} className="w-full text-lg py-4 font-semibold">
                   Start Your Free Trial
                 </Button>
               </div>
@@ -314,31 +347,31 @@ const Landing = () => {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-20 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+      <section className="py-24 lg:py-32 bg-white" data-animate>
+        <div className="container mx-auto px-6 lg:px-8">
+          <div className="text-center mb-20 lg:mb-24 space-y-6">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight">
               What Our Customers Say
             </h2>
-            <p className="text-xl text-gray-600">
+            <p className="text-xl lg:text-2xl text-gray-600 leading-relaxed">
               Don't just take our word for it - hear from construction professionals who use ConexusPM daily.
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-10">
             {testimonials.map((testimonial, index) => (
-              <Card key={index} className="border-0 shadow-lg">
-                <CardContent className="pt-6">
-                  <div className="flex mb-4">
+              <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
+                <CardContent className="pt-8 space-y-6">
+                  <div className="flex">
                     {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
+                      <Star key={i} className="h-6 w-6 text-yellow-400 fill-current" />
                     ))}
                   </div>
-                  <p className="text-gray-600 mb-6 italic">"{testimonial.content}"</p>
-                  <div>
-                    <p className="font-semibold text-gray-900">{testimonial.name}</p>
-                    <p className="text-sm text-gray-500">{testimonial.role}</p>
-                    <p className="text-sm text-gray-500">{testimonial.company}</p>
+                  <p className="text-gray-600 text-lg leading-relaxed italic">"{testimonial.content}"</p>
+                  <div className="space-y-1">
+                    <p className="font-semibold text-lg text-gray-900">{testimonial.name}</p>
+                    <p className="text-gray-500 font-medium">{testimonial.role}</p>
+                    <p className="text-gray-500">{testimonial.company}</p>
                   </div>
                 </CardContent>
               </Card>
@@ -348,13 +381,13 @@ const Landing = () => {
       </section>
 
       {/* Pricing Section */}
-      <section className="py-20 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+      <section className="py-24 lg:py-32 bg-gray-50" data-animate>
+        <div className="container mx-auto px-6 lg:px-8">
+          <div className="text-center mb-20 lg:mb-24 space-y-6">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight">
               Simple, Transparent Pricing
             </h2>
-            <p className="text-xl text-gray-600">
+            <p className="text-xl lg:text-2xl text-gray-600 leading-relaxed">
               Choose the plan that fits your team size and project needs.
             </p>
           </div>
@@ -402,9 +435,9 @@ const Landing = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-primary text-white">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+      <section className="py-24 lg:py-32 bg-primary text-white" data-animate>
+        <div className="container mx-auto px-6 lg:px-8 text-center space-y-8">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
             Ready to Transform Your Construction Projects?
           </h2>
           <p className="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
