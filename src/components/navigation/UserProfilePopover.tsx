@@ -8,7 +8,27 @@ import { useAuth } from '@/contexts/AuthContext';
 const UserProfilePopover: React.FC = () => {
   const { user, profile, signOut } = useAuth();
   const navigate = useNavigate();
-
+  
+  // Show login/signup options for unauthenticated users
+  if (!user) {
+    return (
+      <div className="flex items-center space-x-2">
+        <Button 
+          variant="ghost" 
+          size="sm"
+          onClick={() => navigate('/auth')}
+        >
+          Sign In
+        </Button>
+        <Button 
+          size="sm"
+          onClick={() => navigate('/signup')}
+        >
+          Sign Up
+        </Button>
+      </div>
+    );
+  }
   return (
     <Popover>
       <PopoverTrigger asChild>

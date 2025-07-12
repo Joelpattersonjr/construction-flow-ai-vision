@@ -95,15 +95,23 @@ const Auth = () => {
               {loading ? 'Signing In...' : 'Sign In'}
             </Button>
           </form>
+          <div className="mt-6 text-center">
+            <Button 
+              variant="ghost" 
+              onClick={() => navigate('/signup')}
+              className="text-sm"
+            >
+              Don't have an account? Sign up
+            </Button>
+          </div>
           
-          <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+          <div className="mt-4 p-4 bg-blue-50 rounded-lg">
             <div className="flex items-start space-x-3">
               <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
               <div className="text-sm">
-                <p className="font-medium text-blue-800 mb-1">Invitation Required</p>
+                <p className="font-medium text-blue-800 mb-1">Team Members</p>
                 <p className="text-blue-700">
-                  New users need an invitation from a company admin to join. 
-                  If you received an invitation email, please use the link provided.
+                  If you're joining an existing company, your admin will send you an invitation email with a direct link.
                 </p>
               </div>
             </div>

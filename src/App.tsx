@@ -8,6 +8,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import Signup from "./pages/Signup";
 import AdminDashboard from "./pages/AdminDashboard";
 import InviteAcceptance from "./pages/InviteAcceptance";
 import FileManagement from "./pages/FileManagement";
@@ -33,6 +34,7 @@ const App = () => {
           <BrowserRouter>
             <Routes>
               <Route path="/auth" element={<Auth />} />
+              <Route path="/signup" element={<Signup />} />
               <Route 
                 path="/" 
                 element={
