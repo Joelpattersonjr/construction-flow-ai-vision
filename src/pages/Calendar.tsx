@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { TaskCalendar } from '@/components/calendar/TaskCalendar';
 import { taskService } from '@/services/taskService';
 import { useToast } from '@/hooks/use-toast';
-import { Link } from 'react-router-dom';
+import AppHeader from '@/components/navigation/AppHeader';
 
 export default function CalendarView() {
   const [tasks, setTasks] = useState<any[]>([]);
@@ -149,22 +149,18 @@ export default function CalendarView() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto py-8 px-4">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
-            <Link to="/">
-              <Button variant="outline" size="sm">
-                ← Back
-              </Button>
-            </Link>
-            <div>
-              <h1 className="text-3xl font-bold flex items-center gap-2">
-                <Calendar className="w-8 h-8" />
-                Task Calendar
-              </h1>
-              <p className="text-muted-foreground">View and manage tasks by their due dates</p>
-            </div>
+      <AppHeader />
+      
+      <main className="container mx-auto py-6 px-4">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-3xl font-bold flex items-center gap-2">
+              <Calendar className="w-8 h-8" />
+              Task Calendar
+            </h1>
+            <p className="text-muted-foreground">
+              View and manage tasks by their due dates
+            </p>
           </div>
           
           <div className="flex items-center gap-3">
@@ -385,7 +381,7 @@ export default function CalendarView() {
             )}
           </CardContent>
         </Card>
-      </div>
+      </main>
 
       {/* Simple Task Creation Dialog */}
       <Dialog open={showTaskForm} onOpenChange={setShowTaskForm}>
