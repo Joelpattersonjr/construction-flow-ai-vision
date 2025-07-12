@@ -55,16 +55,24 @@ export function ProductTour({ isActive, onClose }: ProductTourProps) {
   useEffect(() => {
     if (!isActive) return;
 
-    const target = document.querySelector(tourSteps[currentStep].target) as HTMLElement;
-    setTargetElement(target);
+    // Small delay to ensure DOM is ready
+    const timeout = setTimeout(() => {
+      const target = document.querySelector(tourSteps[currentStep].target) as HTMLElement;
+      console.log('Looking for target:', tourSteps[currentStep].target, 'Found:', target);
+      setTargetElement(target);
 
-    if (target) {
-      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      target.style.position = 'relative';
-      target.style.zIndex = '1001';
-    }
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        target.style.position = 'relative';
+        target.style.zIndex = '1001';
+      } else {
+        console.warn('Tour target not found:', tourSteps[currentStep].target);
+      }
+    }, 100);
 
     return () => {
+      clearTimeout(timeout);
+      const target = document.querySelector(tourSteps[currentStep].target) as HTMLElement;
       if (target) {
         target.style.position = '';
         target.style.zIndex = '';
@@ -87,7 +95,14 @@ export function ProductTour({ isActive, onClose }: ProductTourProps) {
   };
 
   const getTooltipPosition = () => {
-    if (!targetElement) return {};
+    if (!targetElement) {
+      // Fallback to center of screen if no target element
+      return {
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)'
+      };
+    }
 
     const rect = targetElement.getBoundingClientRect();
     const step = tourSteps[currentStep];
@@ -118,7 +133,11 @@ export function ProductTour({ isActive, onClose }: ProductTourProps) {
           transform: 'translate(0, -50%)'
         };
       default:
-        return {};
+        return {
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)'
+        };
     }
   };
 
