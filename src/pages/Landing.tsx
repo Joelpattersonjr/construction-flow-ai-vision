@@ -150,7 +150,7 @@ const Landing = () => {
         "Standard Support"
       ],
       popular: false,
-      cta: "Start Basic Plan"
+      cta: "Get Started"
     },
     {
       name: "Premium",
@@ -168,7 +168,7 @@ const Landing = () => {
         "Priority support"
       ],
       popular: true,
-      cta: "Start Premium Plan"
+      cta: "Choose Premium"
     },
     {
       name: "Professional",
@@ -188,7 +188,7 @@ const Landing = () => {
         "Team performance insights"
       ],
       popular: false,
-      cta: "Start Professional Plan"
+      cta: "Choose Professional"
     },
     {
       name: "Enterprise",
@@ -208,7 +208,7 @@ const Landing = () => {
         "Dedicated support"
       ],
       popular: false,
-      cta: "Start Enterprise Plan"
+      cta: "Choose Enterprise"
     }
   ];
 
