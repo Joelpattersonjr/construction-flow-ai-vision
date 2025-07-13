@@ -527,11 +527,11 @@ const Projects: React.FC = () => {
                   
                   <div className="space-y-3 pt-2">
                     <Button 
+                      variant="default"
                       onClick={() => navigate(`/projects/${project.id}`)}
-                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-2.5 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 relative overflow-hidden group"
+                      className="w-full"
                     >
-                      <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-                      <span className="relative">View Details</span>
+                      View Details
                     </Button>
                     
                     <div className="grid grid-cols-2 gap-3">
@@ -539,7 +539,7 @@ const Projects: React.FC = () => {
                         variant="outline" 
                         size="sm"
                         onClick={() => navigate(`/files?project=${project.id}`)}
-                        className="flex items-center justify-center space-x-2 border-blue-200 text-blue-700 hover:bg-blue-50 hover:border-blue-300 transition-all duration-300"
+                        className="flex items-center justify-center space-x-2"
                       >
                         <FileText className="h-4 w-4" />
                         <span>Files</span>
@@ -548,7 +548,7 @@ const Projects: React.FC = () => {
                         variant="outline" 
                         size="sm"
                         onClick={() => navigate(`/projects/${project.id}/permissions`)}
-                        className="flex items-center justify-center space-x-2 border-purple-200 text-purple-700 hover:bg-purple-50 hover:border-purple-300 transition-all duration-300"
+                        className="flex items-center justify-center space-x-2"
                       >
                         <Settings className="h-4 w-4" />
                         <span>Settings</span>
