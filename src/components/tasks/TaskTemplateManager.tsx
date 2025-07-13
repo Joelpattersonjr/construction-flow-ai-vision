@@ -117,9 +117,12 @@ export const TaskTemplateManager: React.FC<TaskTemplateManagerProps> = ({ onUseT
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
-          <FileText className="h-4 w-4 mr-2" />
-          Templates
+        <Button className="group text-lg px-10 py-4 bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl font-semibold relative overflow-hidden" size="sm">
+          <span className="relative z-10 flex items-center">
+            <FileText className="h-4 w-4 mr-2" />
+            Templates
+          </span>
+          <div className="absolute inset-0 bg-gradient-to-r from-primary to-blue-600 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-500"></div>
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
@@ -128,9 +131,12 @@ export const TaskTemplateManager: React.FC<TaskTemplateManagerProps> = ({ onUseT
             <DialogTitle>Task Templates</DialogTitle>
             <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
               <DialogTrigger asChild>
-                <Button size="sm">
-                  <Plus className="h-4 w-4 mr-2" />
-                  New Template
+                <Button className="group text-lg px-10 py-4 bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl font-semibold relative overflow-hidden" size="sm">
+                  <span className="relative z-10 flex items-center">
+                    <Plus className="h-4 w-4 mr-2" />
+                    New Template
+                  </span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-primary to-blue-600 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-500"></div>
                 </Button>
               </DialogTrigger>
               <DialogContent>
@@ -208,8 +214,9 @@ export const TaskTemplateManager: React.FC<TaskTemplateManagerProps> = ({ onUseT
                     <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
                       Cancel
                     </Button>
-                    <Button onClick={handleCreateTemplate} disabled={createTemplateMutation.isPending}>
-                      Create Template
+                    <Button onClick={handleCreateTemplate} disabled={createTemplateMutation.isPending} className="group text-lg px-10 py-4 bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl font-semibold relative overflow-hidden">
+                      <span className="relative z-10">Create Template</span>
+                      <div className="absolute inset-0 bg-gradient-to-r from-primary to-blue-600 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-500"></div>
                     </Button>
                   </div>
                 </div>
@@ -237,9 +244,10 @@ export const TaskTemplateManager: React.FC<TaskTemplateManagerProps> = ({ onUseT
                       <Button 
                         size="sm" 
                         onClick={() => onUseTemplate(template)}
-                        className="h-8"
+                        className="h-8 group bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl font-semibold relative overflow-hidden"
                       >
-                        Use Template
+                        <span className="relative z-10">Use Template</span>
+                        <div className="absolute inset-0 bg-gradient-to-r from-primary to-blue-600 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-500"></div>
                       </Button>
                       <Button
                         size="sm"
