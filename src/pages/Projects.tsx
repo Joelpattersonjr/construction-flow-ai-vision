@@ -527,11 +527,11 @@ const Projects: React.FC = () => {
                   
                   <div className="space-y-3 pt-2">
                     <Button 
-                      variant="default"
                       onClick={() => navigate(`/projects/${project.id}`)}
-                      className="w-full"
+                      className="w-full group text-lg px-10 py-4 bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl font-semibold relative overflow-hidden"
                     >
-                      View Details
+                      <span className="relative z-10">View Details</span>
+                      <div className="absolute inset-0 bg-gradient-to-r from-primary to-blue-600 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-500"></div>
                     </Button>
                     
                     <div className="grid grid-cols-2 gap-3">
