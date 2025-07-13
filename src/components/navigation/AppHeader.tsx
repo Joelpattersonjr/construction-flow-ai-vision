@@ -13,7 +13,7 @@ const AppHeader: React.FC = () => {
   const isActive = (path: string) => location.pathname === path;
 
   const handleBack = () => {
-    window.history.back();
+    navigate(-1);
   };
 
   const handleLogoClick = () => {
