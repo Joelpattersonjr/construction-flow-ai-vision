@@ -23,6 +23,10 @@ import Calendar from "./pages/Calendar";
 import Profile from "./pages/Profile";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentCancel from "./pages/PaymentCancel";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
+import Help from "./pages/Help";
+import Documentation from "./pages/Documentation";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -115,6 +119,10 @@ const App = () => {
               />
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/terms" element={<Terms />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/help" element={<Help />} />
+              <Route path="/documentation" element={<Documentation />} />
               <Route path="/success" element={<PaymentSuccess />} />
               <Route path="/cancel" element={<PaymentCancel />} />
               <Route path="/test" element={<div>TEST ROUTE WORKS</div>} />
