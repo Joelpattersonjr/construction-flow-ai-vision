@@ -472,7 +472,7 @@ const Landing = () => {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 max-w-7xl mx-auto pt-6">
             {pricingPlans.map((plan, index) => (
               <Card key={index} className={`group relative transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 cursor-pointer overflow-hidden ${plan.popular ? 'border-primary shadow-lg' : 'border-gray-200 hover:shadow-xl'}`}>
                 {plan.popular && (
