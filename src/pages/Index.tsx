@@ -82,11 +82,11 @@ const Index = () => {
                 Create and track your construction projects with timeline management.
               </p>
               <Button 
-                className="mt-4" 
-                variant="outline"
+                className="mt-4 w-full group relative overflow-hidden bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary text-white transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl font-semibold" 
                 onClick={() => navigate('/projects')}
               >
-                View Projects
+                <span className="relative z-10">View Projects</span>
+                <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500 skew-x-12"></div>
               </Button>
             </CardContent>
           </Card>
@@ -101,11 +101,11 @@ const Index = () => {
                 Manage tasks across all your projects with Kanban board visualization.
               </p>
               <Button 
-                className="mt-4" 
-                variant="outline"
+                className="mt-4 w-full group relative overflow-hidden bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary text-white transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl font-semibold" 
                 onClick={() => navigate('/tasks')}
               >
-                View Tasks
+                <span className="relative z-10">View Tasks</span>
+                <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500 skew-x-12"></div>
               </Button>
             </CardContent>
           </Card>
@@ -120,11 +120,11 @@ const Index = () => {
                 View tasks by due dates with drag-and-drop calendar interface.
               </p>
               <Button 
-                className="mt-4" 
-                variant="outline"
+                className="mt-4 w-full group relative overflow-hidden bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary text-white transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl font-semibold" 
                 onClick={() => navigate('/calendar')}
               >
-                View Calendar
+                <span className="relative z-10">View Calendar</span>
+                <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500 skew-x-12"></div>
               </Button>
             </CardContent>
           </Card>
@@ -139,11 +139,11 @@ const Index = () => {
                 Upload and analyze construction documents with AI insights.
               </p>
               <Button 
-                className="mt-4" 
-                variant="outline"
+                className="mt-4 w-full group relative overflow-hidden bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary text-white transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl font-semibold" 
                 onClick={() => navigate('/files')}
               >
-                Manage Files
+                <span className="relative z-10">Manage Files</span>
+                <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500 skew-x-12"></div>
               </Button>
             </CardContent>
           </Card>
