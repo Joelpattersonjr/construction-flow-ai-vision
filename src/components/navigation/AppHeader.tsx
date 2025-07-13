@@ -14,8 +14,16 @@ const AppHeader: React.FC = () => {
 
   const handleBack = () => {
     console.log('Back button clicked, current location:', location.pathname);
-    console.log('Attempting to navigate back...');
-    navigate(-1);
+    console.log('Window history length:', window.history.length);
+    
+    // If there's no history to go back to, navigate to dashboard
+    if (window.history.length <= 1) {
+      console.log('No history, navigating to dashboard');
+      navigate('/dashboard');
+    } else {
+      console.log('Attempting to navigate back...');
+      navigate(-1);
+    }
   };
 
   const handleLogoClick = () => {
@@ -52,7 +60,8 @@ const AppHeader: React.FC = () => {
                   variant="ghost"
                   size="sm"
                   onClick={handleBack}
-                  className="flex items-center space-x-2"
+                  className="flex items-center space-x-2 z-50 relative"
+                  style={{ pointerEvents: 'auto', zIndex: 9999 }}
                 >
                   <ArrowLeft className="h-4 w-4" />
                   <span className="hidden sm:inline">Back</span>
