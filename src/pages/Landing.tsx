@@ -507,7 +507,7 @@ const Landing = () => {
                   
                   <Button 
                     className="w-full group relative overflow-hidden" 
-                    variant={plan.popular ? "default" : "outline"}
+                    variant="outline"
                     onClick={() => navigate('/signup')}
                   >
                     <span className="relative z-10">{plan.cta}</span>
