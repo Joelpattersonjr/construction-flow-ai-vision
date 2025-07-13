@@ -144,9 +144,12 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {children || (
-          <Button variant="outline">
-            <Download className="w-4 h-4 mr-2" />
-            Export
+          <Button className="group text-lg px-10 py-4 bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl font-semibold relative overflow-hidden">
+            <span className="relative z-10 flex items-center">
+              <Download className="w-4 h-4 mr-2" />
+              Export
+            </span>
+            <div className="absolute inset-0 bg-gradient-to-r from-primary to-blue-600 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-500"></div>
           </Button>
         )}
       </DialogTrigger>
@@ -302,19 +305,22 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
           <Button 
             onClick={handleExport} 
             disabled={isExporting}
-            className="w-full"
+            className="w-full group text-lg px-10 py-4 bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl font-semibold relative overflow-hidden"
           >
-            {isExporting ? (
-              <>
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                Exporting...
-              </>
-            ) : (
-              <>
-                <Download className="w-4 h-4 mr-2" />
-                Export {format.toUpperCase()}
-              </>
-            )}
+            <span className="relative z-10 flex items-center justify-center">
+              {isExporting ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Exporting...
+                </>
+              ) : (
+                <>
+                  <Download className="w-4 h-4 mr-2" />
+                  Export {format.toUpperCase()}
+                </>
+              )}
+            </span>
+            <div className="absolute inset-0 bg-gradient-to-r from-primary to-blue-600 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-500"></div>
           </Button>
         </div>
       </DialogContent>
