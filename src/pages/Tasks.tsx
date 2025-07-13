@@ -744,18 +744,18 @@ const Tasks = () => {
 
         {/* Task Views */}
         <Tabs defaultValue="list" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 lg:w-[600px]">
-            <TabsTrigger value="list" className="flex items-center gap-2">
+          <TabsList className="grid w-full grid-cols-3 lg:w-[400px] bg-white/70 backdrop-blur-xl border border-white/20">
+            <TabsTrigger value="list" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-blue-600 data-[state=active]:text-white">
               <ListIcon className="h-4 w-4" />
               List View
             </TabsTrigger>
-            <TabsTrigger value="kanban" className="flex items-center gap-2">
+            <TabsTrigger value="kanban" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-blue-600 data-[state=active]:text-white">
               <Grid3X3Icon className="h-4 w-4" />
-              Kanban Board
+              Kanban
             </TabsTrigger>
-            <TabsTrigger value="analytics" className="flex items-center gap-2">
+            <TabsTrigger value="analytics" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-blue-600 data-[state=active]:text-white">
               <BarChart3 className="h-4 w-4" />
-              Time Analytics
+              Analytics
             </TabsTrigger>
           </TabsList>
 
