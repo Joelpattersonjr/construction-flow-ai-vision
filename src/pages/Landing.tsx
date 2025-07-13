@@ -557,26 +557,26 @@ const Landing = () => {
               <ul className="space-y-2 text-gray-400">
                 <li><a href="#features" className="hover:text-white">Features</a></li>
                 <li><a href="#pricing" className="hover:text-white">Pricing</a></li>
-                <li><button onClick={() => navigate('/dashboard')} className="hover:text-white text-left">Dashboard</button></li>
-                <li><button onClick={() => navigate('/projects')} className="hover:text-white text-left">Projects</button></li>
+                <li><a href="#testimonials" className="hover:text-white">Testimonials</a></li>
+                <li><button onClick={() => navigate('/signup')} className="hover:text-white text-left">Start Free Trial</button></li>
               </ul>
             </div>
             
             <div>
               <h3 className="font-semibold mb-4">Company</h3>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#testimonials" className="hover:text-white">Testimonials</a></li>
+                <li><a href="#" className="hover:text-white">About Us</a></li>
+                <li><a href="#" className="hover:text-white">Contact</a></li>
                 <li><button onClick={() => navigate('/auth')} className="hover:text-white text-left">Sign In</button></li>
                 <li><button onClick={() => navigate('/signup')} className="hover:text-white text-left">Sign Up</button></li>
-                <li><button onClick={() => navigate('/profile')} className="hover:text-white text-left">Profile</button></li>
               </ul>
             </div>
             
             <div>
               <h3 className="font-semibold mb-4">Support</h3>
               <ul className="space-y-2 text-gray-400">
-                <li><button onClick={() => navigate('/files')} className="hover:text-white text-left">File Management</button></li>
-                <li><button onClick={() => navigate('/tasks')} className="hover:text-white text-left">Task Management</button></li>
+                <li><a href="#" className="hover:text-white">Help Center</a></li>
+                <li><a href="#" className="hover:text-white">Documentation</a></li>
                 <li><button onClick={() => navigate('/privacy')} className="hover:text-white text-left">Privacy Policy</button></li>
                 <li><button onClick={() => navigate('/terms')} className="hover:text-white text-left">Terms of Service</button></li>
               </ul>
