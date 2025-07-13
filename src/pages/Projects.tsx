@@ -246,48 +246,49 @@ const Projects: React.FC = () => {
       <main className="container mx-auto py-8 px-4 relative z-10">
         {/* Hero Section */}
         <div className="text-center mb-12 space-y-6 animate-fade-in">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-2xl backdrop-blur-sm border border-white/20 mb-4 group-hover:scale-110 transition-transform duration-300">
-            <Folder className="h-10 w-10 text-blue-600 group-hover:rotate-6 transition-transform duration-300" />
-          </div>
-          
-          <div className="space-y-4">
-            <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-slate-800 via-blue-700 to-indigo-700 bg-clip-text text-transparent">
-              Projects
-            </h1>
-            <p className="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
-              {profile?.company_role === 'company_admin' 
-                ? 'Manage your construction projects and track progress with powerful tools'
-                : 'View and access your assigned projects with team collaboration'
-              }
-            </p>
-          </div>
-          
-          <div className="flex justify-center gap-4 pt-4">
-            <ExportDialog 
-              projects={projects.map(project => ({
-                id: project.id,
-                name: project.name,
-                project_number: project.project_number,
-                address: project.address,
-                status: project.status,
-                start_date: project.start_date,
-                end_date: project.end_date,
-                owner_name: project.owner_name,
-                owner_company: project.owner_company,
-                created_at: project.created_at,
-              }))}
-              title="Export Projects"
-            />
+          <div className="relative bg-white/20 backdrop-blur-sm rounded-2xl p-8 shadow-2xl border border-white/30">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-2xl backdrop-blur-sm border border-white/20 mb-4 group-hover:scale-110 transition-transform duration-300">
+              <Folder className="h-10 w-10 text-blue-600 group-hover:rotate-6 transition-transform duration-300" />
+            </div>
             
-            {profile?.company_role === 'company_admin' && (
-              <Dialog open={open} onOpenChange={setOpen}>
-                <DialogTrigger asChild>
-                  <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 relative overflow-hidden group">
-                    <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-                    <Plus className="h-5 w-5 mr-2 group-hover:rotate-90 transition-transform duration-300" />
-                    Create Project
-                  </Button>
-                </DialogTrigger>
+            <div className="space-y-4">
+              <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-slate-800 via-blue-700 to-indigo-700 bg-clip-text text-transparent">
+                Projects
+              </h1>
+              <p className="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
+                {profile?.company_role === 'company_admin' 
+                  ? 'Manage your construction projects and track progress with powerful tools'
+                  : 'View and access your assigned projects with team collaboration'
+                }
+              </p>
+            </div>
+            
+            <div className="flex justify-center gap-4 pt-4">
+              <ExportDialog 
+                projects={projects.map(project => ({
+                  id: project.id,
+                  name: project.name,
+                  project_number: project.project_number,
+                  address: project.address,
+                  status: project.status,
+                  start_date: project.start_date,
+                  end_date: project.end_date,
+                  owner_name: project.owner_name,
+                  owner_company: project.owner_company,
+                  created_at: project.created_at,
+                }))}
+                title="Export Projects"
+              />
+              
+              {profile?.company_role === 'company_admin' && (
+                <Dialog open={open} onOpenChange={setOpen}>
+                  <DialogTrigger asChild>
+                    <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 relative overflow-hidden group">
+                      <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                      <Plus className="h-5 w-5 mr-2 group-hover:rotate-90 transition-transform duration-300" />
+                      Create Project
+                    </Button>
+                  </DialogTrigger>
                 <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto bg-white/95 backdrop-blur-xl border border-white/20">
                   <DialogHeader>
                     <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
@@ -433,8 +434,9 @@ const Projects: React.FC = () => {
                     </Button>
                   </DialogFooter>
                 </DialogContent>
-              </Dialog>
-            )}
+                </Dialog>
+              )}
+            </div>
           </div>
         </div>
 
