@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, List, Filter, Plus } from 'lucide-react';
+import { Calendar, List, Filter, Plus, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -149,39 +149,55 @@ export default function CalendarView() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 opacity-30 pointer-events-none">
+        <div className="absolute top-20 left-10 w-20 h-20 bg-primary/20 rounded-full animate-pulse"></div>
+        <div className="absolute top-40 right-20 w-32 h-32 bg-blue-300/20 rounded-full animate-bounce" style={{animationDelay: '0.5s'}}></div>
+        <div className="absolute bottom-20 left-1/4 w-16 h-16 bg-purple-300/20 rounded-full animate-pulse" style={{animationDelay: '1s'}}></div>
+      </div>
+      
       <AppHeader />
       
-      <main className="container mx-auto py-6 px-4 relative z-10">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-3xl font-bold flex items-center gap-2">
-              <Calendar className="w-8 h-8" />
-              Task Calendar
+      <main className="container mx-auto py-8 px-4 relative z-10">
+        {/* Hero Section */}
+        <div className="text-center mb-12 space-y-6 animate-fade-in relative">
+          {/* Back Button */}
+          <div className="absolute top-4 left-4 z-10">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                if (window.history.length <= 1) {
+                  window.location.href = '/dashboard';
+                } else {
+                  window.history.back();
+                }
+              }}
+              className="flex items-center space-x-2 bg-white/30 backdrop-blur-sm hover:bg-white/50 transition-all duration-300 border border-white/20 text-slate-700"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              <span className="hidden sm:inline">Back</span>
+            </Button>
+          </div>
+          
+          <div className="relative bg-white/20 backdrop-blur-sm rounded-2xl p-8 shadow-2xl border border-white/30">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-2xl backdrop-blur-sm border border-white/20 mb-4 group-hover:scale-110 transition-transform duration-300">
+              <Calendar className="h-10 w-10 text-blue-600 group-hover:rotate-6 transition-transform duration-300" />
+            </div>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-4">
+              Task
+              <span className="block bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
+                Calendar
+              </span>
             </h1>
-            <p className="text-muted-foreground">
-              View and manage tasks by their due dates
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+              Visualize your project timelines, manage deadlines, and track progress across all your construction projects in one comprehensive calendar view.
             </p>
           </div>
           
-          <div className="flex items-center gap-3">
-            <ExportDialog 
-              tasks={filteredTasks.map(task => ({
-                id: task.id,
-                title: task.title,
-                description: task.description,
-                status: task.status,
-                priority: task.priority,
-                assignee: task.assignee,
-                project: task.project,
-                start_date: task.start_date,
-                end_date: task.end_date,
-                created_at: task.created_at,
-                updated_at: task.updated_at,
-              }))}
-              title="Export Calendar Tasks"
-            />
-            
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-6">
             <div className="flex items-center bg-white/20 backdrop-blur-sm rounded-lg border border-white/30 overflow-hidden">
               <Button 
                 variant={viewMode === 'calendar' ? 'default' : 'ghost'} 
@@ -210,6 +226,7 @@ export default function CalendarView() {
                 List
               </Button>
             </div>
+            
             <Button 
               onClick={() => setShowTaskForm(true)}
               className="group bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 border-0 font-semibold relative overflow-hidden"
@@ -220,69 +237,92 @@ export default function CalendarView() {
               </span>
               <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500 skew-x-12"></div>
             </Button>
+            
+            <ExportDialog 
+              tasks={filteredTasks.map(task => ({
+                id: task.id,
+                title: task.title,
+                description: task.description,
+                status: task.status,
+                priority: task.priority,
+                assignee: task.assignee,
+                project: task.project,
+                start_date: task.start_date,
+                end_date: task.end_date,
+                created_at: task.created_at,
+                updated_at: task.updated_at,
+              }))}
+              title="Export Calendar Tasks"
+            />
           </div>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">Total Tasks</CardTitle>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+          <Card className="group relative border-0 bg-white/40 backdrop-blur-sm shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-blue-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <CardHeader className="pb-3 relative z-10">
+              <CardTitle className="text-sm font-semibold text-gray-600 group-hover:text-primary transition-colors duration-300">Total Tasks</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.total}</div>
-              <p className="text-xs text-muted-foreground">All tasks in company</p>
+            <CardContent className="relative z-10">
+              <div className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent group-hover:from-primary group-hover:to-blue-600 transition-all duration-300">{stats.total}</div>
+              <p className="text-sm text-gray-500 mt-1">All tasks in company</p>
             </CardContent>
           </Card>
           
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">With Due Date</CardTitle>
+          <Card className="group relative border-0 bg-white/40 backdrop-blur-sm shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-indigo-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <CardHeader className="pb-3 relative z-10">
+              <CardTitle className="text-sm font-semibold text-gray-600 group-hover:text-blue-600 transition-colors duration-300">With Due Date</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-blue-600">{stats.withDueDate}</div>
-              <p className="text-xs text-muted-foreground">Tasks on calendar</p>
+            <CardContent className="relative z-10">
+              <div className="text-3xl font-bold text-blue-600 group-hover:scale-110 transition-transform duration-300">{stats.withDueDate}</div>
+              <p className="text-sm text-gray-500 mt-1">Tasks on calendar</p>
             </CardContent>
           </Card>
           
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">Overdue</CardTitle>
+          <Card className="group relative border-0 bg-white/40 backdrop-blur-sm shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 to-rose-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <CardHeader className="pb-3 relative z-10">
+              <CardTitle className="text-sm font-semibold text-gray-600 group-hover:text-red-600 transition-colors duration-300">Overdue</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-red-600">{stats.overdue}</div>
-              <p className="text-xs text-muted-foreground">Past due date</p>
+            <CardContent className="relative z-10">
+              <div className="text-3xl font-bold text-red-600 group-hover:scale-110 transition-transform duration-300">{stats.overdue}</div>
+              <p className="text-sm text-gray-500 mt-1">Past due date</p>
             </CardContent>
           </Card>
           
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">Completed</CardTitle>
+          <Card className="group relative border-0 bg-white/40 backdrop-blur-sm shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-emerald-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <CardHeader className="pb-3 relative z-10">
+              <CardTitle className="text-sm font-semibold text-gray-600 group-hover:text-green-600 transition-colors duration-300">Completed</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-600">{stats.completed}</div>
-              <p className="text-xs text-muted-foreground">Finished tasks</p>
+            <CardContent className="relative z-10">
+              <div className="text-3xl font-bold text-green-600 group-hover:scale-110 transition-transform duration-300">{stats.completed}</div>
+              <p className="text-sm text-gray-500 mt-1">Finished tasks</p>
             </CardContent>
           </Card>
         </div>
 
         {/* Filters */}
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Filter className="w-5 h-5" />
+        <Card className="mb-8 border-0 bg-white/40 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300">
+          <CardHeader className="bg-gradient-to-r from-primary/5 to-blue-600/5 rounded-t-lg">
+            <CardTitle className="flex items-center gap-2 text-xl font-bold text-gray-800">
+              <div className="p-2 bg-gradient-to-br from-primary/10 to-blue-600/10 rounded-lg">
+                <Filter className="w-5 h-5 text-primary" />
+              </div>
               Filters
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-gray-600">
               Filter tasks displayed on the calendar
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <label className="text-sm font-medium">Priority:</label>
+          <CardContent className="pt-6">
+            <div className="flex flex-wrap items-center gap-6">
+              <div className="flex items-center gap-3">
+                <label className="text-sm font-semibold text-gray-700">Priority:</label>
                 <Select value={priorityFilter} onValueChange={setPriorityFilter}>
-                  <SelectTrigger className="w-32">
+                  <SelectTrigger className="w-32 bg-white/60 border-white/40 focus:border-primary/50 transition-colors">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -294,10 +334,10 @@ export default function CalendarView() {
                 </Select>
               </div>
               
-              <div className="flex items-center gap-2">
-                <label className="text-sm font-medium">Status:</label>
+              <div className="flex items-center gap-3">
+                <label className="text-sm font-semibold text-gray-700">Status:</label>
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-32">
+                  <SelectTrigger className="w-32 bg-white/60 border-white/40 focus:border-primary/50 transition-colors">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -309,7 +349,7 @@ export default function CalendarView() {
                 </Select>
               </div>
               
-              <Badge variant="secondary" className="ml-auto">
+              <Badge variant="secondary" className="ml-auto bg-primary/10 text-primary font-semibold px-4 py-2">
                 {filteredTasks.filter(task => task.end_date).length} tasks shown
               </Badge>
             </div>
@@ -317,90 +357,98 @@ export default function CalendarView() {
         </Card>
 
         {/* Instructions */}
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle className="text-lg">How to use the calendar</CardTitle>
+        <Card className="mb-8 border-0 bg-white/40 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300">
+          <CardHeader className="bg-gradient-to-r from-green-500/5 to-emerald-600/5 rounded-t-lg">
+            <CardTitle className="text-xl font-bold text-gray-800">How to use the calendar</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-              <div className="flex items-start gap-3">
-                <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+          <CardContent className="pt-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
+              <div className="flex items-start gap-4 p-4 bg-blue-50/50 rounded-lg backdrop-blur-sm border border-blue-200/30">
+                <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full mt-2 flex-shrink-0"></div>
                 <div>
-                  <strong>Click any date</strong> to create a new task with that due date
+                  <strong className="text-blue-800">Click any date</strong>
+                  <p className="text-gray-600 mt-1">Create a new task with that due date</p>
                 </div>
               </div>
-              <div className="flex items-start gap-3">
-                <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
+              <div className="flex items-start gap-4 p-4 bg-green-50/50 rounded-lg backdrop-blur-sm border border-green-200/30">
+                <div className="w-3 h-3 bg-gradient-to-r from-green-500 to-green-600 rounded-full mt-2 flex-shrink-0"></div>
                 <div>
-                  <strong>Click a task</strong> to view details, add comments, or edit
+                  <strong className="text-green-800">Click a task</strong>
+                  <p className="text-gray-600 mt-1">View details, add comments, or edit</p>
                 </div>
               </div>
-              <div className="flex items-start gap-3">
-                <div className="w-2 h-2 bg-purple-500 rounded-full mt-2"></div>
+              <div className="flex items-start gap-4 p-4 bg-purple-50/50 rounded-lg backdrop-blur-sm border border-purple-200/30">
+                <div className="w-3 h-3 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full mt-2 flex-shrink-0"></div>
                 <div>
-                  <strong>Drag tasks</strong> to different dates to change due dates
+                  <strong className="text-purple-800">Drag tasks</strong>
+                  <p className="text-gray-600 mt-1">To different dates to change due dates</p>
                 </div>
               </div>
             </div>
             
-            <div className="mt-4 pt-4 border-t">
-              <p className="text-xs text-muted-foreground">
+            <div className="mt-6 pt-6 border-t border-gray-200/50">
+              <p className="text-sm text-gray-600 font-medium mb-3">
                 <strong>Color coding:</strong> 
-                <span className="mx-2 px-2 py-1 bg-red-500 text-white rounded text-xs">High Priority</span>
-                <span className="mx-2 px-2 py-1 bg-orange-500 text-white rounded text-xs">Medium Priority</span>
-                <span className="mx-2 px-2 py-1 bg-blue-500 text-white rounded text-xs">Low Priority</span>
-                <span className="mx-2 px-2 py-1 bg-green-500 text-white rounded text-xs">Completed</span>
               </p>
+              <div className="flex flex-wrap gap-3">
+                <span className="px-3 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg text-sm font-medium shadow-sm">High Priority</span>
+                <span className="px-3 py-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg text-sm font-medium shadow-sm">Medium Priority</span>
+                <span className="px-3 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg text-sm font-medium shadow-sm">Low Priority</span>
+                <span className="px-3 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg text-sm font-medium shadow-sm">Completed</span>
+              </div>
             </div>
           </CardContent>
         </Card>
 
         {/* Calendar or List View */}
-        <Card>
-          <CardContent className="p-6">
+        <Card className="border-0 bg-white/40 backdrop-blur-sm shadow-xl">
+          <CardContent className="p-8">
             {viewMode === 'calendar' ? (
               <TaskCalendar 
                 companyTasks={filteredTasks} 
                 onTaskUpdate={loadTasks}
               />
             ) : (
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold mb-4">Task List View</h3>
+              <div className="space-y-6">
+                <h3 className="text-2xl font-bold text-gray-800 mb-6">Task List View</h3>
                 {filteredTasks.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    No tasks found matching your filters.
+                  <div className="text-center py-12">
+                    <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl mb-4">
+                      <List className="h-8 w-8 text-gray-400" />
+                    </div>
+                    <p className="text-gray-500 text-lg">No tasks found matching your filters.</p>
                   </div>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     {filteredTasks.map(task => (
-                      <Card key={task.id} className="hover:shadow-md transition-shadow">
-                        <CardContent className="p-4">
+                      <Card key={task.id} className="group border-0 bg-white/60 backdrop-blur-sm hover:bg-white/80 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+                        <CardContent className="p-6">
                           <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                              <div className={`w-3 h-3 rounded-full ${getPriorityColor(task.priority)}`}></div>
+                            <div className="flex items-center gap-4">
+                              <div className={`w-4 h-4 rounded-full ${getPriorityColor(task.priority)} shadow-sm`}></div>
                               <div>
-                                <h4 className="font-medium">{task.title}</h4>
-                                <p className="text-sm text-muted-foreground">
-                                  {task.project?.name && <span className="font-medium">{task.project.name}</span>}
+                                <h4 className="font-semibold text-gray-800 group-hover:text-primary transition-colors">{task.title}</h4>
+                                <p className="text-sm text-gray-500 mt-1">
+                                  {task.project?.name && <span className="font-medium text-gray-600">{task.project.name}</span>}
                                   {task.assignee?.full_name && (
-                                    <span> • Assigned to {task.assignee.full_name}</span>
+                                    <span className="text-gray-500"> • Assigned to {task.assignee.full_name}</span>
                                   )}
                                 </p>
                               </div>
                             </div>
-                            <div className="flex items-center gap-2">
-                              <Badge variant="outline" className={`${getStatusColor(task.status)} text-white border-none`}>
+                            <div className="flex items-center gap-3">
+                              <Badge variant="outline" className={`${getStatusColor(task.status)} text-white border-none font-medium`}>
                                 {task.status.replace('_', ' ')}
                               </Badge>
                               {task.end_date && (
-                                <Badge variant="secondary">
+                                <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
                                   Due: {new Date(task.end_date).toLocaleDateString()}
                                 </Badge>
                               )}
                             </div>
                           </div>
                           {task.description && (
-                            <p className="text-sm text-muted-foreground mt-2 ml-6">
+                            <p className="text-sm text-gray-600 mt-3 ml-8 leading-relaxed">
                               {task.description}
                             </p>
                           )}
