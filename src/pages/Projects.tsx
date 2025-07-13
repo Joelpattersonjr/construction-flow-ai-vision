@@ -549,9 +549,8 @@ const Projects: React.FC = () => {
                     
                     <div className="grid grid-cols-2 gap-3">
                       <Button 
-                        size="sm"
                         onClick={() => navigate(`/files?project=${project.id}`)}
-                        className="group flex items-center justify-center space-x-2 bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl font-semibold relative overflow-hidden"
+                        className="w-full group text-lg px-10 py-4 bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl font-semibold relative overflow-hidden"
                       >
                         <span className="relative z-10 flex items-center space-x-2">
                           <FileText className="h-4 w-4" />
@@ -560,9 +559,8 @@ const Projects: React.FC = () => {
                         <div className="absolute inset-0 bg-gradient-to-r from-primary to-blue-600 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-500"></div>
                       </Button>
                       <Button 
-                        size="sm"
                         onClick={() => navigate(`/projects/${project.id}/permissions`)}
-                        className="group flex items-center justify-center space-x-2 bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl font-semibold relative overflow-hidden"
+                        className="w-full group text-lg px-10 py-4 bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl font-semibold relative overflow-hidden"
                       >
                         <span className="relative z-10 flex items-center space-x-2">
                           <Settings className="h-4 w-4" />
