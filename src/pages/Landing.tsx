@@ -27,6 +27,7 @@ import {
   IntegrationsTooltip,
   MobileTooltip 
 } from '@/components/FeatureTooltips';
+import constructionHero from '@/assets/construction-hero.jpg';
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -292,8 +293,8 @@ const Landing = () => {
             <div className="relative animate-fade-in">
               <div className="relative bg-white/20 backdrop-blur-sm rounded-2xl p-8 shadow-2xl border border-white/30">
                 <img 
-                  src="https://images.unsplash.com/photo-1605810230434-7631ac76ec81?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2340&q=80" 
-                  alt="ConexusPM Dashboard Preview" 
+                  src={constructionHero} 
+                  alt="ConexusPM Construction Management Dashboard" 
                   className="w-full h-auto rounded-xl shadow-lg"
                 />
                 <div className="absolute -top-4 -right-4 bg-primary text-white p-3 rounded-full shadow-lg animate-bounce">
