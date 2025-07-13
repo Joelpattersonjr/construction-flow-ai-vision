@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { Plus, Folder, Calendar, MapPin, FileText, Settings } from 'lucide-react';
+import { Plus, Folder, Calendar, MapPin, FileText, Settings, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import AppHeader from '@/components/navigation/AppHeader';
 import { ExportDialog } from '@/components/export/ExportDialog';
@@ -245,7 +245,20 @@ const Projects: React.FC = () => {
       
       <main className="container mx-auto py-8 px-4 relative z-10">
         {/* Hero Section */}
-        <div className="text-center mb-12 space-y-6 animate-fade-in">
+        <div className="text-center mb-12 space-y-6 animate-fade-in relative">
+          {/* Back Button */}
+          <div className="absolute top-4 left-4 z-10">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate(-1)}
+              className="flex items-center space-x-2 bg-white/30 backdrop-blur-sm hover:bg-white/50 transition-all duration-300 border border-white/20 text-slate-700"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              <span className="hidden sm:inline">Back</span>
+            </Button>
+          </div>
+          
           <div className="relative bg-white/20 backdrop-blur-sm rounded-2xl p-8 shadow-2xl border border-white/30">
             <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-2xl backdrop-blur-sm border border-white/20 mb-4 group-hover:scale-110 transition-transform duration-300">
               <Folder className="h-10 w-10 text-blue-600 group-hover:rotate-6 transition-transform duration-300" />

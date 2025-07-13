@@ -49,19 +49,6 @@ const AppHeader: React.FC = () => {
               >
                 ConexusPM
               </h1>
-              
-              {location.pathname !== '/' && location.pathname !== '/dashboard' && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleBack}
-                  className="flex items-center space-x-2 z-50 relative"
-                  style={{ pointerEvents: 'auto', zIndex: 9999 }}
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                  <span className="hidden sm:inline">Back</span>
-                </Button>
-              )}
             </div>
             
             <div className="hidden md:flex space-x-1 relative z-10">
