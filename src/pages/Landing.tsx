@@ -271,10 +271,10 @@ const Landing = () => {
                 <Button 
                   size="lg" 
                   variant="outline" 
-                  onClick={() => navigate('/dashboard')} 
+                  onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })} 
                   className="group text-lg px-10 py-4 border-2 hover:bg-primary hover:text-white transition-all duration-300 transform hover:scale-105 font-semibold relative overflow-hidden"
                 >
-                  <span className="relative z-10">View Dashboard</span>
+                  <span className="relative z-10">See Features</span>
                   <div className="absolute inset-0 bg-primary translate-y-[100%] group-hover:translate-y-0 transition-transform duration-300"></div>
                 </Button>
               </div>
