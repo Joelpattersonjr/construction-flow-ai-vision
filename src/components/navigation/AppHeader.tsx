@@ -13,15 +13,10 @@ const AppHeader: React.FC = () => {
   const isActive = (path: string) => location.pathname === path;
 
   const handleBack = () => {
-    console.log('Back button clicked, current location:', location.pathname);
-    console.log('Window history length:', window.history.length);
-    
     // If there's no history to go back to, navigate to dashboard
     if (window.history.length <= 1) {
-      console.log('No history, navigating to dashboard');
       navigate('/dashboard');
     } else {
-      console.log('Attempting to navigate back...');
       navigate(-1);
     }
   };
