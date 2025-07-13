@@ -32,7 +32,11 @@ const UserProfilePopover: React.FC = () => {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" className="flex items-center space-x-2">
+        <Button 
+          variant="outline" 
+          className="flex items-center space-x-2 cursor-pointer pointer-events-auto relative z-10"
+          style={{ pointerEvents: 'auto' }}
+        >
           <User className="h-4 w-4" />
           <span className="text-sm text-gray-600">
             {profile?.full_name || user?.email}
@@ -40,7 +44,7 @@ const UserProfilePopover: React.FC = () => {
           <ChevronDown className="h-4 w-4" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80" align="end">
+      <PopoverContent className="w-80 bg-white border shadow-lg z-50" align="end">
         <div className="space-y-4">
           <div className="border-b pb-3">
             <h3 className="font-semibold text-gray-900 flex items-center space-x-2">
