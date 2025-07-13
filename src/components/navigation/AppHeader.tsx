@@ -58,7 +58,7 @@ const AppHeader: React.FC = () => {
               )}
             </div>
             
-            <div className="hidden md:flex space-x-1">
+            <div className="hidden md:flex space-x-1 relative z-10">
               {navigationItems.map((item) => {
                 const Icon = item.icon;
                 return (
@@ -70,7 +70,8 @@ const AppHeader: React.FC = () => {
                       console.log('Navigating to:', item.path);
                       navigate(item.path);
                     }}
-                    className="flex items-center space-x-2"
+                    className="flex items-center space-x-2 cursor-pointer pointer-events-auto"
+                    style={{ pointerEvents: 'auto' }}
                   >
                     <Icon className="h-4 w-4" />
                     <span>{item.label}</span>
