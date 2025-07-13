@@ -271,10 +271,10 @@ const Landing = () => {
                 <Button 
                   size="lg" 
                   variant="outline" 
-                  onClick={() => navigate('/auth')} 
+                  onClick={() => navigate('/dashboard')} 
                   className="group text-lg px-10 py-4 border-2 hover:bg-primary hover:text-white transition-all duration-300 transform hover:scale-105 font-semibold relative overflow-hidden"
                 >
-                  <span className="relative z-10">Watch Demo</span>
+                  <span className="relative z-10">View Dashboard</span>
                   <div className="absolute inset-0 bg-primary translate-y-[100%] group-hover:translate-y-0 transition-transform duration-300"></div>
                 </Button>
               </div>
@@ -309,7 +309,7 @@ const Landing = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-24 lg:py-32 bg-white" data-animate data-tour="features">
+      <section id="features" className="py-24 lg:py-32 bg-white" data-animate data-tour="features">
         <div className="container mx-auto px-6 lg:px-8">
           <div className="text-center mb-20 lg:mb-24 space-y-6">
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
@@ -424,7 +424,7 @@ const Landing = () => {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-24 lg:py-32 bg-white" data-animate data-tour="testimonials">
+      <section id="testimonials" className="py-24 lg:py-32 bg-white" data-animate data-tour="testimonials">
         <div className="container mx-auto px-6 lg:px-8">
           <div className="text-center mb-20 lg:mb-24 space-y-6">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight">
@@ -460,7 +460,7 @@ const Landing = () => {
       </section>
 
       {/* Pricing Section */}
-      <section className="py-24 lg:py-32 bg-gray-50" data-animate data-tour="pricing">
+      <section id="pricing" className="py-24 lg:py-32 bg-gray-50" data-animate data-tour="pricing">
         <div className="container mx-auto px-6 lg:px-8">
           <div className="text-center mb-20 lg:mb-24 space-y-6">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight">
@@ -532,7 +532,7 @@ const Landing = () => {
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
             <Button size="lg" variant="outline" onClick={() => navigate('/auth')} className="text-lg px-8 py-3 border-white text-white bg-transparent hover:bg-white hover:text-primary">
-              Contact Sales
+              Sign In
             </Button>
           </div>
         </div>
@@ -555,30 +555,30 @@ const Landing = () => {
             <div>
               <h3 className="font-semibold mb-4">Product</h3>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white">Features</a></li>
-                <li><a href="#" className="hover:text-white">Pricing</a></li>
-                <li><a href="#" className="hover:text-white">Security</a></li>
-                <li><a href="#" className="hover:text-white">Integrations</a></li>
+                <li><a href="#features" className="hover:text-white">Features</a></li>
+                <li><a href="#pricing" className="hover:text-white">Pricing</a></li>
+                <li><button onClick={() => navigate('/dashboard')} className="hover:text-white text-left">Dashboard</button></li>
+                <li><button onClick={() => navigate('/projects')} className="hover:text-white text-left">Projects</button></li>
               </ul>
             </div>
             
             <div>
               <h3 className="font-semibold mb-4">Company</h3>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white">About</a></li>
-                <li><a href="#" className="hover:text-white">Blog</a></li>
-                <li><a href="#" className="hover:text-white">Careers</a></li>
-                <li><a href="#" className="hover:text-white">Contact</a></li>
+                <li><a href="#testimonials" className="hover:text-white">Testimonials</a></li>
+                <li><button onClick={() => navigate('/auth')} className="hover:text-white text-left">Sign In</button></li>
+                <li><button onClick={() => navigate('/signup')} className="hover:text-white text-left">Sign Up</button></li>
+                <li><button onClick={() => navigate('/profile')} className="hover:text-white text-left">Profile</button></li>
               </ul>
             </div>
             
             <div>
               <h3 className="font-semibold mb-4">Support</h3>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white">Help Center</a></li>
-                <li><a href="#" className="hover:text-white">Documentation</a></li>
-                <li><a href="/privacy" className="hover:text-white">Privacy Policy</a></li>
-                <li><a href="/terms" className="hover:text-white">Terms of Service</a></li>
+                <li><button onClick={() => navigate('/files')} className="hover:text-white text-left">File Management</button></li>
+                <li><button onClick={() => navigate('/tasks')} className="hover:text-white text-left">Task Management</button></li>
+                <li><button onClick={() => navigate('/privacy')} className="hover:text-white text-left">Privacy Policy</button></li>
+                <li><button onClick={() => navigate('/terms')} className="hover:text-white text-left">Terms of Service</button></li>
               </ul>
             </div>
           </div>
