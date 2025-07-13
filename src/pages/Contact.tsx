@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Building2, Mail, Phone, MapPin, Clock, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
+import DemoBookingDialog from '@/components/DemoBookingDialog';
 
 const Contact = () => {
   const navigate = useNavigate();
@@ -231,13 +232,14 @@ const Contact = () => {
                 <p className="text-gray-600 mb-4">
                   See ConexusPM in action with a personalized demo tailored to your needs.
                 </p>
-                <Button 
-                  variant="outline" 
-                  onClick={() => navigate('/signup')}
-                  className="w-full"
-                >
-                  Book a Demo
-                </Button>
+                <DemoBookingDialog>
+                  <Button 
+                    variant="outline" 
+                    className="w-full"
+                  >
+                    Book a Demo
+                  </Button>
+                </DemoBookingDialog>
               </div>
             </div>
           </div>
