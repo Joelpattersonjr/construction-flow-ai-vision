@@ -80,7 +80,7 @@ export const SubscriptionSelectionPage: React.FC<SubscriptionSelectionPageProps>
               title="Pro"
               price="$199.99"
               features={proFeatures}
-              buttonText="Choose Pro"
+              buttonText="Start Pro Plan"
               isPopular={true}
               onClick={() => onSubscriptionChoice('pro')}
             />

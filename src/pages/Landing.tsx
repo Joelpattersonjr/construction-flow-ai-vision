@@ -140,34 +140,32 @@ const Landing = () => {
       period: "per month",
       description: "Perfect for small teams and growing businesses",
       features: [
-        "File Management & Storage",
+        "Basic File Management",
         "5 Projects",
-        "Version Control (5 versions per file)",
-        "Team Collaboration (up to 5 collaborators)",
-        "90 days version history",
-        "Basic File Sharing",
-        "Standard Support"
+        "5 Team Members",
+        "Basic Support",
+        "Limited Storage (1GB)"
       ],
       popular: false,
       cta: "Start Basic Plan"
     },
     {
-      name: "Premium",
+      name: "Pro",
       price: "$199.99", 
       period: "per month",
       description: "Enhanced features for growing teams",
       features: [
-        "Advanced version control",
+        "Advanced File Management",
         "10 Projects",
-        "Real-time collaboration",
-        "Up to 50 versions per file",
-        "10 collaborators max",
-        "1 year version history",
-        "Advanced analytics",
-        "Priority support"
+        "50 Team Members",
+        "Real-time Collaboration",
+        "Version Control (50 versions)",
+        "Priority Support",
+        "Advanced Analytics",
+        "100GB Storage"
       ],
       popular: true,
-      cta: "Start Premium Plan"
+      cta: "Start Pro Plan"
     },
     {
       name: "Professional",
@@ -175,16 +173,16 @@ const Landing = () => {
       period: "per month",
       description: "Advanced features for professional teams",
       features: [
-        "Advanced version control",
+        "Advanced File Management",
         "20 Projects",
-        "Real-time collaboration",
-        "Up to 50 versions per file",
-        "50 collaborators max",
-        "2 years version history",
-        "Advanced analytics",
-        "Priority support",
-        "Enhanced file management",
-        "Team performance insights"
+        "50 Team Members",
+        "Real-time Collaboration",
+        "Version Control (50 versions)",
+        "Priority Support",
+        "Advanced Analytics",
+        "100GB Storage",
+        "50 Collaborators Max",
+        "2 Years Version History"
       ],
       popular: false,
       cta: "Start Professional Plan"
@@ -195,16 +193,14 @@ const Landing = () => {
       period: "per month",
       description: "Complete solution for large organizations",
       features: [
-        "Unlimited version control",
-        "Unlimited Projects",
-        "Unlimited collaboration",
-        "Unlimited versions per file",
-        "Unlimited collaborators",
-        "Unlimited version history",
-        "Advanced time tracking & reporting",
-        "Advanced analytics & reporting",
-        "Custom integrations",
-        "Dedicated support"
+        "Everything in Professional",
+        "Unlimited Team Members",
+        "Unlimited Storage",
+        "Advanced Security",
+        "Custom Integrations",
+        "Dedicated Support",
+        "Custom Branding",
+        "SLA Guarantee"
       ],
       popular: false,
       cta: "Start Enterprise Plan"
