@@ -13,6 +13,8 @@ const AppHeader: React.FC = () => {
   const isActive = (path: string) => location.pathname === path;
 
   const handleBack = () => {
+    console.log('Back button clicked, current location:', location.pathname);
+    console.log('Attempting to navigate back...');
     navigate(-1);
   };
 
