@@ -506,14 +506,12 @@ const Landing = () => {
                   </ul>
                   
                   <Button 
-                    className="group/btn w-full relative overflow-hidden" 
+                    className="w-full group relative overflow-hidden" 
                     variant={plan.popular ? "default" : "outline"}
                     onClick={() => navigate('/signup')}
                   >
                     <span className="relative z-10">{plan.cta}</span>
-                    {!plan.popular && (
-                      <div className="absolute inset-0 bg-primary translate-y-[100%] group-hover/btn:translate-y-0 transition-transform duration-300"></div>
-                    )}
+                    <div className="absolute inset-0 bg-gradient-to-r from-primary to-blue-600 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-500"></div>
                   </Button>
                 </CardContent>
                 
