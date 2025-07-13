@@ -44,8 +44,7 @@ export const PricingCard: React.FC<PricingCardProps> = ({
           ))}
         </ul>
         <Button 
-          className="w-full mt-4 group relative overflow-hidden" 
-          variant={buttonVariant}
+          className="w-full mt-4 group relative overflow-hidden bg-black text-white border-black hover:bg-black hover:text-white" 
           onClick={onClick}
         >
           <span className="relative z-10">{buttonText}</span>

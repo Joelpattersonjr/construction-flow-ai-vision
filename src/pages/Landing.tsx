@@ -506,8 +506,7 @@ const Landing = () => {
                   </ul>
                   
                   <Button 
-                    className="w-full group relative overflow-hidden" 
-                    variant="outline"
+                    className="w-full group relative overflow-hidden bg-black text-white border-black hover:bg-black hover:text-white" 
                     onClick={() => navigate('/signup')}
                   >
                     <span className="relative z-10">{plan.cta}</span>
