@@ -551,7 +551,7 @@ const Projects: React.FC = () => {
                       <Button 
                         size="sm"
                         onClick={() => navigate(`/files?project=${project.id}`)}
-                        className="group flex items-center justify-center space-x-2 bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl font-semibold relative overflow-hidden text-white"
+                        className="group flex items-center justify-center space-x-2 bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl font-semibold relative overflow-hidden"
                       >
                         <span className="relative z-10 flex items-center space-x-2">
                           <FileText className="h-4 w-4" />
@@ -562,7 +562,7 @@ const Projects: React.FC = () => {
                       <Button 
                         size="sm"
                         onClick={() => navigate(`/projects/${project.id}/permissions`)}
-                        className="group flex items-center justify-center space-x-2 bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl font-semibold relative overflow-hidden text-white"
+                        className="group flex items-center justify-center space-x-2 bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl font-semibold relative overflow-hidden"
                       >
                         <span className="relative z-10 flex items-center space-x-2">
                           <Settings className="h-4 w-4" />
