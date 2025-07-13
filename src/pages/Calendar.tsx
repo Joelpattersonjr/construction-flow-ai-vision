@@ -182,12 +182,16 @@ export default function CalendarView() {
               title="Export Calendar Tasks"
             />
             
-            <div className="flex items-center border rounded-lg">
+            <div className="flex items-center bg-white/20 backdrop-blur-sm rounded-lg border border-white/30 overflow-hidden">
               <Button 
                 variant={viewMode === 'calendar' ? 'default' : 'ghost'} 
                 size="sm"
                 onClick={() => setViewMode('calendar')}
-                className="rounded-r-none"
+                className={`rounded-none border-0 ${
+                  viewMode === 'calendar' 
+                    ? 'bg-gradient-to-r from-primary to-blue-600 text-white shadow-lg' 
+                    : 'bg-transparent hover:bg-white/30 text-gray-700'
+                } transition-all duration-300`}
               >
                 <Calendar className="w-4 h-4 mr-2" />
                 Calendar
@@ -196,15 +200,25 @@ export default function CalendarView() {
                 variant={viewMode === 'list' ? 'default' : 'ghost'} 
                 size="sm"
                 onClick={() => setViewMode('list')}
-                className="rounded-l-none"
+                className={`rounded-none border-0 ${
+                  viewMode === 'list' 
+                    ? 'bg-gradient-to-r from-primary to-blue-600 text-white shadow-lg' 
+                    : 'bg-transparent hover:bg-white/30 text-gray-700'
+                } transition-all duration-300`}
               >
                 <List className="w-4 h-4 mr-2" />
                 List
               </Button>
             </div>
-            <Button onClick={() => setShowTaskForm(true)}>
-              <Plus className="w-4 h-4 mr-2" />
-              New Task
+            <Button 
+              onClick={() => setShowTaskForm(true)}
+              className="group bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 border-0 font-semibold relative overflow-hidden"
+            >
+              <span className="relative z-10 flex items-center">
+                <Plus className="w-4 h-4 mr-2" />
+                New Task
+              </span>
+              <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500 skew-x-12"></div>
             </Button>
           </div>
         </div>
@@ -439,11 +453,19 @@ export default function CalendarView() {
               </Select>
             </div>
             <div className="flex justify-end gap-2 pt-4">
-              <Button variant="outline" onClick={() => setShowTaskForm(false)}>
+              <Button 
+                variant="outline" 
+                onClick={() => setShowTaskForm(false)}
+                className="border-2 hover:bg-gray-50 transition-all duration-300"
+              >
                 Cancel
               </Button>
-              <Button onClick={handleCreateTask}>
-                Create Task
+              <Button 
+                onClick={handleCreateTask}
+                className="group bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 border-0 font-semibold relative overflow-hidden"
+              >
+                <span className="relative z-10">Create Task</span>
+                <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500 skew-x-12"></div>
               </Button>
             </div>
           </div>
