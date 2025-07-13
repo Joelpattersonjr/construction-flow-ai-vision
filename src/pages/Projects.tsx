@@ -536,22 +536,26 @@ const Projects: React.FC = () => {
                     
                     <div className="grid grid-cols-2 gap-3">
                       <Button 
-                        variant="outline" 
                         size="sm"
                         onClick={() => navigate(`/files?project=${project.id}`)}
-                        className="flex items-center justify-center space-x-2"
+                        className="group flex items-center justify-center space-x-2 bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl font-semibold relative overflow-hidden text-white"
                       >
-                        <FileText className="h-4 w-4" />
-                        <span>Files</span>
+                        <span className="relative z-10 flex items-center space-x-2">
+                          <FileText className="h-4 w-4" />
+                          <span>Files</span>
+                        </span>
+                        <div className="absolute inset-0 bg-gradient-to-r from-primary to-blue-600 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-500"></div>
                       </Button>
                       <Button 
-                        variant="outline" 
                         size="sm"
                         onClick={() => navigate(`/projects/${project.id}/permissions`)}
-                        className="flex items-center justify-center space-x-2"
+                        className="group flex items-center justify-center space-x-2 bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl font-semibold relative overflow-hidden text-white"
                       >
-                        <Settings className="h-4 w-4" />
-                        <span>Settings</span>
+                        <span className="relative z-10 flex items-center space-x-2">
+                          <Settings className="h-4 w-4" />
+                          <span>Settings</span>
+                        </span>
+                        <div className="absolute inset-0 bg-gradient-to-r from-primary to-blue-600 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-500"></div>
                       </Button>
                     </div>
                   </div>
