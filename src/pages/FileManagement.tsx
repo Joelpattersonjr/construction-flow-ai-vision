@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { FolderOpen, Search } from 'lucide-react';
+import { FolderOpen, Search, ArrowLeft, FileIcon, Users, Shield } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -120,62 +120,104 @@ const FileManagement = () => {
   }, [selectedProjectId, navigate]);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 opacity-30 pointer-events-none">
+        <div className="absolute top-20 left-10 w-20 h-20 bg-primary/20 rounded-full animate-pulse"></div>
+        <div className="absolute top-40 right-20 w-32 h-32 bg-blue-300/20 rounded-full animate-bounce" style={{animationDelay: '0.5s'}}></div>
+        <div className="absolute bottom-20 left-1/4 w-16 h-16 bg-purple-300/20 rounded-full animate-pulse" style={{animationDelay: '1s'}}></div>
+      </div>
+      
       <AppHeader />
 
-      <main className="container mx-auto py-6 px-4">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold">File Management</h1>
-          <p className="text-muted-foreground">
-            Upload, organize, and manage all your construction project files
-          </p>
+      <main className="container mx-auto py-8 px-4 relative z-10">
+        {/* Hero Section */}
+        <div className="text-center mb-12 space-y-6 animate-fade-in relative">
+          {/* Back Button */}
+          <div className="absolute top-4 left-4 z-10">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                if (window.history.length <= 1) {
+                  window.location.href = '/dashboard';
+                } else {
+                  window.history.back();
+                }
+              }}
+              className="flex items-center space-x-2 bg-white/30 backdrop-blur-sm hover:bg-white/50 transition-all duration-300 border border-white/20 text-slate-700"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              <span className="hidden sm:inline">Back</span>
+            </Button>
+          </div>
+          
+          <div className="relative bg-white/20 backdrop-blur-sm rounded-2xl p-8 shadow-2xl border border-white/30">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-2xl backdrop-blur-sm border border-white/20 mb-4 group-hover:scale-110 transition-transform duration-300">
+              <FileIcon className="h-10 w-10 text-blue-600 group-hover:rotate-6 transition-transform duration-300" />
+            </div>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-4">
+              File
+              <span className="block bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
+                Management
+              </span>
+            </h1>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+              Upload, organize, and manage all your construction project files with secure access controls and real-time collaboration.
+            </p>
+          </div>
         </div>
 
         {!selectedProjectId ? (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <FolderOpen className="h-5 w-5" />
+          <Card className="border-0 bg-white/40 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300">
+            <CardHeader className="bg-gradient-to-r from-primary/5 to-blue-600/5 rounded-t-lg">
+              <CardTitle className="flex items-center space-x-3 text-2xl font-bold text-gray-800">
+                <div className="p-2 bg-gradient-to-br from-primary/10 to-blue-600/10 rounded-lg">
+                  <FolderOpen className="h-6 w-6 text-primary" />
+                </div>
                 <span>Select a Project</span>
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-gray-600 text-lg">
                 Choose a project to view and manage its files
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6 pt-8">
               {/* Search Projects */}
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                 <Input
                   placeholder="Search projects..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
+                  className="pl-12 py-3 bg-white/60 border-white/40 focus:border-primary/50 transition-colors text-lg"
                 />
               </div>
 
               {loading ? (
-                <div className="text-center py-4">
-                  <div className="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full mx-auto"></div>
-                  <p className="mt-2 text-gray-600">Loading projects...</p>
+                <div className="text-center py-12">
+                  <div className="animate-spin h-8 w-8 border-3 border-primary border-t-transparent rounded-full mx-auto"></div>
+                  <p className="mt-4 text-gray-600 text-lg">Loading projects...</p>
                 </div>
               ) : (
                 <Select value={selectedProjectId || ''} onValueChange={setSelectedProjectId}>
-                  <SelectTrigger>
+                  <SelectTrigger className="py-4 bg-white/60 border-white/40 focus:border-primary/50 transition-colors text-lg">
                     <SelectValue placeholder={projects.length === 0 ? "No accessible projects" : "Select a project..."} />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-white/95 backdrop-blur-sm border-white/40">
                     {filteredProjects.map(project => (
-                      <SelectItem key={project.id} value={project.id}>
+                      <SelectItem key={project.id} value={project.id} className="py-3">
                         <div className="flex items-center justify-between w-full">
                           <div>
-                            <div className="font-medium">{project.name}</div>
+                            <div className="font-semibold text-gray-800">{project.name}</div>
                             {project.address && (
                               <div className="text-sm text-gray-500">{project.address}</div>
                             )}
                           </div>
                           {!project.hasWritePermission && (
-                            <span className="text-xs text-amber-600 ml-2">Read Only</span>
+                            <div className="flex items-center space-x-1 ml-2">
+                              <Shield className="h-3 w-3 text-amber-600" />
+                              <span className="text-xs text-amber-600 font-medium">Read Only</span>
+                            </div>
                           )}
                         </div>
                       </SelectItem>
@@ -184,12 +226,14 @@ const FileManagement = () => {
                 </Select>
               )}
               
-              <div className="text-center py-8">
-                <FolderOpen className="mx-auto h-16 w-16 text-gray-300" />
-                <h3 className="mt-4 text-lg font-medium text-gray-900">
+              <div className="text-center py-12">
+                <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-gray-100/80 to-gray-200/80 rounded-2xl backdrop-blur-sm mb-6">
+                  <FolderOpen className="h-12 w-12 text-gray-400" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-800 mb-3">
                   {projects.length === 0 ? "No accessible projects" : "No project selected"}
                 </h3>
-                <p className="mt-2 text-gray-500">
+                <p className="text-gray-600 text-lg leading-relaxed max-w-md mx-auto">
                   {projects.length === 0 
                     ? "Contact your administrator to be added to projects with file access."
                     : searchTerm 
@@ -197,21 +241,55 @@ const FileManagement = () => {
                       : "Select a project from the dropdown above to start managing files"
                   }
                 </p>
+                {projects.length === 0 && (
+                  <div className="mt-6 p-4 bg-blue-50/80 rounded-lg border border-blue-200/50">
+                    <div className="flex items-center justify-center space-x-2 text-blue-700">
+                      <Users className="h-5 w-5" />
+                      <span className="font-medium">Need access? Contact your project administrator</span>
+                    </div>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
         ) : (
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
+          <div className="space-y-8">
+            <Card className="border-0 bg-white/40 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300">
+              <CardHeader className="bg-gradient-to-r from-green-500/5 to-emerald-600/5 rounded-t-lg">
                 <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle>{selectedProject?.name}</CardTitle>
-                    <CardDescription>{selectedProject?.address}</CardDescription>
+                  <div className="space-y-2">
+                    <CardTitle className="text-2xl font-bold text-gray-800 flex items-center space-x-3">
+                      <div className="p-2 bg-gradient-to-br from-green-500/10 to-emerald-600/10 rounded-lg">
+                        <FolderOpen className="h-6 w-6 text-green-600" />
+                      </div>
+                      <span>{selectedProject?.name}</span>
+                    </CardTitle>
+                    <CardDescription className="text-gray-600 text-lg flex items-center space-x-2">
+                      {selectedProject?.address && (
+                        <>
+                          <span>{selectedProject.address}</span>
+                          <span className="text-gray-400">•</span>
+                        </>
+                      )}
+                      <div className="flex items-center space-x-1">
+                        {selectedProject?.hasWritePermission ? (
+                          <>
+                            <Users className="h-4 w-4 text-green-600" />
+                            <span className="text-green-600 font-medium">Full Access</span>
+                          </>
+                        ) : (
+                          <>
+                            <Shield className="h-4 w-4 text-amber-600" />
+                            <span className="text-amber-600 font-medium">Read Only</span>
+                          </>
+                        )}
+                      </div>
+                    </CardDescription>
                   </div>
                   <Button
                     variant="outline"
                     onClick={() => setSelectedProjectId(null)}
+                    className="bg-white/60 border-white/40 hover:bg-white/80 transition-all duration-300"
                   >
                     Change Project
                   </Button>
@@ -219,10 +297,12 @@ const FileManagement = () => {
               </CardHeader>
             </Card>
 
-            <FileManager 
-              projectId={selectedProjectId} 
-              hasWritePermission={selectedProject?.hasWritePermission || false}
-            />
+            <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-1 shadow-xl border border-white/30">
+              <FileManager 
+                projectId={selectedProjectId} 
+                hasWritePermission={selectedProject?.hasWritePermission || false}
+              />
+            </div>
           </div>
         )}
       </main>
