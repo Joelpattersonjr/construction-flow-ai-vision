@@ -58,7 +58,9 @@ const MoveFileDialog: React.FC<MoveFileDialogProps> = ({
   const handleMoveFile = async () => {
     setIsMoving(true);
     try {
-      await FileService.moveFile(file.id, selectedFolderPath);
+      // Convert ROOT_FOLDER back to empty string for the API
+      const targetPath = selectedFolderPath === 'ROOT_FOLDER' ? '' : selectedFolderPath;
+      await FileService.moveFile(file.id, targetPath);
       
       toast({
         title: "File moved",
@@ -110,8 +112,15 @@ const MoveFileDialog: React.FC<MoveFileDialogProps> = ({
                   <SelectValue placeholder="Select destination folder" />
                 </SelectTrigger>
                 <SelectContent>
+                  {/* Add root folder option first */}
+                  <SelectItem value="ROOT_FOLDER">
+                    <div className="flex items-center">
+                      <FolderOpen className="h-4 w-4 mr-2 text-blue-500" />
+                      Root folder
+                    </div>
+                  </SelectItem>
                   {folders.map((folder) => (
-                    <SelectItem key={folder.path} value={folder.path}>
+                    <SelectItem key={folder.path || 'root'} value={folder.path || 'ROOT_FOLDER'}>
                       <div className="flex items-center">
                         <FolderOpen className="h-4 w-4 mr-2 text-blue-500" />
                         {getDisplayPath(folder.path)}
@@ -136,7 +145,7 @@ const MoveFileDialog: React.FC<MoveFileDialogProps> = ({
           </Button>
           <Button 
             onClick={handleMoveFile} 
-            disabled={!selectedFolderPath && selectedFolderPath !== '' || isMoving || isLoading}
+            disabled={!selectedFolderPath || isMoving || isLoading}
           >
             {isMoving ? (
               <>
