@@ -66,7 +66,10 @@ const AppHeader: React.FC = () => {
                     key={item.path}
                     variant={isActive(item.path) ? "default" : "ghost"}
                     size="sm"
-                    onClick={() => navigate(item.path)}
+                    onClick={() => {
+                      console.log('Navigating to:', item.path);
+                      navigate(item.path);
+                    }}
                     className="flex items-center space-x-2"
                   >
                     <Icon className="h-4 w-4" />
