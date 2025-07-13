@@ -149,10 +149,10 @@ export default function CalendarView() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       <AppHeader />
       
-      <main className="container mx-auto py-6 px-4">
+      <main className="container mx-auto py-6 px-4 relative z-10">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-3xl font-bold flex items-center gap-2">
