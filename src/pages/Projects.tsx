@@ -296,10 +296,12 @@ const Projects: React.FC = () => {
               {profile?.company_role === 'company_admin' && (
                 <Dialog open={open} onOpenChange={setOpen}>
                   <DialogTrigger asChild>
-                    <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 relative overflow-hidden group">
-                      <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-                      <Plus className="h-5 w-5 mr-2 group-hover:rotate-90 transition-transform duration-300" />
-                      Create Project
+                    <Button className="group text-lg px-10 py-4 bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl font-semibold relative overflow-hidden">
+                      <span className="relative z-10 flex items-center">
+                        <Plus className="h-5 w-5 mr-2 group-hover:rotate-90 transition-transform duration-300" />
+                        Create Project
+                      </span>
+                      <div className="absolute inset-0 bg-gradient-to-r from-primary to-blue-600 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-500"></div>
                     </Button>
                   </DialogTrigger>
                 <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto bg-white/95 backdrop-blur-xl border border-white/20">
@@ -441,9 +443,12 @@ const Projects: React.FC = () => {
                     <Button 
                       onClick={handleCreateProject} 
                       disabled={creating}
-                      className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                      className="group text-lg px-10 py-4 bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl font-semibold relative overflow-hidden"
                     >
-                      {creating ? 'Creating...' : 'Create Project'}
+                      <span className="relative z-10">
+                        {creating ? 'Creating...' : 'Create Project'}
+                      </span>
+                      <div className="absolute inset-0 bg-gradient-to-r from-primary to-blue-600 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-500"></div>
                     </Button>
                   </DialogFooter>
                 </DialogContent>
