@@ -72,12 +72,9 @@ const ErrorTesting = () => {
   const testPermissionError = async () => {
     setIsLoading(true);
     try {
-      // Try to access a protected resource
-      const { error } = await supabase
-        .from('admin_password_resets')
-        .select('*');
-      
-      if (error) throw error;
+      // Simulate a permission error by throwing it directly
+      // This ensures the test always works regardless of user permissions
+      throw new Error("Access denied: Insufficient permissions to access this resource");
     } catch (error: any) {
       toast({
         title: "Permission Error Test",
