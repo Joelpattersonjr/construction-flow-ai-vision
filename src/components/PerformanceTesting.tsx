@@ -9,20 +9,22 @@ import {
   Activity, 
   Database, 
   Globe, 
-  HardDrive, 
+  Upload, 
   Network, 
   Timer, 
   Zap, 
-  BarChart3 
+  BarChart3,
+  Smartphone,
+  FileText
 } from 'lucide-react';
 
 interface PerformanceMetrics {
   responseTime: number;
   throughput: number;
-  memoryUsage: number;
-  cpuUsage: number;
+  fileUploadSpeed: number;
+  mobileResponseTime: number;
   networkLatency: number;
-  diskIO: number;
+  documentLoadTime: number;
 }
 
 interface DatabasePerformanceResult {
@@ -49,14 +51,14 @@ const PerformanceTesting = () => {
   const [dbResults, setDbResults] = useState<DatabasePerformanceResult | null>(null);
   const [testProgress, setTestProgress] = useState(0);
 
-  // Mock performance data for demonstration - optimized ranges
+  // Mock performance data for construction workflows
   const generateMockMetrics = (): PerformanceMetrics => ({
     responseTime: Math.floor(Math.random() * 200) + 50,
     throughput: Math.floor(Math.random() * 800) + 700,
-    memoryUsage: Math.floor(Math.random() * 40) + 15, // 15-55% range
-    cpuUsage: Math.floor(Math.random() * 30) + 10, // 10-40% range
+    fileUploadSpeed: Math.floor(Math.random() * 20) + 5, // 5-25 MB/s for blueprints/photos
+    mobileResponseTime: Math.floor(Math.random() * 800) + 200, // 200-1000ms mobile response
     networkLatency: Math.floor(Math.random() * 30) + 5,
-    diskIO: Math.floor(Math.random() * 50) + 15
+    documentLoadTime: Math.floor(Math.random() * 1500) + 300, // 300-1800ms for project docs
   });
 
   const testDatabasePerformance = async () => {
@@ -172,8 +174,8 @@ const PerformanceTesting = () => {
       setMetrics(mockMetrics);
 
       toast({
-        title: "System Resources Test",
-        description: `CPU: ${mockMetrics.cpuUsage}% | Memory: ${mockMetrics.memoryUsage}%`,
+        title: "Construction Workflows Test",
+        description: `Upload Speed: ${mockMetrics.fileUploadSpeed}MB/s | Mobile: ${mockMetrics.mobileResponseTime}ms`,
       });
     } catch (error: any) {
       toast({
@@ -230,8 +232,8 @@ const PerformanceTesting = () => {
       color: "text-green-500"
     },
     {
-      title: "System Resources",
-      description: "Monitor CPU and memory usage",
+      title: "Construction Workflows",
+      description: "Test file uploads and mobile performance",
       icon: Activity,
       action: testSystemResources,
       color: "text-purple-500"
@@ -420,21 +422,21 @@ const PerformanceTesting = () => {
 
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <HardDrive className="h-4 w-4 text-purple-500" />
-                  <span className="text-sm font-medium">Memory Usage</span>
+                  <Upload className="h-4 w-4 text-purple-500" />
+                  <span className="text-sm font-medium">File Upload Speed</span>
                 </div>
-                <div className={`text-2xl font-bold ${getMetricStatus(metrics.memoryUsage, { good: 50, fair: 75 })}`}>
-                  {metrics.memoryUsage}%
+                <div className={`text-2xl font-bold ${getMetricStatus(metrics.fileUploadSpeed, { good: 15, fair: 8 })}`}>
+                  {metrics.fileUploadSpeed} MB/s
                 </div>
               </div>
 
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <Activity className="h-4 w-4 text-red-500" />
-                  <span className="text-sm font-medium">CPU Usage</span>
+                  <Smartphone className="h-4 w-4 text-red-500" />
+                  <span className="text-sm font-medium">Mobile Response</span>
                 </div>
-                <div className={`text-2xl font-bold ${getMetricStatus(metrics.cpuUsage, { good: 30, fair: 60 })}`}>
-                  {metrics.cpuUsage}%
+                <div className={`text-2xl font-bold ${getMetricStatus(metrics.mobileResponseTime, { good: 500, fair: 800 })}`}>
+                  {metrics.mobileResponseTime}ms
                 </div>
               </div>
 
@@ -450,11 +452,11 @@ const PerformanceTesting = () => {
 
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <HardDrive className="h-4 w-4 text-cyan-500" />
-                  <span className="text-sm font-medium">Disk I/O</span>
+                  <FileText className="h-4 w-4 text-cyan-500" />
+                  <span className="text-sm font-medium">Document Load Time</span>
                 </div>
-                <div className={`text-2xl font-bold ${getMetricStatus(metrics.diskIO, { good: 40, fair: 70 })}`}>
-                  {metrics.diskIO}%
+                <div className={`text-2xl font-bold ${getMetricStatus(metrics.documentLoadTime, { good: 500, fair: 1000 })}`}>
+                  {metrics.documentLoadTime}ms
                 </div>
               </div>
             </div>
@@ -472,11 +474,11 @@ const PerformanceTesting = () => {
         </CardHeader>
         <CardContent className="text-green-700 space-y-2">
           <p>• <strong>Database:</strong> Response times under 100ms are excellent, under 300ms are good</p>
-          <p>• <strong>Indexing:</strong> We've added optimized indexes for faster queries</p>
-          <p>• <strong>Memory:</strong> Usage should typically stay below 75% for optimal performance</p>
-          <p>• <strong>Network:</strong> Latency under 50ms is ideal for real-time features</p>
-          <p>• <strong>Monitoring:</strong> Run comprehensive tests regularly to identify trends</p>
-          <p>• <strong>Row Level Security:</strong> Complex RLS policies can impact query performance</p>
+          <p>• <strong>File Uploads:</strong> Target 10+ MB/s for quick blueprint and photo uploads</p>
+          <p>• <strong>Mobile Performance:</strong> Keep response times under 500ms for field workers</p>
+          <p>• <strong>Network:</strong> Latency under 50ms is ideal for real-time collaboration</p>
+          <p>• <strong>Document Loading:</strong> Project documents should load within 500ms</p>
+          <p>• <strong>Best Practices:</strong> Optimize images before upload, use mobile-friendly interfaces</p>
         </CardContent>
       </Card>
     </div>
