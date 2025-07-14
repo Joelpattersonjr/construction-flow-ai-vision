@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useToast } from '@/hooks/use-toast';
-import { Users, UserPlus, Mail, Shield, User, ChevronDown, LogOut, Settings, Building2, UserCheck, FolderOpen, Crown } from 'lucide-react';
+import { Users, UserPlus, Mail, Shield, User, ChevronDown, LogOut, Settings, Building2, UserCheck, FolderOpen, Crown, Activity } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { InviteUserDialog } from '@/components/admin/InviteUserDialog';
 import { TeamMembersTable } from '@/components/admin/TeamMembersTable';
@@ -17,6 +17,7 @@ import AdminProjectsTable from '@/components/admin/AdminProjectsTable';
 import { CustomFieldsManager } from '@/components/admin/CustomFieldsManager';
 import { LockedAccountsTable } from '@/components/admin/LockedAccountsTable';
 import SecurityTesting from '@/components/SecurityTesting';
+import PerformanceTesting from '@/components/PerformanceTesting';
 
 import { ArrowLeft } from 'lucide-react';
 
@@ -323,13 +324,13 @@ const AdminDashboard = () => {
         {/* Main Content Tabs */}
         <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-1 shadow-xl border border-white/30">
           <Tabs defaultValue="team" className="w-full">
-            <TabsList className="grid w-full grid-cols-5 bg-white/40 backdrop-blur-sm">
+            <TabsList className="grid w-full grid-cols-6 bg-white/40 backdrop-blur-sm">
               <TabsTrigger value="team" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-blue-600 data-[state=active]:text-white">Team Members</TabsTrigger>
               <TabsTrigger value="invitations" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-blue-600 data-[state=active]:text-white">Pending Invitations</TabsTrigger>
               <TabsTrigger value="projects" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-blue-600 data-[state=active]:text-white">Projects</TabsTrigger>
               <TabsTrigger value="custom-fields" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-blue-600 data-[state=active]:text-white">Custom Fields</TabsTrigger>
               <TabsTrigger value="security" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-blue-600 data-[state=active]:text-white">Security</TabsTrigger>
-              
+              <TabsTrigger value="performance" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-blue-600 data-[state=active]:text-white">Performance</TabsTrigger>
             </TabsList>
 
             <TabsContent value="team" className="space-y-4 mt-6">
@@ -409,6 +410,23 @@ const AdminDashboard = () => {
               <div className="bg-white/20 backdrop-blur-sm rounded-xl p-1 mt-6">
                 <LockedAccountsTable />
               </div>
+            </TabsContent>
+
+            <TabsContent value="performance" className="space-y-4 mt-6">
+              <Card className="border-0 bg-white/40 backdrop-blur-sm shadow-lg">
+                <CardHeader className="bg-gradient-to-r from-blue-500/5 to-purple-600/5 rounded-t-lg">
+                  <div className="flex items-center space-x-2">
+                    <Activity className="h-5 w-5 text-blue-600" />
+                    <CardTitle className="text-xl font-bold text-gray-800">System Performance</CardTitle>
+                  </div>
+                  <CardDescription className="text-gray-600">
+                    Monitor construction workflow performance, test system resources, and optimize application speed
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="pt-6">
+                  <PerformanceTesting />
+                </CardContent>
+              </Card>
             </TabsContent>
 
           </Tabs>
