@@ -8,6 +8,7 @@ import AppHeader from '@/components/navigation/AppHeader';
 import { TrialBanner } from '@/components/subscription/TrialBanner';
 import { SubscriptionService, SubscriptionInfo } from '@/services/subscriptionService';
 import { useAuthState } from '@/hooks/useAuthState';
+import ErrorTesting from '@/components/ErrorTesting';
 import { 
   Star, 
   Zap, 
@@ -270,6 +271,13 @@ const Index = () => {
               </Card>
             );
           })}
+        </div>
+
+        {/* Error Testing Section */}
+        <div className="mt-16" data-animate>
+          <div className="relative bg-white/20 backdrop-blur-sm rounded-2xl p-8 shadow-2xl border border-white/30">
+            <ErrorTesting />
+          </div>
         </div>
 
         {/* Additional CTA Section */}
