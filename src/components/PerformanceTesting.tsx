@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { Badge } from '@/components/ui/badge';
 import { 
   Activity, 
   Database, 
@@ -24,10 +25,28 @@ interface PerformanceMetrics {
   diskIO: number;
 }
 
+interface DatabasePerformanceResult {
+  totalTests: number;
+  totalTime: number;
+  averageTime: number;
+  successfulTests: number;
+  failedTests: number;
+  results: Array<{
+    test: string;
+    duration: number;
+    status: string;
+    error?: string;
+    rowsReturned: number;
+    expectedRows: number;
+  }>;
+  recommendations: string[];
+}
+
 const PerformanceTesting = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [metrics, setMetrics] = useState<PerformanceMetrics | null>(null);
+  const [dbResults, setDbResults] = useState<DatabasePerformanceResult | null>(null);
   const [testProgress, setTestProgress] = useState(0);
 
   // Mock performance data for demonstration
@@ -52,28 +71,30 @@ const PerformanceTesting = () => {
         setTestProgress(prev => prev < 90 ? prev + 10 : prev);
       }, 200);
 
-      // Test database query performance
-      const { data, error } = await supabase
-        .from('projects')
-        .select('*')
-        .limit(10);
-
-      const endTime = performance.now();
-      const responseTime = endTime - startTime;
+      // Test advanced database performance using edge function
+      const { data, error } = await supabase.functions.invoke('db-performance-monitor', {
+        body: { testType: 'comprehensive' }
+      });
 
       clearInterval(progressInterval);
       setTestProgress(100);
 
       if (error) throw error;
 
-      const mockMetrics = generateMockMetrics();
-      mockMetrics.responseTime = Math.floor(responseTime);
+      const endTime = performance.now();
+      const responseTime = endTime - startTime;
+
+      setDbResults(data);
       
+      // Update metrics with real database performance data
+      const mockMetrics = generateMockMetrics();
+      mockMetrics.responseTime = Math.floor(data.averageTime || responseTime);
       setMetrics(mockMetrics);
 
       toast({
-        title: "Database Performance Test",
-        description: `Query completed in ${responseTime.toFixed(2)}ms`,
+        title: "Database Performance Test Complete",
+        description: `${data.successfulTests}/${data.totalTests} tests passed in ${data.totalTime}ms`,
+        variant: data.failedTests > 0 ? "destructive" : "default"
       });
     } catch (error: any) {
       toast({
@@ -230,6 +251,14 @@ const PerformanceTesting = () => {
     return "text-red-600";
   };
 
+  const getPerformanceGrade = (averageTime: number) => {
+    if (averageTime < 100) return { grade: 'A', color: 'bg-green-500', label: 'Excellent' };
+    if (averageTime < 300) return { grade: 'B', color: 'bg-blue-500', label: 'Good' };
+    if (averageTime < 500) return { grade: 'C', color: 'bg-yellow-500', label: 'Fair' };
+    if (averageTime < 1000) return { grade: 'D', color: 'bg-orange-500', label: 'Poor' };
+    return { grade: 'F', color: 'bg-red-500', label: 'Critical' };
+  };
+
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-6">
       <div className="text-center space-y-4">
@@ -282,6 +311,76 @@ const PerformanceTesting = () => {
           );
         })}
       </div>
+
+      {/* Database Performance Results */}
+      {dbResults && (
+        <Card className="bg-blue-50 border-blue-200">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2 text-blue-800">
+                <Database className="h-5 w-5" />
+                Database Performance Analysis
+              </CardTitle>
+              <div className="flex items-center gap-2">
+                <Badge 
+                  className={`${getPerformanceGrade(dbResults.averageTime).color} text-white`}
+                >
+                  Grade: {getPerformanceGrade(dbResults.averageTime).grade}
+                </Badge>
+                <Badge variant="outline">
+                  {dbResults.successfulTests}/{dbResults.totalTests} Passed
+                </Badge>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div className="text-center p-4 bg-white rounded-lg">
+                <div className="text-2xl font-bold text-blue-600">{dbResults.totalTime}ms</div>
+                <div className="text-sm text-gray-600">Total Time</div>
+              </div>
+              <div className="text-center p-4 bg-white rounded-lg">
+                <div className="text-2xl font-bold text-green-600">{dbResults.averageTime}ms</div>
+                <div className="text-sm text-gray-600">Average Time</div>
+              </div>
+              <div className="text-center p-4 bg-white rounded-lg">
+                <div className="text-2xl font-bold text-purple-600">{dbResults.successfulTests}</div>
+                <div className="text-sm text-gray-600">Successful Tests</div>
+              </div>
+            </div>
+            
+            <div className="space-y-3">
+              <h4 className="font-semibold text-blue-800">Test Results:</h4>
+              {dbResults.results.map((result, index) => (
+                <div key={index} className="flex items-center justify-between p-3 bg-white rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-3 h-3 rounded-full ${result.status === 'success' ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                    <span className="font-medium">{result.test}</span>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <span className="text-sm text-gray-600">{result.rowsReturned} rows</span>
+                    <span className={`font-semibold ${getMetricStatus(result.duration, { good: 100, fair: 300 })}`}>
+                      {result.duration}ms
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            <div className="mt-6 p-4 bg-white rounded-lg">
+              <h4 className="font-semibold text-blue-800 mb-2">Recommendations:</h4>
+              <ul className="space-y-1">
+                {dbResults.recommendations.map((rec, index) => (
+                  <li key={index} className="text-sm text-blue-700 flex items-start gap-2">
+                    <span className="text-blue-500 mt-1">•</span>
+                    {rec}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Performance Metrics Display */}
       {metrics && (
@@ -363,15 +462,16 @@ const PerformanceTesting = () => {
         <CardHeader>
           <CardTitle className="text-green-800 flex items-center gap-2">
             <Zap className="h-5 w-5" />
-            Performance Tips
+            Performance Optimization Tips
           </CardTitle>
         </CardHeader>
         <CardContent className="text-green-700 space-y-2">
-          <p>• Response times under 200ms are excellent, under 500ms are acceptable</p>
-          <p>• Monitor CPU usage - consistently high values may indicate optimization needs</p>
-          <p>• Network latency under 20ms is ideal for real-time features</p>
-          <p>• Memory usage should typically stay below 75% for optimal performance</p>
-          <p>• Run comprehensive tests regularly to identify performance trends</p>
+          <p>• <strong>Database:</strong> Response times under 100ms are excellent, under 300ms are good</p>
+          <p>• <strong>Indexing:</strong> We've added optimized indexes for faster queries</p>
+          <p>• <strong>Memory:</strong> Usage should typically stay below 75% for optimal performance</p>
+          <p>• <strong>Network:</strong> Latency under 50ms is ideal for real-time features</p>
+          <p>• <strong>Monitoring:</strong> Run comprehensive tests regularly to identify trends</p>
+          <p>• <strong>Row Level Security:</strong> Complex RLS policies can impact query performance</p>
         </CardContent>
       </Card>
     </div>
