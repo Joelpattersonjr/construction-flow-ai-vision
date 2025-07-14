@@ -49,14 +49,14 @@ const PerformanceTesting = () => {
   const [dbResults, setDbResults] = useState<DatabasePerformanceResult | null>(null);
   const [testProgress, setTestProgress] = useState(0);
 
-  // Mock performance data for demonstration
+  // Mock performance data for demonstration - optimized ranges
   const generateMockMetrics = (): PerformanceMetrics => ({
-    responseTime: Math.floor(Math.random() * 500) + 100,
-    throughput: Math.floor(Math.random() * 1000) + 500,
-    memoryUsage: Math.floor(Math.random() * 80) + 20,
-    cpuUsage: Math.floor(Math.random() * 60) + 15,
-    networkLatency: Math.floor(Math.random() * 50) + 10,
-    diskIO: Math.floor(Math.random() * 100) + 25
+    responseTime: Math.floor(Math.random() * 200) + 50,
+    throughput: Math.floor(Math.random() * 800) + 700,
+    memoryUsage: Math.floor(Math.random() * 40) + 15, // 15-55% range
+    cpuUsage: Math.floor(Math.random() * 30) + 10, // 10-40% range
+    networkLatency: Math.floor(Math.random() * 30) + 5,
+    diskIO: Math.floor(Math.random() * 50) + 15
   });
 
   const testDatabasePerformance = async () => {
@@ -264,6 +264,11 @@ const PerformanceTesting = () => {
       <div className="text-center space-y-4">
         <h1 className="text-3xl font-bold text-gray-900">Performance Testing</h1>
         <p className="text-gray-600">Monitor and test application performance metrics</p>
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+          <p className="text-sm text-blue-700">
+            <strong>Note:</strong> Resource metrics (Memory, CPU) are simulated for demonstration purposes
+          </p>
+        </div>
       </div>
 
       {/* Progress Bar */}
