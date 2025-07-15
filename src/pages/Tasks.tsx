@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Search, Filter, ListIcon, Grid3X3Icon, EditIcon, X, Tag, Clock, BarChart3, ArrowLeft } from 'lucide-react';
+import { MobileHeader } from '@/components/mobile/MobileHeader';
+import { MobileTaskCard } from '@/components/mobile/MobileTaskCard';
+import { useOfflineStorage } from '@/hooks/useOfflineStorage';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { 
   DndContext, 
   DragEndEvent, 
@@ -38,6 +42,9 @@ import { KanbanTaskCard } from '@/components/tasks/KanbanTaskCard';
 import { ExportDialog } from '@/components/export/ExportDialog';
 
 const Tasks = () => {
+  const isMobile = useIsMobile();
+  const { isOnline, saveOfflineData, loadOfflineData } = useOfflineStorage();
+  
   // Advanced search filters state
   const [advancedFilters, setAdvancedFilters] = useState<AdvancedSearchFiltersType>({
     searchTerm: '',

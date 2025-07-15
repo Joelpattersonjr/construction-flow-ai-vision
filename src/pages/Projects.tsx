@@ -17,6 +17,10 @@ import { useNavigate } from 'react-router-dom';
 import AppHeader from '@/components/navigation/AppHeader';
 import { ExportDialog } from '@/components/export/ExportDialog';
 import TeamCollaborationPanel from '@/components/projects/TeamCollaborationPanel';
+import { MobileHeader } from '@/components/mobile/MobileHeader';
+import { MobileProjectCard } from '@/components/mobile/MobileProjectCard';
+import { useOfflineStorage } from '@/hooks/useOfflineStorage';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface Project {
   id: string;
@@ -72,6 +76,8 @@ const Projects: React.FC = () => {
   const { toast } = useToast();
   const { user, profile } = useAuth();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
+  const { isOnline, saveOfflineData, loadOfflineData } = useOfflineStorage();
 
   const [newProject, setNewProject] = useState({
     name: '',
@@ -88,6 +94,16 @@ const Projects: React.FC = () => {
 
   const loadProjects = async () => {
     try {
+      // Try to load from offline cache first if offline
+      if (!isOnline) {
+        const cachedData = loadOfflineData();
+        if (cachedData?.projects) {
+          setProjects(cachedData.projects);
+          setLoading(false);
+          return;
+        }
+      }
+
       const { data, error } = await supabase
         .from('projects')
         .select('*')
@@ -181,6 +197,11 @@ const Projects: React.FC = () => {
       );
       
       setProjects(projectsWithStats);
+      
+      // Save to offline storage for future offline access
+      if (isOnline) {
+        saveOfflineData({ projects: projectsWithStats });
+      }
     } catch (error) {
       toast({
         title: "Error loading projects",
@@ -410,6 +431,185 @@ const Projects: React.FC = () => {
     );
   }
 
+  // Mobile-optimized render
+  if (isMobile) {
+    return (
+      <div className="min-h-screen bg-background">
+        <MobileHeader 
+          title="Projects"
+          showSearch={true}
+          showNotifications={true}
+          notificationCount={3}
+          onSearch={() => {}}
+          onNotifications={() => {}}
+        />
+        
+        <main className="px-4 py-6 pb-20 space-y-6">
+          {/* Offline indicator */}
+          {!isOnline && (
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4 text-amber-600" />
+              <span className="text-sm text-amber-800">Viewing cached data (offline)</span>
+            </div>
+          )}
+
+          {/* Quick Stats */}
+          <div className="grid grid-cols-2 gap-4">
+            <Card className="p-4">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-primary">{projects.length}</div>
+                <div className="text-sm text-muted-foreground">Total Projects</div>
+              </div>
+            </Card>
+            <Card className="p-4">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-green-600">
+                  {projects.filter(p => p.status === 'active').length}
+                </div>
+                <div className="text-sm text-muted-foreground">Active</div>
+              </div>
+            </Card>
+          </div>
+
+          {/* Search and Filter */}
+          <div className="space-y-3">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search projects..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger>
+                <SelectValue placeholder="Filter by status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="planning">Planning</SelectItem>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="on-hold">On Hold</SelectItem>
+                <SelectItem value="completed">Completed</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Create Project Button */}
+          {profile?.company_role === 'company_admin' && (
+            <Dialog open={open} onOpenChange={setOpen}>
+              <DialogTrigger asChild>
+                <Button className="w-full h-12" size="lg">
+                  <Plus className="h-5 w-5 mr-2" />
+                  Create New Project
+                </Button>
+              </DialogTrigger>
+              {/* ... mobile-optimized dialog content ... */}
+              <DialogContent className="w-[95vw] max-w-md max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Create New Project</DialogTitle>
+                  <DialogDescription>Add a new construction project.</DialogDescription>
+                </DialogHeader>
+                
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="name">Project Name *</Label>
+                    <Input
+                      id="name"
+                      value={newProject.name}
+                      onChange={(e) => setNewProject(prev => ({ ...prev, name: e.target.value }))}
+                      placeholder="Enter project name"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="address">Address</Label>
+                    <Textarea
+                      id="address"
+                      value={newProject.address}
+                      onChange={(e) => setNewProject(prev => ({ ...prev, address: e.target.value }))}
+                      placeholder="Project location"
+                      rows={2}
+                    />
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <Label htmlFor="start_date">Start Date</Label>
+                      <Input
+                        id="start_date"
+                        type="date"
+                        value={newProject.start_date}
+                        onChange={(e) => setNewProject(prev => ({ ...prev, start_date: e.target.value }))}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="end_date">End Date</Label>
+                      <Input
+                        id="end_date"
+                        type="date"
+                        value={newProject.end_date}
+                        onChange={(e) => setNewProject(prev => ({ ...prev, end_date: e.target.value }))}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <DialogFooter className="flex-col space-y-2">
+                  <Button 
+                    onClick={handleCreateProject} 
+                    disabled={creating}
+                    className="w-full"
+                  >
+                    {creating ? 'Creating...' : 'Create Project'}
+                  </Button>
+                  <Button variant="outline" onClick={() => setOpen(false)} disabled={creating} className="w-full">
+                    Cancel
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          )}
+
+          {/* Projects List */}
+          {filteredAndSortedProjects.length === 0 ? (
+            <Card className="p-8 text-center">
+              <Folder className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+              <h3 className="text-lg font-semibold mb-2">No projects found</h3>
+              <p className="text-muted-foreground mb-4">
+                {profile?.company_role === 'company_admin' 
+                  ? 'Create your first project to get started.'
+                  : 'Contact your administrator to be added to projects.'
+                }
+              </p>
+              {profile?.company_role === 'company_admin' && (
+                <Button onClick={() => setOpen(true)}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Create Project
+                </Button>
+              )}
+            </Card>
+          ) : (
+            <div className="space-y-4">
+              {filteredAndSortedProjects.map((project) => (
+                <MobileProjectCard
+                  key={project.id}
+                  project={project}
+                  taskCount={project.taskCount}
+                  teamCount={project.teamMembers?.length}
+                  onSelect={(projectId) => navigate(`/project-details/${projectId}`)}
+                />
+              ))}
+            </div>
+          )}
+        </main>
+      </div>
+    );
+  }
+
+  // Desktop render
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20 relative overflow-hidden">
       {/* Background Elements */}
