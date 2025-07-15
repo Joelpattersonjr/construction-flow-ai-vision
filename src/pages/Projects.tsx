@@ -492,7 +492,7 @@ const Projects: React.FC = () => {
                   <div className="grid gap-6 py-4">
                     {/* Project Information Section */}
                     <div className="space-y-4">
-                      <h4 className="font-semibold text-slate-800 border-b border-gradient-to-r from-blue-200 to-purple-200 pb-2">
+                      <h4 className="font-semibold text-slate-800 border-b border-slate-200 pb-2">
                         Project Information
                       </h4>
                       
@@ -557,7 +557,7 @@ const Projects: React.FC = () => {
 
                     {/* Owner Information Section */}
                     <div className="space-y-4">
-                      <h4 className="font-semibold text-slate-800 border-b border-gradient-to-r from-blue-200 to-purple-200 pb-2">
+                      <h4 className="font-semibold text-slate-800 border-b border-slate-200 pb-2">
                         Owner Information
                       </h4>
                       
