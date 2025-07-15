@@ -109,7 +109,7 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
   } catch (error: any) {
-    console.error('Error in admin-password-reset function:', error);
+    console.error('Error in admin-password-reset function:', error.message || 'Unknown error');
     return new Response(
       JSON.stringify({ error: error.message }),
       {
