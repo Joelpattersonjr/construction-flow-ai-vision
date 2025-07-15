@@ -164,7 +164,7 @@ export async function getFileUrl(category: FileCategory, storagePath: string, pr
   }
 
   // Convert relative URL to full URL
-  const baseUrl = 'https://gnyflfsjaqnxgnpsshwe.supabase.co/storage/v1';
+  const baseUrl = 'https://gnyflfsjaqnxgnpsshwe.supabase.co/storage/v1'; // TODO: Move to config
   return data.signedUrl.startsWith('/') ? `${baseUrl}${data.signedUrl}` : data.signedUrl;
 }
 
