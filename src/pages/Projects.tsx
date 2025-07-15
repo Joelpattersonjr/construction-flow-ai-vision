@@ -363,7 +363,7 @@ const Projects: React.FC = () => {
         navigate(`/tasks?project=${projectId}&action=create`);
         break;
       case 'upload-file':
-        navigate(`/file-management?project=${projectId}&action=upload`);
+        navigate(`/files?project=${projectId}&action=upload`);
         break;
       case 'view-calendar':
         navigate(`/calendar?project=${projectId}`);
@@ -660,7 +660,7 @@ const Projects: React.FC = () => {
               </Card>
               
               <Card className="bg-white/50 border-white/20 hover:bg-white/70 transition-colors cursor-pointer group"
-                    onClick={() => navigate('/file-management?action=upload')}>
+                    onClick={() => navigate('/files?action=upload')}>
                 <CardContent className="p-4 text-center">
                   <div className="w-12 h-12 bg-gradient-to-br from-green-500/10 to-green-600/10 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
                     <Upload className="h-6 w-6 text-green-600" />
@@ -955,7 +955,7 @@ const Projects: React.FC = () => {
                        <Button
                          variant="outline"
                          size="sm"
-                         onClick={() => navigate(`/file-management?project=${project.id}`)}
+                         onClick={() => navigate(`/files?project=${project.id}`)}
                          className="group/btn bg-white/50 border-white/20 hover:bg-white/70 transition-all duration-200"
                        >
                          <Folder className="h-4 w-4 mr-2 group-hover/btn:scale-110 transition-transform" />
