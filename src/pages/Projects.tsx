@@ -16,6 +16,7 @@ import { Plus, Folder, Calendar, MapPin, FileText, Settings, ArrowLeft, Search, 
 import { useNavigate } from 'react-router-dom';
 import AppHeader from '@/components/navigation/AppHeader';
 import { ExportDialog } from '@/components/export/ExportDialog';
+import TeamCollaborationPanel from '@/components/projects/TeamCollaborationPanel';
 
 interface Project {
   id: string;
@@ -999,6 +1000,11 @@ const Projects: React.FC = () => {
             ))}
           </div>
         )}
+
+        {/* Team Collaboration Section */}
+        <div className="mt-12">
+          <TeamCollaborationPanel selectedProjectId={selectedProjectForAction} />
+        </div>
       </main>
     </div>
   );
