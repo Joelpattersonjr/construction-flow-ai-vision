@@ -109,9 +109,9 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
   } catch (error: any) {
-    console.error('Error in admin-password-reset function:', error.message || 'Unknown error');
+    console.error('Error in admin-password-reset function: Password reset failed');
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: 'Password reset failed. Please try again.' }),
       {
         status: 500,
         headers: { 'Content-Type': 'application/json', ...corsHeaders },
