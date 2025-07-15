@@ -3,9 +3,11 @@ import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
 // Configuration object to centralize credentials
+// Note: These are PUBLIC credentials safe for client-side use
+// Supabase URL and anon key are designed to be exposed in frontend applications
 const supabaseConfig = {
-  url: "https://gnyflfsjaqnxgnpsshwe.supabase.co",
-  anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdueWZsZnNqYXFueGducHNzaHdlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE5MjI1NjksImV4cCI6MjA2NzQ5ODU2OX0.IpmWKi4bR2Ybf2MvqEjjb0B223t1rTQ2MZT9OA1wuoU"
+  url: "https://gnyflfsjaqnxgnpsshwe.supabase.co", // Public Supabase project URL
+  anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdueWZsZnNqYXFueGducHNzaHdlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE5MjI1NjksImV4cCI6MjA2NzQ5ODU2OX0.IpmWKi4bR2Ybf2MvqEjjb0B223t1rTQ2MZT9OA1wuoU" // Public anon key, safe for client-side
 };
 
 // Import the supabase client like this:
