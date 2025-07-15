@@ -1,14 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { Plus, Folder, Calendar, MapPin, FileText, Settings, ArrowLeft } from 'lucide-react';
+import { Plus, Folder, Calendar, MapPin, FileText, Settings, ArrowLeft, Search, Filter, Users, Clock, AlertTriangle, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import AppHeader from '@/components/navigation/AppHeader';
 import { ExportDialog } from '@/components/export/ExportDialog';
@@ -28,6 +32,13 @@ interface Project {
   created_at: string;
   fileCount?: number;
   recentFileActivity?: string;
+  taskCount?: number;
+  completedTasks?: number;
+  teamMembers?: Array<{
+    id: string;
+    full_name?: string;
+    avatar_url?: string;
+  }>;
 }
 
 const Projects: React.FC = () => {
@@ -35,6 +46,9 @@ const Projects: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [open, setOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('created_at');
   const { toast } = useToast();
   const { user, profile } = useAuth();
   const navigate = useNavigate();
@@ -61,11 +75,11 @@ const Projects: React.FC = () => {
 
       if (error) throw error;
       
-      // Enhance projects with file statistics
+      // Enhance projects with enhanced statistics
       const projectsWithStats = await Promise.all(
         (data || []).map(async (project) => {
           // Get file count for this project
-          const { count } = await supabase
+          const { count: fileCount } = await supabase
             .from('documents')
             .select('*', { count: 'exact', head: true })
             .eq('project_id', project.id);
@@ -79,10 +93,43 @@ const Projects: React.FC = () => {
             .limit(1)
             .single();
 
+          // Get task statistics
+          const { count: taskCount } = await supabase
+            .from('tasks')
+            .select('*', { count: 'exact', head: true })
+            .eq('project_id', project.id);
+
+          const { count: completedTaskCount } = await supabase
+            .from('tasks')
+            .select('*', { count: 'exact', head: true })
+            .eq('project_id', project.id)
+            .eq('status', 'completed');
+
+          // Get team members
+          const { data: teamMembers } = await supabase
+            .from('project_members_enhanced')
+            .select(`
+              user_id,
+              profiles!inner(
+                id,
+                full_name,
+                avatar_url
+              )
+            `)
+            .eq('project_id', project.id)
+            .limit(5);
+
           return {
             ...project,
-            fileCount: count || 0,
-            recentFileActivity: recentFile?.created_at
+            fileCount: fileCount || 0,
+            recentFileActivity: recentFile?.created_at,
+            taskCount: taskCount || 0,
+            completedTasks: completedTaskCount || 0,
+            teamMembers: teamMembers?.map(member => ({
+              id: member.profiles.id,
+              full_name: member.profiles.full_name,
+              avatar_url: member.profiles.avatar_url
+            })) || []
           };
         })
       );
@@ -190,13 +237,71 @@ const Projects: React.FC = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'active': return 'bg-green-100 text-green-800';
-      case 'planning': return 'bg-blue-100 text-blue-800';
-      case 'completed': return 'bg-gray-100 text-gray-800';
-      case 'on-hold': return 'bg-yellow-100 text-yellow-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'active': return 'bg-green-100 text-green-800 border-green-200';
+      case 'planning': return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'completed': return 'bg-gray-100 text-gray-800 border-gray-200';
+      case 'on-hold': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      default: return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'active': return <CheckCircle className="h-3 w-3" />;
+      case 'planning': return <Clock className="h-3 w-3" />;
+      case 'completed': return <CheckCircle className="h-3 w-3" />;
+      case 'on-hold': return <AlertTriangle className="h-3 w-3" />;
+      default: return <Clock className="h-3 w-3" />;
+    }
+  };
+
+  const getPriorityLevel = (project: Project) => {
+    const now = new Date();
+    const endDate = project.end_date ? new Date(project.end_date) : null;
+    const daysUntilEnd = endDate ? Math.ceil((endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)) : null;
+    
+    if (daysUntilEnd !== null && daysUntilEnd < 7) return 'high';
+    if (daysUntilEnd !== null && daysUntilEnd < 30) return 'medium';
+    return 'low';
+  };
+
+  const getProgressPercentage = (project: Project) => {
+    if (!project.taskCount || project.taskCount === 0) return 0;
+    return Math.round((project.completedTasks || 0) / project.taskCount * 100);
+  };
+
+  // Filtered and sorted projects
+  const filteredAndSortedProjects = useMemo(() => {
+    let filtered = projects.filter(project => {
+      const matchesSearch = project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           project.address?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           project.owner_name?.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      const matchesStatus = statusFilter === 'all' || project.status === statusFilter;
+      
+      return matchesSearch && matchesStatus;
+    });
+
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case 'name':
+          return a.name.localeCompare(b.name);
+        case 'status':
+          return a.status.localeCompare(b.status);
+        case 'progress':
+          return getProgressPercentage(b) - getProgressPercentage(a);
+        case 'end_date':
+          if (!a.end_date && !b.end_date) return 0;
+          if (!a.end_date) return 1;
+          if (!b.end_date) return -1;
+          return new Date(a.end_date).getTime() - new Date(b.end_date).getTime();
+        default: // created_at
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      }
+    });
+
+    return filtered;
+  }, [projects, searchTerm, statusFilter, sortBy]);
 
   if (loading) {
     return (
@@ -458,8 +563,79 @@ const Projects: React.FC = () => {
           </div>
         </div>
 
+        {/* Enhanced Filters and Search */}
+        <div className="bg-white/30 backdrop-blur-sm rounded-xl border border-white/20 p-6 shadow-xl mb-8">
+          <div className="flex flex-col lg:flex-row gap-4 items-center">
+            {/* Search */}
+            <div className="relative flex-1 min-w-0">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <Input
+                placeholder="Search projects by name, location, or owner..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 bg-white/70 border-white/20 focus:border-blue-300 transition-colors"
+              />
+            </div>
+
+            {/* Status Filter */}
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-full lg:w-48 bg-white/70 border-white/20">
+                <Filter className="h-4 w-4 mr-2" />
+                <SelectValue placeholder="Filter by status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="planning">Planning</SelectItem>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="on-hold">On Hold</SelectItem>
+                <SelectItem value="completed">Completed</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {/* Sort Options */}
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger className="w-full lg:w-48 bg-white/70 border-white/20">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="created_at">Recent</SelectItem>
+                <SelectItem value="name">Name</SelectItem>
+                <SelectItem value="status">Status</SelectItem>
+                <SelectItem value="progress">Progress</SelectItem>
+                <SelectItem value="end_date">Due Date</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Quick Stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-white/20">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-slate-800">{projects.length}</div>
+              <div className="text-sm text-slate-600">Total Projects</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-green-600">
+                {projects.filter(p => p.status === 'active').length}
+              </div>
+              <div className="text-sm text-slate-600">Active</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-blue-600">
+                {projects.filter(p => p.status === 'planning').length}
+              </div>
+              <div className="text-sm text-slate-600">Planning</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-gray-600">
+                {projects.filter(p => p.status === 'completed').length}
+              </div>
+              <div className="text-sm text-slate-600">Completed</div>
+            </div>
+          </div>
+        </div>
+
         {/* Projects Grid */}
-        {projects.length === 0 ? (
+        {filteredAndSortedProjects.length === 0 ? (
           <div className="flex justify-center">
             <Card className="max-w-md bg-white/70 backdrop-blur-xl border border-white/20 shadow-xl">
               <CardContent className="p-12 text-center space-y-6">
@@ -491,89 +667,122 @@ const Projects: React.FC = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {projects.map((project, index) => (
-              <Card 
-                key={project.id} 
-                className="group bg-white/70 backdrop-blur-xl border border-white/20 shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-500 overflow-hidden relative animate-fade-in"
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
-                {/* Gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            {filteredAndSortedProjects.map((project, index) => (
+              <Card key={project.id} className="group bg-white/70 backdrop-blur-xl border border-white/20 hover:border-white/40 transition-all duration-300 transform hover:scale-[1.02] hover:shadow-2xl shadow-xl rounded-xl overflow-hidden animate-fade-in relative"
+                    style={{ animationDelay: `${index * 100}ms` }}>
+                {/* Priority indicator */}
+                <div className={`absolute top-4 right-4 w-3 h-3 rounded-full ${
+                  getPriorityLevel(project) === 'high' ? 'bg-red-500' :
+                  getPriorityLevel(project) === 'medium' ? 'bg-yellow-500' : 'bg-green-500'
+                }`} />
                 
-                <CardHeader className="relative z-10">
+                <CardHeader className="pb-4">
                   <div className="flex items-start justify-between">
-                    <div className="flex-1 space-y-2">
-                      <CardTitle className="text-xl font-bold text-slate-800 group-hover:text-blue-700 transition-colors duration-300">
+                    <div className="flex-1 min-w-0">
+                      <CardTitle className="text-xl font-bold text-slate-800 mb-2 group-hover:text-blue-700 transition-colors line-clamp-2">
                         {project.name}
                       </CardTitle>
                       {project.project_number && (
-                        <CardDescription className="font-mono text-sm text-slate-500 bg-slate-100/80 px-2 py-1 rounded-md inline-block">
-                          {project.project_number}
-                        </CardDescription>
+                        <p className="text-sm text-slate-500 font-medium mb-2">
+                          #{project.project_number}
+                        </p>
                       )}
                     </div>
-                    <span className={`px-3 py-1.5 text-xs font-semibold rounded-full capitalize ${getStatusColor(project.status)} shadow-sm`}>
-                      {project.status}
-                    </span>
                   </div>
-                </CardHeader>
-                
-                <CardContent className="space-y-6 relative z-10">
-                  {project.address && (
-                    <div className="flex items-start space-x-3 text-sm text-slate-600 p-3 bg-slate-50/80 rounded-lg">
-                      <MapPin className="h-4 w-4 mt-0.5 text-blue-500" />
-                      <span className="leading-relaxed">{project.address}</span>
+                  
+                  <div className="flex items-center gap-2 mb-3">
+                    <Badge className={`px-3 py-1 text-xs font-medium border ${getStatusColor(project.status)} flex items-center gap-1`}>
+                      {getStatusIcon(project.status)}
+                      {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
+                    </Badge>
+                  </div>
+
+                  {/* Progress bar */}
+                  {project.taskCount && project.taskCount > 0 && (
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-slate-600">Progress</span>
+                        <span className="font-medium text-slate-800">{getProgressPercentage(project)}%</span>
+                      </div>
+                      <Progress value={getProgressPercentage(project)} className="h-2" />
                     </div>
                   )}
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="flex items-center space-x-2 text-sm text-slate-600 p-2 bg-blue-50/50 rounded-lg">
-                      <Calendar className="h-4 w-4 text-blue-500" />
-                      <span>Created {formatDate(project.created_at)}</span>
+                </CardHeader>
+
+                <CardContent className="space-y-4">
+                  {/* Project details */}
+                  {project.address && (
+                    <div className="flex items-start gap-2 text-sm text-slate-600">
+                      <MapPin className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                      <span className="line-clamp-2">{project.address}</span>
                     </div>
-                    <div className="flex items-center space-x-2 text-sm text-slate-600 p-2 bg-purple-50/50 rounded-lg">
-                      <FileText className="h-4 w-4 text-purple-500" />
-                      <span>{project.fileCount || 0} files</span>
+                  )}
+
+                  {(project.start_date || project.end_date) && (
+                    <div className="flex items-center gap-2 text-sm text-slate-600">
+                      <Calendar className="h-4 w-4" />
+                      <span>
+                        {project.start_date && formatDate(project.start_date)}
+                        {project.start_date && project.end_date && ' - '}
+                        {project.end_date && formatDate(project.end_date)}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Team members */}
+                  {project.teamMembers && project.teamMembers.length > 0 && (
+                    <div className="flex items-center gap-2">
+                      <Users className="h-4 w-4 text-slate-600" />
+                      <div className="flex -space-x-2">
+                        {project.teamMembers.slice(0, 4).map((member, idx) => (
+                          <Avatar key={member.id} className="w-6 h-6 border-2 border-white">
+                            <AvatarImage src={member.avatar_url || ''} />
+                            <AvatarFallback className="text-xs">
+                              {member.full_name?.split(' ').map(n => n[0]).join('') || 'U'}
+                            </AvatarFallback>
+                          </Avatar>
+                        ))}
+                        {project.teamMembers.length > 4 && (
+                          <div className="w-6 h-6 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center text-xs text-slate-600">
+                            +{project.teamMembers.length - 4}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Statistics */}
+                  <div className="grid grid-cols-2 gap-4 pt-2 border-t border-slate-200">
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-slate-800">{project.fileCount || 0}</div>
+                      <div className="text-xs text-slate-500">Files</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-slate-800">{project.taskCount || 0}</div>
+                      <div className="text-xs text-slate-500">Tasks</div>
                     </div>
                   </div>
 
-                  {project.recentFileActivity && (
-                    <div className="text-xs text-slate-500 bg-slate-50/50 p-2 rounded-lg">
-                      Last activity: {formatDate(project.recentFileActivity)}
-                    </div>
-                  )}
-                  
-                  <div className="space-y-3 pt-2">
-                    <Button 
-                      onClick={() => navigate(`/projects/${project.id}`)}
-                      className="w-full group text-lg px-10 py-4 bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl font-semibold relative overflow-hidden"
+                  {/* Action buttons */}
+                  <div className="grid grid-cols-2 gap-2 pt-4">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => navigate(`/project-details/${project.id}`)}
+                      className="group/btn bg-white/50 border-white/20 hover:bg-white/70 transition-all duration-200"
                     >
-                      <span className="relative z-10">View Details</span>
-                      <div className="absolute inset-0 bg-gradient-to-r from-primary to-blue-600 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-500"></div>
+                      <FileText className="h-4 w-4 mr-2 group-hover/btn:scale-110 transition-transform" />
+                      Details
                     </Button>
-                    
-                    <div className="grid grid-cols-2 gap-3">
-                      <Button 
-                        onClick={() => navigate(`/files?project=${project.id}`)}
-                        className="w-full group text-lg px-10 py-4 bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl font-semibold relative overflow-hidden"
-                      >
-                        <span className="relative z-10 flex items-center space-x-2">
-                          <FileText className="h-4 w-4" />
-                          <span>Files</span>
-                        </span>
-                        <div className="absolute inset-0 bg-gradient-to-r from-primary to-blue-600 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-500"></div>
-                      </Button>
-                      <Button 
-                        onClick={() => navigate(`/projects/${project.id}/permissions`)}
-                        className="w-full group text-lg px-10 py-4 bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl font-semibold relative overflow-hidden"
-                      >
-                        <span className="relative z-10 flex items-center space-x-2">
-                          <Settings className="h-4 w-4" />
-                          <span>Settings</span>
-                        </span>
-                        <div className="absolute inset-0 bg-gradient-to-r from-primary to-blue-600 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-500"></div>
-                      </Button>
-                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => navigate(`/file-management?project=${project.id}`)}
+                      className="group/btn bg-white/50 border-white/20 hover:bg-white/70 transition-all duration-200"
+                    >
+                      <Folder className="h-4 w-4 mr-2 group-hover/btn:scale-110 transition-transform" />
+                      Files
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
