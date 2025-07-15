@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,6 +9,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -27,7 +29,10 @@ import {
   TrendingUp,
   MessageCircle,
   UserCheck,
-  AtSign
+  AtSign,
+  Search,
+  ChevronDown,
+  Check
 } from 'lucide-react';
 
 interface TeamActivity {
@@ -67,6 +72,14 @@ interface TeamMember {
   avatar?: string;
   role: string;
   online?: boolean;
+  department?: string;
+}
+
+interface RecentContact {
+  id: string;
+  name: string;
+  avatar?: string;
+  lastMessageTime: string;
 }
 
 interface TeamCollaborationPanelProps {
@@ -78,9 +91,15 @@ const TeamCollaborationPanel: React.FC<TeamCollaborationPanelProps> = ({ selecte
   const [projectUpdates, setProjectUpdates] = useState<ProjectUpdate[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+  const [recentContacts, setRecentContacts] = useState<RecentContact[]>([]);
   const [message, setMessage] = useState('');
   const [selectedRecipients, setSelectedRecipients] = useState<string[]>(['all']);
   const [messageRecipientType, setMessageRecipientType] = useState<'all' | 'specific' | 'group'>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedDepartment, setSelectedDepartment] = useState<string>('all');
+  const [showMentionSuggestions, setShowMentionSuggestions] = useState(false);
+  const [mentionQuery, setMentionQuery] = useState('');
+  const [cursorPosition, setCursorPosition] = useState(0);
   const [activeTab, setActiveTab] = useState('activity');
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
@@ -140,12 +159,23 @@ const TeamCollaborationPanel: React.FC<TeamCollaborationPanelProps> = ({ selecte
       }
     } catch (error) {
       console.error('Error loading team members:', error);
-      // Add mock data for demo purposes
+      // Add mock data for demo purposes with departments
       setTeamMembers([
-        { id: '1', name: 'John Doe', role: 'Project Manager', online: true },
-        { id: '2', name: 'Sarah Miller', role: 'Engineer', online: true },
-        { id: '3', name: 'Mike Johnson', role: 'Architect', online: false },
-        { id: '4', name: 'Lisa Chen', role: 'Supervisor', online: true }
+        { id: '1', name: 'John Doe', role: 'Project Manager', department: 'Management', online: true },
+        { id: '2', name: 'Sarah Miller', role: 'Engineer', department: 'Engineering', online: true },
+        { id: '3', name: 'Mike Johnson', role: 'Architect', department: 'Design', online: false },
+        { id: '4', name: 'Lisa Chen', role: 'Supervisor', department: 'Operations', online: true },
+        { id: '5', name: 'Robert Smith', role: 'Foreman', department: 'Operations', online: true },
+        { id: '6', name: 'Emily Davis', role: 'Engineer', department: 'Engineering', online: false },
+        { id: '7', name: 'David Wilson', role: 'Designer', department: 'Design', online: true },
+        { id: '8', name: 'Jennifer Brown', role: 'Safety Officer', department: 'Safety', online: true }
+      ]);
+      
+      // Set recent contacts
+      setRecentContacts([
+        { id: '2', name: 'Sarah Miller', avatar: '', lastMessageTime: '2 hours ago' },
+        { id: '1', name: 'John Doe', avatar: '', lastMessageTime: '1 day ago' },
+        { id: '4', name: 'Lisa Chen', avatar: '', lastMessageTime: '3 days ago' }
       ]);
     }
   };
@@ -356,6 +386,82 @@ const TeamCollaborationPanel: React.FC<TeamCollaborationPanelProps> = ({ selecte
     } else {
       setSelectedRecipients([]);
     }
+  };
+
+  // Enhanced team member filtering and search
+  const filteredTeamMembers = useMemo(() => {
+    let filtered = teamMembers;
+    
+    // Filter by department
+    if (selectedDepartment !== 'all') {
+      filtered = filtered.filter(member => member.department === selectedDepartment);
+    }
+    
+    // Filter by search query
+    if (searchQuery.trim()) {
+      filtered = filtered.filter(member => 
+        member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        member.role.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+    
+    return filtered;
+  }, [teamMembers, selectedDepartment, searchQuery]);
+
+  // Get unique departments for filtering
+  const departments = useMemo(() => {
+    const uniqueDepts = [...new Set(teamMembers.map(member => member.department).filter(Boolean))];
+    return uniqueDepts;
+  }, [teamMembers]);
+
+  // Handle @mention functionality
+  const handleMessageChange = (value: string) => {
+    setMessage(value);
+    
+    // Check for @ mentions
+    const lastAtIndex = value.lastIndexOf('@');
+    if (lastAtIndex !== -1 && lastAtIndex === value.length - 1) {
+      setShowMentionSuggestions(true);
+      setMentionQuery('');
+    } else if (lastAtIndex !== -1) {
+      const mentionText = value.slice(lastAtIndex + 1);
+      if (mentionText.includes(' ')) {
+        setShowMentionSuggestions(false);
+      } else {
+        setShowMentionSuggestions(true);
+        setMentionQuery(mentionText);
+      }
+    } else {
+      setShowMentionSuggestions(false);
+    }
+  };
+
+  const handleMentionSelect = (memberName: string) => {
+    const lastAtIndex = message.lastIndexOf('@');
+    const newMessage = message.slice(0, lastAtIndex) + `@${memberName} `;
+    setMessage(newMessage);
+    setShowMentionSuggestions(false);
+    setMentionQuery('');
+  };
+
+  // Filtered mention suggestions
+  const mentionSuggestions = useMemo(() => {
+    if (!mentionQuery) return teamMembers.slice(0, 5);
+    return teamMembers.filter(member =>
+      member.name.toLowerCase().includes(mentionQuery.toLowerCase())
+    ).slice(0, 5);
+  }, [teamMembers, mentionQuery]);
+
+  // Select all members from a department
+  const selectDepartmentMembers = (department: string) => {
+    const departmentMembers = teamMembers
+      .filter(member => member.department === department)
+      .map(member => member.id);
+    
+    setSelectedRecipients(prev => {
+      const newSelection = [...new Set([...prev, ...departmentMembers])];
+      return newSelection;
+    });
   };
 
   const markNotificationAsRead = (id: string) => {
@@ -662,36 +768,145 @@ const TeamCollaborationPanel: React.FC<TeamCollaborationPanelProps> = ({ selecte
               </div>
 
               {messageRecipientType === 'specific' && (
-                <div className="space-y-2">
-                  <p className="text-xs text-slate-600">Select team members to message:</p>
-                  <ScrollArea className="h-[120px]">
+                <div className="space-y-3">
+                  {/* Recent Contacts */}
+                  {recentContacts.length > 0 && (
                     <div className="space-y-2">
-                      {teamMembers.map((member) => (
-                        <div key={member.id} className="flex items-center gap-3 p-2 hover:bg-white rounded transition-colors">
-                          <Checkbox
-                            id={`member-${member.id}`}
-                            checked={selectedRecipients.includes(member.id)}
-                            onCheckedChange={() => handleRecipientToggle(member.id)}
-                          />
-                          <Avatar className="h-6 w-6">
-                            <AvatarImage src={member.avatar} />
-                            <AvatarFallback className="text-xs">
-                              {member.name.split(' ').map(n => n[0]).join('')}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm font-medium">{member.name}</span>
-                              {member.online && (
-                                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                              )}
-                            </div>
-                            <p className="text-xs text-slate-500">{member.role}</p>
-                          </div>
-                        </div>
-                      ))}
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-3 w-3 text-slate-500" />
+                        <span className="text-xs font-medium text-slate-600">Recent Contacts</span>
+                      </div>
+                      <div className="flex gap-2 flex-wrap">
+                        {recentContacts.map((contact) => (
+                          <Button
+                            key={contact.id}
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleRecipientToggle(contact.id)}
+                            className={`text-xs h-7 ${
+                              selectedRecipients.includes(contact.id) 
+                                ? 'bg-blue-100 border-blue-300' 
+                                : ''
+                            }`}
+                          >
+                            <Avatar className="h-4 w-4 mr-1">
+                              <AvatarImage src={contact.avatar} />
+                              <AvatarFallback className="text-xs">
+                                {contact.name.split(' ').map(n => n[0]).join('')}
+                              </AvatarFallback>
+                            </Avatar>
+                            {contact.name}
+                            {selectedRecipients.includes(contact.id) && (
+                              <Check className="h-3 w-3 ml-1" />
+                            )}
+                          </Button>
+                        ))}
+                      </div>
                     </div>
-                  </ScrollArea>
+                  )}
+
+                  {/* Search and Filter */}
+                  <div className="space-y-2">
+                    <div className="flex gap-2">
+                      <div className="relative flex-1">
+                        <Search className="h-3 w-3 absolute left-2 top-1/2 transform -translate-y-1/2 text-slate-400" />
+                        <Input
+                          placeholder="Search team members..."
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          className="text-xs h-8 pl-7"
+                        />
+                      </div>
+                      <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
+                        <SelectTrigger className="w-32 h-8 text-xs">
+                          <SelectValue placeholder="Department" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-white border shadow-lg z-50">
+                          <SelectItem value="all" className="text-xs">All Depts</SelectItem>
+                          {departments.map((dept) => (
+                            <SelectItem key={dept} value={dept} className="text-xs">
+                              {dept}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Quick Department Selection */}
+                    {departments.length > 0 && (
+                      <div className="space-y-1">
+                        <span className="text-xs text-slate-600">Quick select by department:</span>
+                        <div className="flex gap-1 flex-wrap">
+                          {departments.map((dept) => (
+                            <Button
+                              key={dept}
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => selectDepartmentMembers(dept)}
+                              className="text-xs h-6 px-2"
+                            >
+                              <Users className="h-2 w-2 mr-1" />
+                              {dept}
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Team Members List */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-slate-600">Team members:</span>
+                      <span className="text-xs text-slate-500">
+                        {selectedRecipients.length} selected
+                      </span>
+                    </div>
+                    <ScrollArea className="h-[120px]">
+                      <div className="space-y-2">
+                        {filteredTeamMembers.map((member) => (
+                          <div key={member.id} className="flex items-center gap-3 p-2 hover:bg-white rounded transition-colors">
+                            <Checkbox
+                              id={`member-${member.id}`}
+                              checked={selectedRecipients.includes(member.id)}
+                              onCheckedChange={() => handleRecipientToggle(member.id)}
+                            />
+                            <Avatar className="h-6 w-6">
+                              <AvatarImage src={member.avatar} />
+                              <AvatarFallback className="text-xs">
+                                {member.name.split(' ').map(n => n[0]).join('')}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm font-medium">{member.name}</span>
+                                {member.online && (
+                                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <p className="text-xs text-slate-500">{member.role}</p>
+                                {member.department && (
+                                  <>
+                                    <span className="text-xs text-slate-400">•</span>
+                                    <Badge variant="secondary" className="text-xs px-1 py-0">
+                                      {member.department}
+                                    </Badge>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                        {filteredTeamMembers.length === 0 && (
+                          <div className="text-center py-4 text-slate-500">
+                            <Users className="h-6 w-6 mx-auto mb-1 opacity-50" />
+                            <p className="text-xs">No team members found</p>
+                          </div>
+                        )}
+                      </div>
+                    </ScrollArea>
+                  </div>
                 </div>
               )}
             </div>
@@ -763,21 +978,55 @@ const TeamCollaborationPanel: React.FC<TeamCollaborationPanelProps> = ({ selecte
                     <span>Messaging {getRecipientDisplayText()}</span>
                   </div>
                 )}
-                <div className="flex gap-2">
-                  <Input
-                    placeholder={
-                      messageRecipientType === 'all' 
-                        ? "Type a message to all team members..."
-                        : selectedRecipients.length === 0
-                        ? "Select recipients first..."
-                        : `Message ${getRecipientDisplayText()}...`
-                    }
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && sendQuickMessage()}
-                    disabled={messageRecipientType !== 'all' && selectedRecipients.length === 0}
-                    className="flex-1"
-                  />
+                <div className="relative flex gap-2">
+                  <div className="relative flex-1">
+                    <Input
+                      placeholder={
+                        messageRecipientType === 'all' 
+                          ? "Type a message to all team members... (use @ to mention)"
+                          : selectedRecipients.length === 0
+                          ? "Select recipients first..."
+                          : `Message ${getRecipientDisplayText()}... (use @ to mention)`
+                      }
+                      value={message}
+                      onChange={(e) => handleMessageChange(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && !showMentionSuggestions && sendQuickMessage()}
+                      disabled={messageRecipientType !== 'all' && selectedRecipients.length === 0}
+                      className="flex-1"
+                    />
+                    
+                    {/* @Mention Suggestions */}
+                    {showMentionSuggestions && (
+                      <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-50 max-h-32 overflow-y-auto">
+                        {mentionSuggestions.map((member) => (
+                          <div
+                            key={member.id}
+                            className="flex items-center gap-2 p-2 hover:bg-slate-100 cursor-pointer text-sm"
+                            onClick={() => handleMentionSelect(member.name)}
+                          >
+                            <Avatar className="h-5 w-5">
+                              <AvatarImage src={member.avatar} />
+                              <AvatarFallback className="text-xs">
+                                {member.name.split(' ').map(n => n[0]).join('')}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <span className="font-medium">{member.name}</span>
+                              <span className="text-slate-500 ml-2">{member.role}</span>
+                            </div>
+                            {member.online && (
+                              <div className="w-2 h-2 bg-green-500 rounded-full ml-auto"></div>
+                            )}
+                          </div>
+                        ))}
+                        {mentionSuggestions.length === 0 && (
+                          <div className="p-2 text-sm text-slate-500 text-center">
+                            No team members found
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
                   <Button 
                     onClick={sendQuickMessage}
                     disabled={!message.trim() || (messageRecipientType !== 'all' && selectedRecipients.length === 0)}
