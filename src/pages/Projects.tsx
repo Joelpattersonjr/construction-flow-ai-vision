@@ -12,7 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { Plus, Folder, Calendar, MapPin, FileText, Settings, ArrowLeft, Search, Filter, Users, Clock, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Plus, Folder, Calendar, MapPin, FileText, Settings, ArrowLeft, Search, Filter, Users, Clock, AlertTriangle, CheckCircle, Upload, PlusCircle, Eye, Cloud, Sun, CloudRain, Zap, Activity, TrendingUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import AppHeader from '@/components/navigation/AppHeader';
 import { ExportDialog } from '@/components/export/ExportDialog';
@@ -39,6 +39,23 @@ interface Project {
     full_name?: string;
     avatar_url?: string;
   }>;
+  recentFiles?: Array<{
+    id: number;
+    file_name: string;
+    created_at: string;
+    file_type?: string;
+  }>;
+  weather?: {
+    temperature: number;
+    condition: string;
+    icon: string;
+  };
+  phases?: Array<{
+    name: string;
+    status: 'completed' | 'active' | 'pending';
+    start_date: string;
+    end_date?: string;
+  }>;
 }
 
 const Projects: React.FC = () => {
@@ -49,6 +66,8 @@ const Projects: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [sortBy, setSortBy] = useState('created_at');
+  const [showQuickActions, setShowQuickActions] = useState(true);
+  const [selectedProjectForAction, setSelectedProjectForAction] = useState<string | null>(null);
   const { toast } = useToast();
   const { user, profile } = useAuth();
   const navigate = useNavigate();
@@ -119,6 +138,29 @@ const Projects: React.FC = () => {
             .eq('project_id', project.id)
             .limit(5);
 
+          // Get recent files
+          const { data: recentFiles } = await supabase
+            .from('documents')
+            .select('id, file_name, created_at, file_type')
+            .eq('project_id', project.id)
+            .order('created_at', { ascending: false })
+            .limit(3);
+
+          // Mock weather data (in real app, would integrate with weather API)
+          const mockWeather = {
+            temperature: Math.floor(Math.random() * 40) + 50, // 50-90°F
+            condition: ['sunny', 'cloudy', 'rainy'][Math.floor(Math.random() * 3)],
+            icon: ['sun', 'cloud', 'cloud-rain'][Math.floor(Math.random() * 3)]
+          };
+
+          // Mock project phases
+          const mockPhases = [
+            { name: 'Planning', status: 'completed' as const, start_date: project.start_date, end_date: project.start_date },
+            { name: 'Foundation', status: project.status === 'completed' ? 'completed' as const : 'active' as const, start_date: project.start_date },
+            { name: 'Framing', status: project.status === 'completed' ? 'completed' as const : 'pending' as const, start_date: project.start_date },
+            { name: 'Finishing', status: 'pending' as const, start_date: project.start_date }
+          ];
+
           return {
             ...project,
             fileCount: fileCount || 0,
@@ -129,7 +171,10 @@ const Projects: React.FC = () => {
               id: member.profiles.id,
               full_name: member.profiles.full_name,
               avatar_url: member.profiles.avatar_url
-            })) || []
+            })) || [],
+            recentFiles: recentFiles || [],
+            weather: mockWeather,
+            phases: mockPhases
           };
         })
       );
@@ -302,6 +347,31 @@ const Projects: React.FC = () => {
 
     return filtered;
   }, [projects, searchTerm, statusFilter, sortBy]);
+
+  const getWeatherIcon = (condition: string) => {
+    switch (condition) {
+      case 'sunny': return <Sun className="h-4 w-4 text-yellow-500" />;
+      case 'cloudy': return <Cloud className="h-4 w-4 text-gray-500" />;
+      case 'rainy': return <CloudRain className="h-4 w-4 text-blue-500" />;
+      default: return <Sun className="h-4 w-4 text-yellow-500" />;
+    }
+  };
+
+  const handleQuickAction = async (action: string, projectId: string) => {
+    switch (action) {
+      case 'add-task':
+        navigate(`/tasks?project=${projectId}&action=create`);
+        break;
+      case 'upload-file':
+        navigate(`/file-management?project=${projectId}&action=upload`);
+        break;
+      case 'view-calendar':
+        navigate(`/calendar?project=${projectId}`);
+        break;
+      default:
+        break;
+    }
+  };
 
   if (loading) {
     return (
@@ -563,6 +633,57 @@ const Projects: React.FC = () => {
           </div>
         </div>
 
+        {/* Quick Actions Panel */}
+        {showQuickActions && (
+          <div className="bg-white/30 backdrop-blur-sm rounded-xl border border-white/20 p-6 shadow-xl mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-slate-800">Quick Actions</h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowQuickActions(false)}
+                className="text-slate-500 hover:text-slate-700"
+              >
+                ✕
+              </Button>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <Card className="bg-white/50 border-white/20 hover:bg-white/70 transition-colors cursor-pointer group"
+                    onClick={() => navigate('/tasks?action=create')}>
+                <CardContent className="p-4 text-center">
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500/10 to-blue-600/10 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                    <PlusCircle className="h-6 w-6 text-blue-600" />
+                  </div>
+                  <h4 className="font-semibold text-slate-800 mb-1">Add Task</h4>
+                  <p className="text-sm text-slate-600">Create new project tasks</p>
+                </CardContent>
+              </Card>
+              
+              <Card className="bg-white/50 border-white/20 hover:bg-white/70 transition-colors cursor-pointer group"
+                    onClick={() => navigate('/file-management?action=upload')}>
+                <CardContent className="p-4 text-center">
+                  <div className="w-12 h-12 bg-gradient-to-br from-green-500/10 to-green-600/10 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                    <Upload className="h-6 w-6 text-green-600" />
+                  </div>
+                  <h4 className="font-semibold text-slate-800 mb-1">Upload File</h4>
+                  <p className="text-sm text-slate-600">Add project documents</p>
+                </CardContent>
+              </Card>
+              
+              <Card className="bg-white/50 border-white/20 hover:bg-white/70 transition-colors cursor-pointer group"
+                    onClick={() => navigate('/calendar')}>
+                <CardContent className="p-4 text-center">
+                  <div className="w-12 h-12 bg-gradient-to-br from-purple-500/10 to-purple-600/10 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                    <Calendar className="h-6 w-6 text-purple-600" />
+                  </div>
+                  <h4 className="font-semibold text-slate-800 mb-1">View Calendar</h4>
+                  <p className="text-sm text-slate-600">Check project timeline</p>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        )}
+
         {/* Enhanced Filters and Search */}
         <div className="bg-white/30 backdrop-blur-sm rounded-xl border border-white/20 p-6 shadow-xl mb-8">
           <div className="flex flex-col lg:flex-row gap-4 items-center">
@@ -751,39 +872,128 @@ const Projects: React.FC = () => {
                     </div>
                   )}
 
-                  {/* Statistics */}
-                  <div className="grid grid-cols-2 gap-4 pt-2 border-t border-slate-200">
-                    <div className="text-center">
-                      <div className="text-lg font-bold text-slate-800">{project.fileCount || 0}</div>
-                      <div className="text-xs text-slate-500">Files</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-lg font-bold text-slate-800">{project.taskCount || 0}</div>
-                      <div className="text-xs text-slate-500">Tasks</div>
-                    </div>
-                  </div>
+                   {/* Weather Info */}
+                   {project.weather && project.address && (
+                     <div className="flex items-center justify-between p-3 bg-slate-50/50 rounded-lg border border-slate-100">
+                       <div className="flex items-center gap-2">
+                         {getWeatherIcon(project.weather.condition)}
+                         <span className="text-sm font-medium text-slate-700">
+                           {project.weather.temperature}°F
+                         </span>
+                       </div>
+                       <span className="text-xs text-slate-500 capitalize">
+                         {project.weather.condition}
+                       </span>
+                     </div>
+                   )}
 
-                  {/* Action buttons */}
-                  <div className="grid grid-cols-2 gap-2 pt-4">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => navigate(`/project-details/${project.id}`)}
-                      className="group/btn bg-white/50 border-white/20 hover:bg-white/70 transition-all duration-200"
-                    >
-                      <FileText className="h-4 w-4 mr-2 group-hover/btn:scale-110 transition-transform" />
-                      Details
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => navigate(`/file-management?project=${project.id}`)}
-                      className="group/btn bg-white/50 border-white/20 hover:bg-white/70 transition-all duration-200"
-                    >
-                      <Folder className="h-4 w-4 mr-2 group-hover/btn:scale-110 transition-transform" />
-                      Files
-                    </Button>
-                  </div>
+                   {/* Recent Files Preview */}
+                   {project.recentFiles && project.recentFiles.length > 0 && (
+                     <div className="space-y-2">
+                       <h5 className="text-sm font-medium text-slate-700 flex items-center gap-1">
+                         <FileText className="h-3 w-3" />
+                         Recent Files
+                       </h5>
+                       <div className="space-y-1">
+                         {project.recentFiles.slice(0, 2).map((file) => (
+                           <div key={file.id} className="flex items-center justify-between text-xs p-2 bg-slate-50/50 rounded">
+                             <span className="text-slate-600 truncate flex-1">{file.file_name}</span>
+                             <span className="text-slate-400 ml-2">
+                               {new Date(file.created_at).toLocaleDateString()}
+                             </span>
+                           </div>
+                         ))}
+                       </div>
+                     </div>
+                   )}
+
+                   {/* Project Timeline/Phases */}
+                   {project.phases && project.phases.length > 0 && (
+                     <div className="space-y-2">
+                       <h5 className="text-sm font-medium text-slate-700 flex items-center gap-1">
+                         <Activity className="h-3 w-3" />
+                         Project Phases
+                       </h5>
+                       <div className="grid grid-cols-2 gap-1">
+                         {project.phases.slice(0, 4).map((phase, idx) => (
+                           <div key={idx} className={`text-xs p-2 rounded text-center ${
+                             phase.status === 'completed' ? 'bg-green-100 text-green-700' :
+                             phase.status === 'active' ? 'bg-blue-100 text-blue-700' :
+                             'bg-slate-100 text-slate-500'
+                           }`}>
+                             {phase.name}
+                           </div>
+                         ))}
+                       </div>
+                     </div>
+                   )}
+
+                   {/* Statistics */}
+                   <div className="grid grid-cols-2 gap-4 pt-2 border-t border-slate-200">
+                     <div className="text-center">
+                       <div className="text-lg font-bold text-slate-800">{project.fileCount || 0}</div>
+                       <div className="text-xs text-slate-500">Files</div>
+                     </div>
+                     <div className="text-center">
+                       <div className="text-lg font-bold text-slate-800">{project.taskCount || 0}</div>
+                       <div className="text-xs text-slate-500">Tasks</div>
+                     </div>
+                   </div>
+
+                   {/* Action buttons */}
+                   <div className="space-y-2 pt-4">
+                     <div className="grid grid-cols-2 gap-2">
+                       <Button
+                         variant="outline"
+                         size="sm"
+                         onClick={() => navigate(`/project-details/${project.id}`)}
+                         className="group/btn bg-white/50 border-white/20 hover:bg-white/70 transition-all duration-200"
+                       >
+                         <FileText className="h-4 w-4 mr-2 group-hover/btn:scale-110 transition-transform" />
+                         Details
+                       </Button>
+                       <Button
+                         variant="outline"
+                         size="sm"
+                         onClick={() => navigate(`/file-management?project=${project.id}`)}
+                         className="group/btn bg-white/50 border-white/20 hover:bg-white/70 transition-all duration-200"
+                       >
+                         <Folder className="h-4 w-4 mr-2 group-hover/btn:scale-110 transition-transform" />
+                         Files
+                       </Button>
+                     </div>
+                     
+                     {/* Quick Action Buttons */}
+                     <div className="grid grid-cols-3 gap-1">
+                       <Button
+                         variant="ghost"
+                         size="sm"
+                         onClick={() => handleQuickAction('add-task', project.id)}
+                         className="text-xs bg-blue-50/50 hover:bg-blue-100/50 text-blue-700 border-0"
+                       >
+                         <PlusCircle className="h-3 w-3 mr-1" />
+                         Task
+                       </Button>
+                       <Button
+                         variant="ghost"
+                         size="sm"
+                         onClick={() => handleQuickAction('upload-file', project.id)}
+                         className="text-xs bg-green-50/50 hover:bg-green-100/50 text-green-700 border-0"
+                       >
+                         <Upload className="h-3 w-3 mr-1" />
+                         Upload
+                       </Button>
+                       <Button
+                         variant="ghost"
+                         size="sm"
+                         onClick={() => handleQuickAction('view-calendar', project.id)}
+                         className="text-xs bg-purple-50/50 hover:bg-purple-100/50 text-purple-700 border-0"
+                       >
+                         <Calendar className="h-3 w-3 mr-1" />
+                         Plan
+                       </Button>
+                     </div>
+                   </div>
                 </CardContent>
               </Card>
             ))}
