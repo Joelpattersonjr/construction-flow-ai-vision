@@ -138,13 +138,7 @@ const FileManagement = () => {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => {
-                if (window.history.length <= 1) {
-                  window.location.href = '/dashboard';
-                } else {
-                  window.history.back();
-                }
-              }}
+              onClick={() => navigate(-1)}
               className="flex items-center space-x-2 bg-white/30 backdrop-blur-sm hover:bg-white/50 transition-all duration-300 border border-white/20 text-slate-700"
             >
               <ArrowLeft className="h-4 w-4" />
