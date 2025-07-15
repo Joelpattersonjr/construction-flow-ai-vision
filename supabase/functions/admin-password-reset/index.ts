@@ -87,8 +87,8 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
     if (passwordError) {
-      console.error('Error updating user password:', passwordError);
-      throw passwordError;
+      console.error('Error updating user password: Password update failed');
+      throw new Error('Password update failed');
     }
 
     // Clear any existing lockouts for this user
