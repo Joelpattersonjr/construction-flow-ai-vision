@@ -7,6 +7,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -23,7 +25,9 @@ import {
   Calendar,
   AlertCircle,
   TrendingUp,
-  MessageCircle
+  MessageCircle,
+  UserCheck,
+  AtSign
 } from 'lucide-react';
 
 interface TeamActivity {
@@ -57,6 +61,14 @@ interface Notification {
   read: boolean;
 }
 
+interface TeamMember {
+  id: string;
+  name: string;
+  avatar?: string;
+  role: string;
+  online?: boolean;
+}
+
 interface TeamCollaborationPanelProps {
   selectedProjectId?: string;
 }
@@ -65,7 +77,10 @@ const TeamCollaborationPanel: React.FC<TeamCollaborationPanelProps> = ({ selecte
   const [teamActivity, setTeamActivity] = useState<TeamActivity[]>([]);
   const [projectUpdates, setProjectUpdates] = useState<ProjectUpdate[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [message, setMessage] = useState('');
+  const [selectedRecipients, setSelectedRecipients] = useState<string[]>(['all']);
+  const [messageRecipientType, setMessageRecipientType] = useState<'all' | 'specific' | 'group'>('all');
   const [activeTab, setActiveTab] = useState('activity');
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
@@ -73,6 +88,7 @@ const TeamCollaborationPanel: React.FC<TeamCollaborationPanelProps> = ({ selecte
 
   useEffect(() => {
     loadCollaborationData();
+    loadTeamMembers();
   }, [selectedProjectId]);
 
   const loadCollaborationData = async () => {
@@ -91,6 +107,46 @@ const TeamCollaborationPanel: React.FC<TeamCollaborationPanelProps> = ({ selecte
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadTeamMembers = async () => {
+    try {
+      // Get team members from all projects if no specific project selected
+      const { data: members } = await supabase
+        .from('project_members_enhanced')
+        .select(`
+          user_id,
+          role,
+          profiles!inner(
+            id,
+            full_name,
+            avatar_url,
+            company_role
+          )
+        `)
+        .eq('project_id', selectedProjectId || '')
+        .limit(20);
+
+      if (members) {
+        const teamMembersList: TeamMember[] = members.map((member: any) => ({
+          id: member.profiles.id,
+          name: member.profiles.full_name || 'Unknown User',
+          avatar: member.profiles.avatar_url,
+          role: member.role,
+          online: Math.random() > 0.5 // Mock online status
+        }));
+        setTeamMembers(teamMembersList);
+      }
+    } catch (error) {
+      console.error('Error loading team members:', error);
+      // Add mock data for demo purposes
+      setTeamMembers([
+        { id: '1', name: 'John Doe', role: 'Project Manager', online: true },
+        { id: '2', name: 'Sarah Miller', role: 'Engineer', online: true },
+        { id: '3', name: 'Mike Johnson', role: 'Architect', online: false },
+        { id: '4', name: 'Lisa Chen', role: 'Supervisor', online: true }
+      ]);
     }
   };
 
@@ -252,11 +308,13 @@ const TeamCollaborationPanel: React.FC<TeamCollaborationPanelProps> = ({ selecte
   const sendQuickMessage = async () => {
     if (!message.trim()) return;
 
+    const recipientText = getRecipientDisplayText();
+    
     try {
-      // In a real app, this would send to a messages/chat table
+      // In a real app, this would send to a messages/chat table with specific recipients
       toast({
         title: "Message sent",
-        description: "Your message has been sent to the team",
+        description: `Your message has been sent to ${recipientText}`,
       });
       setMessage('');
     } catch (error) {
@@ -265,6 +323,38 @@ const TeamCollaborationPanel: React.FC<TeamCollaborationPanelProps> = ({ selecte
         description: "Please try again",
         variant: "destructive",
       });
+    }
+  };
+
+  const getRecipientDisplayText = () => {
+    if (messageRecipientType === 'all') {
+      return 'all team members';
+    }
+    if (selectedRecipients.length === 1) {
+      const member = teamMembers.find(m => m.id === selectedRecipients[0]);
+      return member?.name || 'selected member';
+    }
+    return `${selectedRecipients.length} team members`;
+  };
+
+  const handleRecipientToggle = (memberId: string) => {
+    if (messageRecipientType === 'all') return;
+    
+    setSelectedRecipients(prev => {
+      if (prev.includes(memberId)) {
+        return prev.filter(id => id !== memberId);
+      } else {
+        return [...prev, memberId];
+      }
+    });
+  };
+
+  const handleRecipientTypeChange = (type: 'all' | 'specific' | 'group') => {
+    setMessageRecipientType(type);
+    if (type === 'all') {
+      setSelectedRecipients(['all']);
+    } else {
+      setSelectedRecipients([]);
     }
   };
 
@@ -530,15 +620,86 @@ const TeamCollaborationPanel: React.FC<TeamCollaborationPanelProps> = ({ selecte
           </TabsContent>
 
           <TabsContent value="messaging" className="space-y-4">
-            <div className="flex items-center gap-2 mb-4">
-              <MessageSquare className="h-4 w-4" />
-              <h3 className="font-medium">Quick Team Chat</h3>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <MessageSquare className="h-4 w-4" />
+                <h3 className="font-medium">Quick Team Chat</h3>
+              </div>
+              {messageRecipientType !== 'all' && selectedRecipients.length > 0 && (
+                <Badge variant="outline" className="text-xs">
+                  <AtSign className="h-3 w-3 mr-1" />
+                  {getRecipientDisplayText()}
+                </Badge>
+              )}
+            </div>
+            
+            {/* Recipient Selection */}
+            <div className="space-y-3 p-3 bg-slate-50 rounded-lg">
+              <div className="flex items-center gap-2">
+                <UserCheck className="h-4 w-4 text-slate-600" />
+                <span className="text-sm font-medium text-slate-700">Send to:</span>
+              </div>
+              
+              <div className="flex gap-2">
+                <Button
+                  variant={messageRecipientType === 'all' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => handleRecipientTypeChange('all')}
+                  className="text-xs"
+                >
+                  <Users className="h-3 w-3 mr-1" />
+                  All Team
+                </Button>
+                <Button
+                  variant={messageRecipientType === 'specific' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => handleRecipientTypeChange('specific')}
+                  className="text-xs"
+                >
+                  <AtSign className="h-3 w-3 mr-1" />
+                  Specific Members
+                </Button>
+              </div>
+
+              {messageRecipientType === 'specific' && (
+                <div className="space-y-2">
+                  <p className="text-xs text-slate-600">Select team members to message:</p>
+                  <ScrollArea className="h-[120px]">
+                    <div className="space-y-2">
+                      {teamMembers.map((member) => (
+                        <div key={member.id} className="flex items-center gap-3 p-2 hover:bg-white rounded transition-colors">
+                          <Checkbox
+                            id={`member-${member.id}`}
+                            checked={selectedRecipients.includes(member.id)}
+                            onCheckedChange={() => handleRecipientToggle(member.id)}
+                          />
+                          <Avatar className="h-6 w-6">
+                            <AvatarImage src={member.avatar} />
+                            <AvatarFallback className="text-xs">
+                              {member.name.split(' ').map(n => n[0]).join('')}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm font-medium">{member.name}</span>
+                              {member.online && (
+                                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                              )}
+                            </div>
+                            <p className="text-xs text-slate-500">{member.role}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                </div>
+              )}
             </div>
             
             <div className="space-y-4">
               <ScrollArea className="h-[200px] p-4 bg-slate-50 rounded-lg">
                 <div className="space-y-3">
-                  {/* Mock chat messages */}
+                  {/* Mock chat messages with recipient indicators */}
                   <div className="flex items-start gap-3">
                     <Avatar className="h-8 w-8">
                       <AvatarFallback className="text-xs">JD</AvatarFallback>
@@ -547,7 +708,13 @@ const TeamCollaborationPanel: React.FC<TeamCollaborationPanelProps> = ({ selecte
                       <div className="bg-white p-2 rounded-lg shadow-sm">
                         <p className="text-sm">Hey team, just uploaded the latest blueprints for review!</p>
                       </div>
-                      <p className="text-xs text-slate-500 mt-1">John Doe • 2h ago</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <p className="text-xs text-slate-500">John Doe • 2h ago</p>
+                        <Badge variant="outline" className="text-xs px-1 py-0">
+                          <Users className="h-2 w-2 mr-1" />
+                          All Team
+                        </Badge>
+                      </div>
                     </div>
                   </div>
                   
@@ -557,30 +724,69 @@ const TeamCollaborationPanel: React.FC<TeamCollaborationPanelProps> = ({ selecte
                     </Avatar>
                     <div className="flex-1">
                       <div className="bg-white p-2 rounded-lg shadow-sm">
-                        <p className="text-sm">Great! I'll review them this afternoon.</p>
+                        <p className="text-sm">@John Great! I'll review them this afternoon.</p>
                       </div>
-                      <p className="text-xs text-slate-500 mt-1">Sarah Miller • 1h ago</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <p className="text-xs text-slate-500">Sarah Miller • 1h ago</p>
+                        <Badge variant="outline" className="text-xs px-1 py-0">
+                          <AtSign className="h-2 w-2 mr-1" />
+                          John Doe
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback className="text-xs">MJ</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <div className="bg-white p-2 rounded-lg shadow-sm">
+                        <p className="text-sm">@Sarah @John The electrical plans need updating too</p>
+                      </div>
+                      <div className="flex items-center gap-2 mt-1">
+                        <p className="text-xs text-slate-500">Mike Johnson • 30m ago</p>
+                        <Badge variant="outline" className="text-xs px-1 py-0">
+                          <AtSign className="h-2 w-2 mr-1" />
+                          2 members
+                        </Badge>
+                      </div>
                     </div>
                   </div>
                 </div>
               </ScrollArea>
               
-              <div className="flex gap-2">
-                <Input
-                  placeholder="Type a message..."
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && sendQuickMessage()}
-                  className="flex-1"
-                />
-                <Button 
-                  onClick={sendQuickMessage}
-                  disabled={!message.trim()}
-                  size="sm"
-                  className="px-3"
-                >
-                  <Send className="h-4 w-4" />
-                </Button>
+              <div className="space-y-2">
+                {messageRecipientType !== 'all' && selectedRecipients.length > 0 && (
+                  <div className="flex items-center gap-2 text-xs text-slate-600">
+                    <AtSign className="h-3 w-3" />
+                    <span>Messaging {getRecipientDisplayText()}</span>
+                  </div>
+                )}
+                <div className="flex gap-2">
+                  <Input
+                    placeholder={
+                      messageRecipientType === 'all' 
+                        ? "Type a message to all team members..."
+                        : selectedRecipients.length === 0
+                        ? "Select recipients first..."
+                        : `Message ${getRecipientDisplayText()}...`
+                    }
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && sendQuickMessage()}
+                    disabled={messageRecipientType !== 'all' && selectedRecipients.length === 0}
+                    className="flex-1"
+                  />
+                  <Button 
+                    onClick={sendQuickMessage}
+                    disabled={!message.trim() || (messageRecipientType !== 'all' && selectedRecipients.length === 0)}
+                    size="sm"
+                    className="px-3"
+                  >
+                    <Send className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             </div>
           </TabsContent>
