@@ -27,6 +27,7 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Help from "./pages/Help";
 import Documentation from "./pages/Documentation";
+import Testing from "./pages/Testing";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -123,6 +124,14 @@ const App = () => {
               <Route path="/contact" element={<Contact />} />
               <Route path="/help" element={<Help />} />
               <Route path="/documentation" element={<Documentation />} />
+              <Route 
+                path="/testing" 
+                element={
+                  <ProtectedRoute>
+                    <Testing />
+                  </ProtectedRoute>
+                } 
+              />
               <Route path="/success" element={<PaymentSuccess />} />
               <Route path="/cancel" element={<PaymentCancel />} />
               <Route path="/test" element={<div>TEST ROUTE WORKS</div>} />
