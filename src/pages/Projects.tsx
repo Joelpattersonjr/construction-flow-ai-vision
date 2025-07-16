@@ -632,7 +632,10 @@ const Projects: React.FC = () => {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => navigate(-1)}
+              onClick={() => {
+                console.log('Desktop back button clicked');
+                navigate('/dashboard');
+              }}
               className="flex items-center space-x-2 bg-white/30 backdrop-blur-sm hover:bg-white/50 transition-all duration-300 border border-white/20 text-slate-700"
             >
               <ArrowLeft className="h-4 w-4" />
