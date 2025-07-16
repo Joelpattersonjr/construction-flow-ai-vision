@@ -437,9 +437,11 @@ const Projects: React.FC = () => {
       <div className="min-h-screen bg-background">
         <MobileHeader 
           title="Projects"
+          showBack={true}
           showSearch={true}
           showNotifications={true}
           notificationCount={3}
+          onBack={() => navigate('/')}
           onSearch={() => {}}
           onNotifications={() => {}}
         />
