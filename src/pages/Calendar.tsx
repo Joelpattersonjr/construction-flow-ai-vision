@@ -239,21 +239,22 @@ export default function CalendarView() {
               <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500 skew-x-12"></div>
             </Button>
             
-            <FeatureGate 
-              feature="scheduling"
-              showUpgradePrompt={false}
-              fallback={null}
-            >
-              <Button 
-                className="group bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-indigo-600 hover:to-purple-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 border-0 font-semibold relative overflow-hidden"
-              >
-                <span className="relative z-10 flex items-center">
-                  <Clock className="w-4 h-4 mr-2" />
-                  Schedule Builder
-                </span>
-                <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500 skew-x-12"></div>
-              </Button>
-            </FeatureGate>
+                <FeatureGate 
+                  feature="scheduling"
+                  showUpgradePrompt={false}
+                  fallback={null}
+                >
+                  <Button 
+                    onClick={() => window.location.href = '/schedule-builder'}
+                    className="group bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-indigo-600 hover:to-purple-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 border-0 font-semibold relative overflow-hidden"
+                  >
+                    <span className="relative z-10 flex items-center">
+                      <Clock className="w-4 h-4 mr-2" />
+                      Schedule Builder
+                    </span>
+                    <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500 skew-x-12"></div>
+                  </Button>
+                </FeatureGate>
             
             <ExportDialog 
               tasks={filteredTasks.map(task => ({

@@ -20,6 +20,7 @@ import ProjectDetails from "./pages/ProjectDetails";
 import ProjectPermissions from "./pages/ProjectPermissions";
 import Tasks from "./pages/Tasks";
 import Calendar from "./pages/Calendar";
+import ScheduleBuilder from "./pages/ScheduleBuilder";
 import Profile from "./pages/Profile";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentCancel from "./pages/PaymentCancel";
@@ -107,6 +108,14 @@ const App = () => {
                 element={
                   <ProtectedRoute>
                     <Calendar />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/schedule-builder" 
+                element={
+                  <ProtectedRoute>
+                    <ScheduleBuilder />
                   </ProtectedRoute>
                 } 
               />

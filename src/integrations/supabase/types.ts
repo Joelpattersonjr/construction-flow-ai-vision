@@ -803,6 +803,50 @@ export type Database = {
           },
         ]
       }
+      schedule_analytics: {
+        Row: {
+          actual_hours: number | null
+          created_at: string | null
+          date: string
+          efficiency_score: number | null
+          id: string
+          scheduled_hours: number | null
+          tasks_completed: number | null
+          tasks_scheduled: number | null
+          user_id: string
+        }
+        Insert: {
+          actual_hours?: number | null
+          created_at?: string | null
+          date: string
+          efficiency_score?: number | null
+          id?: string
+          scheduled_hours?: number | null
+          tasks_completed?: number | null
+          tasks_scheduled?: number | null
+          user_id: string
+        }
+        Update: {
+          actual_hours?: number | null
+          created_at?: string | null
+          date?: string
+          efficiency_score?: number | null
+          id?: string
+          scheduled_hours?: number | null
+          tasks_completed?: number | null
+          tasks_scheduled?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "schedule_analytics_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       task_activity: {
         Row: {
           action_type: string
@@ -972,6 +1016,60 @@ export type Database = {
             columns: ["task_id"]
             isOneToOne: false
             referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      task_schedule_slots: {
+        Row: {
+          created_at: string | null
+          date: string
+          duration_minutes: number
+          end_time: string
+          id: string
+          is_locked: boolean | null
+          start_time: string
+          task_id: number
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          date: string
+          duration_minutes: number
+          end_time: string
+          id?: string
+          is_locked?: boolean | null
+          start_time: string
+          task_id: number
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          date?: string
+          duration_minutes?: number
+          end_time?: string
+          id?: string
+          is_locked?: boolean | null
+          start_time?: string
+          task_id?: number
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_schedule_slots_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "task_schedule_slots_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -1164,6 +1262,63 @@ export type Database = {
           },
         ]
       }
+      team_schedule_templates: {
+        Row: {
+          break_duration_minutes: number | null
+          company_id: number
+          created_at: string | null
+          created_by: string
+          description: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          updated_at: string | null
+          work_hours_end: string | null
+          work_hours_start: string | null
+        }
+        Insert: {
+          break_duration_minutes?: number | null
+          company_id: number
+          created_at?: string | null
+          created_by: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          updated_at?: string | null
+          work_hours_end?: string | null
+          work_hours_start?: string | null
+        }
+        Update: {
+          break_duration_minutes?: number | null
+          company_id?: number
+          created_at?: string | null
+          created_by?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          updated_at?: string | null
+          work_hours_end?: string | null
+          work_hours_start?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_schedule_templates_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "team_schedule_templates_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_invitations: {
         Row: {
           accepted_at: string | null
@@ -1237,6 +1392,20 @@ export type Database = {
       calculate_lockout_duration: {
         Args: { lockout_count: number }
         Returns: unknown
+      }
+      calculate_schedule_efficiency: {
+        Args: { p_user_id: string; p_date: string }
+        Returns: number
+      }
+      check_schedule_overlap: {
+        Args: {
+          p_user_id: string
+          p_date: string
+          p_start_time: string
+          p_end_time: string
+          p_slot_id?: string
+        }
+        Returns: boolean
       }
       cleanup_expired_locks: {
         Args: Record<PropertyKey, never>
