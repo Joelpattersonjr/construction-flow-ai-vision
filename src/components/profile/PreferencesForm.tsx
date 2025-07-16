@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { UserPreferences } from '@/services/profileService';
+import { useTheme } from 'next-themes';
 
 interface PreferencesFormProps {
   preferences: UserPreferences;
@@ -14,8 +15,18 @@ export const PreferencesForm: React.FC<PreferencesFormProps> = ({
   preferences,
   onPreferencesChange,
 }) => {
-  const handleThemeChange = (theme: string) => {
-    onPreferencesChange({ theme: theme as 'light' | 'dark' | 'system' });
+  const { theme, setTheme } = useTheme();
+
+  // Sync next-themes with user preferences on mount
+  useEffect(() => {
+    if (preferences.theme && theme !== preferences.theme) {
+      setTheme(preferences.theme);
+    }
+  }, [preferences.theme, theme, setTheme]);
+
+  const handleThemeChange = (newTheme: string) => {
+    setTheme(newTheme);
+    onPreferencesChange({ theme: newTheme as 'light' | 'dark' | 'system' });
   };
 
   const handleNotificationChange = (key: keyof UserPreferences['notifications'], value: boolean) => {
