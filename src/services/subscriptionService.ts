@@ -259,34 +259,48 @@ export class SubscriptionService {
 
   static async upgradeSubscription(newTier: 'basic' | 'premium' | 'professional' | 'enterprise'): Promise<{ success: boolean; error?: string }> {
     try {
-      const companyId = await this.getCurrentCompanyId();
-      if (!companyId) {
-        return { success: false, error: 'Company not found' };
+      // For Enterprise plan, redirect to customer portal for custom pricing
+      if (newTier === 'enterprise') {
+        const { data, error } = await supabase.functions.invoke('customer-portal');
+        
+        if (error) {
+          return { success: false, error: 'Failed to open customer portal' };
+        }
+        
+        if (data?.url) {
+          window.open(data.url, '_blank');
+          return { success: true };
+        }
+        
+        return { success: false, error: 'No portal URL received' };
       }
 
-      const features = {
-        version_control: newTier !== 'basic',
-        collaboration: true,
-        advanced_analytics: newTier === 'premium' || newTier === 'professional' || newTier === 'enterprise',
-        time_tracking: newTier === 'premium' || newTier === 'professional' || newTier === 'enterprise',
-        scheduling: newTier === 'premium' || newTier === 'professional' || newTier === 'enterprise',
+      // Map frontend tiers to Stripe tiers
+      const tierMapping = {
+        basic: 'free',
+        premium: 'pro', 
+        professional: 'pro',
+        enterprise: 'enterprise'
       };
 
-      const { error } = await supabase
-        .from('companies')
-        .update({
-          subscription_tier: newTier,
-          subscription_status: 'active',
-          subscription_features: features,
-          subscription_expires_at: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(), // 1 year from now
-        })
-        .eq('id', companyId);
+      const stripeTier = tierMapping[newTier];
+      
+      // Create checkout session for paid plans
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
+        body: { tier: stripeTier }
+      });
 
       if (error) {
-        return { success: false, error: error.message };
+        return { success: false, error: 'Failed to create checkout session' };
       }
 
-      return { success: true };
+      if (data?.url) {
+        // Open Stripe checkout in a new tab
+        window.open(data.url, '_blank');
+        return { success: true };
+      }
+
+      return { success: false, error: 'No checkout URL received' };
     } catch (error) {
       return { success: false, error: 'Failed to upgrade subscription' };
     }

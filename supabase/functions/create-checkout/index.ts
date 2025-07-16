@@ -45,7 +45,7 @@ serve(async (req) => {
     logStep("User authenticated", { userId: user.id, email: user.email });
 
     const { tier } = await req.json();
-    if (!tier || !['free', 'pro', 'enterprise'].includes(tier)) {
+    if (!tier || !['free', 'pro'].includes(tier)) {
       throw new Error("Invalid tier specified");
     }
     logStep("Tier specified", { tier });
@@ -65,8 +65,7 @@ serve(async (req) => {
     // Define pricing based on your new tiers
     const pricingMap = {
       free: { amount: 6999, name: "Basic Plan" }, // $69.99
-      pro: { amount: 9999, name: "Premium Plan" }, // $99.99
-      enterprise: { amount: 39999, name: "Enterprise Plan" }, // $399.99
+      pro: { amount: 19999, name: "Premium/Professional Plan" }, // $199.99
     };
 
     const pricing = pricingMap[tier as keyof typeof pricingMap];
