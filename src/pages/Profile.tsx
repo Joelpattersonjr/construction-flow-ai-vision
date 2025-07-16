@@ -121,7 +121,13 @@ export default function Profile() {
       <div className="container max-w-4xl mx-auto py-8 px-4">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
-          <Button variant="outline" size="sm" onClick={() => navigate(-1)}>
+          <Button variant="outline" size="sm" onClick={() => {
+            if (window.history.length > 1) {
+              navigate(-1);
+            } else {
+              navigate('/dashboard');
+            }
+          }}>
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back
           </Button>
