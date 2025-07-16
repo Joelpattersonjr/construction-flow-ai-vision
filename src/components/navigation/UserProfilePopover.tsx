@@ -2,11 +2,13 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { User, ChevronDown, LogOut, UserCheck, Building2, Settings, UserCog } from 'lucide-react';
+import { User, ChevronDown, LogOut, UserCheck, Building2, Settings, UserCog, Crown } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useSubscription } from '@/hooks/useSubscription';
 
 const UserProfilePopover: React.FC = () => {
   const { user, profile, signOut } = useAuth();
+  const { subscription } = useSubscription();
   const navigate = useNavigate();
   
   // Show login/signup options for unauthenticated users
@@ -74,6 +76,16 @@ const UserProfilePopover: React.FC = () => {
               <span className="text-gray-600 capitalize">
                 {profile?.company_role === 'company_admin' ? 'Company Admin' : 'Team Member'}
               </span>
+            </div>
+            
+            <div className="flex items-start space-x-2">
+              <span className="font-medium text-gray-700 min-w-[60px]">Plan:</span>
+              <div className="flex items-center space-x-1">
+                <Crown className="h-3 w-3 text-yellow-500" />
+                <span className="text-gray-600 capitalize">
+                  {subscription?.subscription_tier || 'Free'}
+                </span>
+              </div>
             </div>
           </div>
 
