@@ -8,7 +8,6 @@ import AppHeader from '@/components/navigation/AppHeader';
 import { TrialBanner } from '@/components/subscription/TrialBanner';
 import { SubscriptionService, SubscriptionInfo } from '@/services/subscriptionService';
 import { useAuthState } from '@/hooks/useAuthState';
-import PerformanceTesting from '@/components/PerformanceTesting';
 import { 
   Star, 
   Zap, 
@@ -279,12 +278,6 @@ const Index = () => {
           })}
         </div>
 
-        {/* Performance Testing Section */}
-        <div className="mt-16" data-animate>
-          <div className="relative bg-white/20 backdrop-blur-sm rounded-2xl p-8 shadow-2xl border border-white/30">
-            <PerformanceTesting />
-          </div>
-        </div>
 
         {/* Additional CTA Section */}
         <div className="mt-16 text-center" data-animate>
