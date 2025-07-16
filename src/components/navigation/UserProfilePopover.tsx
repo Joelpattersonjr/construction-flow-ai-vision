@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { User, ChevronDown, LogOut, UserCheck, Building2, Settings, UserCog, Crown } from 'lucide-react';
+import { User, ChevronDown, LogOut, UserCheck, Building2, Settings, UserCog, Crown, CreditCard } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSubscription } from '@/hooks/useSubscription';
 
@@ -132,6 +132,16 @@ const UserProfilePopover: React.FC = () => {
             >
               <UserCog className="h-4 w-4" />
               <span>Profile Settings</span>
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => navigate('/subscription')}
+              className="w-full flex items-center justify-center space-x-2"
+            >
+              <CreditCard className="h-4 w-4" />
+              <span>Subscription</span>
             </Button>
             
             {profile?.company_role === 'company_admin' && (

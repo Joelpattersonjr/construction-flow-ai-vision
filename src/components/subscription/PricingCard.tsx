@@ -11,6 +11,7 @@ interface PricingCardProps {
   isPopular?: boolean;
   subtitle?: string;
   onClick: () => void;
+  disabled?: boolean;
 }
 
 export const PricingCard: React.FC<PricingCardProps> = ({
@@ -22,6 +23,7 @@ export const PricingCard: React.FC<PricingCardProps> = ({
   isPopular = false,
   subtitle,
   onClick,
+  disabled = false,
 }) => {
   return (
     <Card className={`relative border-2 ${isPopular ? 'border-primary' : 'hover:border-primary'} transition-colors ${isPopular ? 'mt-6' : ''}`}>
@@ -46,6 +48,8 @@ export const PricingCard: React.FC<PricingCardProps> = ({
         <Button 
           className="w-full mt-4 group relative overflow-hidden bg-black text-white border-black hover:bg-black hover:text-white" 
           onClick={onClick}
+          disabled={disabled}
+          variant={buttonVariant}
         >
           <span className="relative z-10">{buttonText}</span>
           <div className="absolute inset-0 bg-gradient-to-r from-primary to-blue-600 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-500"></div>
