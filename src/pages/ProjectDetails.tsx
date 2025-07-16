@@ -10,6 +10,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import AppHeader from '@/components/navigation/AppHeader';
 import FileManager from '@/components/file-management/FileManager';
+import TeamManagementPanel from '@/components/projects/TeamManagementPanel';
 
 interface Project {
   id: string;
@@ -302,21 +303,11 @@ const ProjectDetails: React.FC = () => {
           </TabsContent>
 
           <TabsContent value="team">
-            <Card>
-              <CardContent className="p-6 text-center">
-                <Users className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Team Management</h3>
-                <p className="text-gray-500 mb-4">
-                  Team management functionality coming soon.
-                </p>
-                <Button 
-                  variant="outline"
-                  onClick={() => navigate(`/projects/${project.id}/permissions`)}
-                >
-                  Manage Permissions
-                </Button>
-              </CardContent>
-            </Card>
+            <TeamManagementPanel 
+              projectId={project.id}
+              projectName={project.name || 'Untitled Project'}
+              hasWritePermission={project.hasWritePermission || false}
+            />
           </TabsContent>
         </Tabs>
       </main>
