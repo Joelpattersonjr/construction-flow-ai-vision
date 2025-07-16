@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import UserProfilePopover from '@/components/navigation/UserProfilePopover';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -147,96 +148,8 @@ const AdminDashboard = () => {
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className="flex items-center space-x-2 bg-white/30 backdrop-blur-sm border-white/30 hover:bg-white/50 transition-all duration-300">
-                    <User className="h-4 w-4" />
-                    <span className="text-sm text-gray-700">
-                      {profile?.full_name || user?.email}
-                    </span>
-                    <ChevronDown className="h-4 w-4" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-80 bg-white/95 backdrop-blur-sm border-white/40" align="end">
-                  <div className="space-y-4">
-                    <div className="border-b border-gray-200/50 pb-3">
-                      <h3 className="font-semibold text-gray-900 flex items-center space-x-2">
-                        <UserCheck className="h-4 w-4" />
-                        <span>Account Information</span>
-                      </h3>
-                    </div>
-                    
-                    <div className="space-y-3 text-sm">
-                      <div className="flex items-start space-x-2">
-                        <span className="font-medium text-gray-700 min-w-[60px]">Name:</span>
-                        <span className="text-gray-600">{profile?.full_name || 'Not provided'}</span>
-                      </div>
-                      
-                      <div className="flex items-start space-x-2">
-                        <span className="font-medium text-gray-700 min-w-[60px]">Email:</span>
-                        <span className="text-gray-600 break-all">{user?.email}</span>
-                      </div>
-                      
-                      <div className="flex items-start space-x-2">
-                        <span className="font-medium text-gray-700 min-w-[60px]">Role:</span>
-                        <span className="text-gray-600">{profile?.job_title || 'User'}</span>
-                      </div>
-                      
-                      <div className="flex items-start space-x-2">
-                        <span className="font-medium text-gray-700 min-w-[60px]">Status:</span>
-                        <span className="text-gray-600 capitalize">
-                          {profile?.company_role === 'company_admin' ? 'Company Admin' : 'Team Member'}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="border-t border-gray-200/50 pt-3">
-                      <div className="flex items-center space-x-2 mb-3">
-                        <Building2 className="h-4 w-4 text-gray-500" />
-                        <h4 className="font-medium text-gray-900">Company Details</h4>
-                      </div>
-                      
-                      <div className="space-y-2 text-sm">
-                        <div className="flex items-start space-x-2">
-                          <span className="font-medium text-gray-700 min-w-[70px]">Company:</span>
-                          <span className="text-gray-600">{profile?.company?.name || 'Not provided'}</span>
-                        </div>
-                        
-                        <div className="bg-green-50/80 p-3 rounded-lg border border-green-200/50">
-                          <p className="text-xs text-green-700">
-                            <span className="font-medium">Administrator Access</span>
-                            <br />
-                            You have full access to manage company settings and invite team members.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="border-t border-gray-200/50 pt-3 space-y-2">
-                      <Button
-                        variant="outline" 
-                        size="sm" 
-                        onClick={signOut}
-                        className="w-full flex items-center justify-center space-x-2 bg-white/60 border-white/40 hover:bg-white/80"
-                      >
-                        <LogOut className="h-4 w-4" />
-                        <span>Sign Out</span>
-                      </Button>
-                      
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={clearAuthState}
-                        className="w-full flex items-center justify-center space-x-2 text-red-600 hover:text-red-700 bg-white/60 border-white/40 hover:bg-white/80"
-                      >
-                        <LogOut className="h-4 w-4" />
-                        <span>Clear Auth State</span>
-                      </Button>
-                    </div>
-                  </div>
-                </PopoverContent>
-              </Popover>
-              <Button 
+              <UserProfilePopover />
+              <Button
                 onClick={() => setIsInviteDialogOpen(true)}
                 className="group bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 border-0 font-semibold relative overflow-hidden"
               >
