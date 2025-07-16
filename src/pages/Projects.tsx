@@ -599,7 +599,7 @@ const Projects: React.FC = () => {
                   project={project}
                   taskCount={project.taskCount}
                   teamCount={project.teamMembers?.length}
-                  onSelect={(projectId) => navigate(`/project-details/${projectId}`)}
+                  onSelect={(projectId) => navigate(`/projects/${projectId}`)}
                 />
               ))}
             </div>
@@ -1147,7 +1147,7 @@ const Projects: React.FC = () => {
                        <Button
                          variant="outline"
                          size="sm"
-                         onClick={() => navigate(`/project-details/${project.id}`)}
+                         onClick={() => navigate(`/projects/${project.id}`)}
                          className="group/btn bg-white/50 border-white/20 hover:bg-white/70 transition-all duration-200"
                        >
                          <FileText className="h-4 w-4 mr-2 group-hover/btn:scale-110 transition-transform" />
