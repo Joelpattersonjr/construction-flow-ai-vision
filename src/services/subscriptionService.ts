@@ -259,20 +259,9 @@ export class SubscriptionService {
 
   static async upgradeSubscription(newTier: 'basic' | 'premium' | 'professional' | 'enterprise'): Promise<{ success: boolean; error?: string }> {
     try {
-      // For Enterprise plan, redirect to customer portal for custom pricing
+      // Enterprise plan is handled via contact sales dialog
       if (newTier === 'enterprise') {
-        const { data, error } = await supabase.functions.invoke('customer-portal');
-        
-        if (error) {
-          return { success: false, error: 'Failed to open customer portal' };
-        }
-        
-        if (data?.url) {
-          window.open(data.url, '_blank');
-          return { success: true };
-        }
-        
-        return { success: false, error: 'No portal URL received' };
+        return { success: true };
       }
 
       // Map frontend tiers to Stripe tiers

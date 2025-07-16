@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { useSubscription } from '@/hooks/useSubscription';
 import { PricingCard } from '@/components/subscription/PricingCard';
+import { ContactSalesDialog } from '@/components/subscription/ContactSalesDialog';
 import { useToast } from '@/hooks/use-toast';
 import { 
   ArrowLeft, 
@@ -24,11 +25,17 @@ export default function Subscription() {
   const { subscription, loading, upgradeSubscription } = useSubscription();
   const { toast } = useToast();
   const [upgrading, setUpgrading] = useState<string | null>(null);
+  const [showContactSales, setShowContactSales] = useState(false);
 
   const currentTier = subscription?.subscription_tier?.toLowerCase() || 'free';
   const subscriptionEnd = subscription?.subscription_expires_at;
 
   const handleUpgrade = async (newTier: 'basic' | 'premium' | 'professional' | 'enterprise') => {
+    if (newTier === 'enterprise') {
+      setShowContactSales(true);
+      return;
+    }
+
     setUpgrading(newTier);
     try {
       const success = await upgradeSubscription(newTier);
@@ -110,8 +117,8 @@ export default function Subscription() {
     {
       id: 'enterprise',
       title: 'Enterprise',
-      price: '$499.99',
-      subtitle: 'Per month',
+      price: 'Custom Pricing',
+      subtitle: 'Contact Sales',
       features: [
         'Everything in Professional',
         'Unlimited Projects',
@@ -121,7 +128,8 @@ export default function Subscription() {
         'Custom Integrations',
         'Dedicated Support',
         'Custom Branding',
-        'SLA Guarantee'
+        'SLA Guarantee',
+        'Dedicated Account Manager'
       ],
       popular: false
     }
@@ -274,7 +282,9 @@ export default function Subscription() {
                           ? 'Current Plan' 
                           : upgrading === plan.id 
                             ? 'Upgrading...' 
-                            : `Upgrade to ${plan.title}`
+                            : plan.id === 'enterprise' 
+                              ? 'Contact Sales'
+                              : `Upgrade to ${plan.title}`
                       }
                       buttonVariant={isCurrentPlan ? 'outline' : 'default'}
                       isPopular={plan.popular}
@@ -306,6 +316,11 @@ export default function Subscription() {
             </div>
           </CardContent>
         </Card>
+
+        <ContactSalesDialog 
+          isOpen={showContactSales} 
+          onClose={() => setShowContactSales(false)} 
+        />
       </div>
     </div>
   );
