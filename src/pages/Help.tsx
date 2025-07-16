@@ -185,7 +185,16 @@ const Help = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {quickHelp.map((category, index) => (
-              <Card key={index} className="group cursor-pointer border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
+              <Card 
+                key={index} 
+                className="group cursor-pointer border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2"
+                onClick={() => {
+                  if (category.title === "Getting Started") {
+                    navigate('/getting-started');
+                  }
+                  // Add other category navigation here when ready
+                }}
+              >
                 <CardHeader className="pb-4">
                   <div className="flex items-start justify-between mb-4">
                     <div className="p-3 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors duration-300">
@@ -206,7 +215,9 @@ const Help = () => {
                     {category.description}
                   </CardDescription>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-500">{category.articles} articles</span>
+                    <span className="text-sm text-gray-500">
+                      {category.title === "Getting Started" ? "6 articles" : `${category.articles} articles`}
+                    </span>
                     <ArrowRight className="h-4 w-4 text-gray-400 group-hover:text-primary transition-colors duration-300" />
                   </div>
                 </CardContent>

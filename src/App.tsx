@@ -33,6 +33,7 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Help from "./pages/Help";
 import Documentation from "./pages/Documentation";
+import GettingStarted from "./pages/GettingStarted";
 import Testing from "./pages/Testing";
 import NotFound from "./pages/NotFound";
 
@@ -147,8 +148,9 @@ const App: React.FC = () => {
                     <Route path="/terms" element={<Terms />} />
                     <Route path="/about" element={<About />} />
                     <Route path="/contact" element={<Contact />} />
-                    <Route path="/help" element={<Help />} />
-                    <Route path="/documentation" element={<Documentation />} />
+                  <Route path="/help" element={<Help />} />
+                  <Route path="/getting-started" element={<GettingStarted />} />
+                  <Route path="/documentation" element={<Documentation />} />
                     <Route 
                       path="/testing" 
                       element={
