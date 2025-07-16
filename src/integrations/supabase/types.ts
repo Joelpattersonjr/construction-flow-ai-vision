@@ -1496,6 +1496,10 @@ export type Database = {
         Args: { owner_id_param: string }
         Returns: boolean
       }
+      is_user_company_admin: {
+        Args: { user_id: string; company_id: number }
+        Returns: boolean
+      }
       validate_temporary_password: {
         Args: { temp_password: string; user_email: string }
         Returns: Json
