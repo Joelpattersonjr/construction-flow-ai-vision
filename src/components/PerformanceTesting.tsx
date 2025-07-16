@@ -266,11 +266,6 @@ const PerformanceTesting = () => {
       <div className="text-center space-y-4">
         <h1 className="text-3xl font-bold text-gray-900">Performance Testing</h1>
         <p className="text-gray-600">Monitor and test application performance metrics</p>
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-          <p className="text-sm text-blue-700">
-            <strong>Note:</strong> Resource metrics (Memory, CPU) are simulated for demonstration purposes
-          </p>
-        </div>
       </div>
 
       {/* Progress Bar */}
