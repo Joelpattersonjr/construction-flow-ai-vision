@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Lock, Crown } from 'lucide-react';
 import { useSubscription } from '@/hooks/useSubscription';
-import { UpgradeDialog } from './UpgradeDialog';
+import { SubscriptionUpgradeDialog } from './SubscriptionUpgradeDialog';
 import { SubscriptionService } from '@/services/subscriptionService';
 
 interface FeatureGateProps {
@@ -78,12 +78,11 @@ export const FeatureGate = ({
         </Button>
       </div>
 
-      <UpgradeDialog
+      <SubscriptionUpgradeDialog
         isOpen={showUpgradeDialog}
         onClose={() => setShowUpgradeDialog(false)}
-        feature={featureDescription}
-        title="Upgrade to Access This Feature"
-        description={upgradeMessage || `${featureDescription} is available on Pro and Enterprise plans.`}
+        feature={upgradeMessage || featureDescription}
+        requiredTier={feature === 'advanced_analytics' ? 'enterprise' : 'professional'}
       />
     </>
   );
