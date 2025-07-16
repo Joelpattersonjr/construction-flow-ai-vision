@@ -441,7 +441,10 @@ const Projects: React.FC = () => {
           showSearch={true}
           showNotifications={true}
           notificationCount={3}
-          onBack={() => navigate('/dashboard')}
+          onBack={() => {
+            console.log('Back button clicked');
+            navigate('/dashboard');
+          }}
           onSearch={() => {}}
           onNotifications={() => {}}
         />
