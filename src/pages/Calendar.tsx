@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, List, Filter, Plus, ArrowLeft } from 'lucide-react';
+import { Calendar, List, Filter, Plus, ArrowLeft, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -12,6 +12,7 @@ import { taskService } from '@/services/taskService';
 import { useToast } from '@/hooks/use-toast';
 import AppHeader from '@/components/navigation/AppHeader';
 import { ExportDialog } from '@/components/export/ExportDialog';
+import { FeatureGate } from '@/components/subscription/FeatureGate';
 
 export default function CalendarView() {
   const [tasks, setTasks] = useState<any[]>([]);
@@ -238,6 +239,22 @@ export default function CalendarView() {
               <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500 skew-x-12"></div>
             </Button>
             
+            <FeatureGate 
+              feature="scheduling"
+              showUpgradePrompt={false}
+              fallback={null}
+            >
+              <Button 
+                className="group bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-indigo-600 hover:to-purple-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 border-0 font-semibold relative overflow-hidden"
+              >
+                <span className="relative z-10 flex items-center">
+                  <Clock className="w-4 h-4 mr-2" />
+                  Schedule Builder
+                </span>
+                <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500 skew-x-12"></div>
+              </Button>
+            </FeatureGate>
+            
             <ExportDialog 
               tasks={filteredTasks.map(task => ({
                 id: task.id,
@@ -399,6 +416,14 @@ export default function CalendarView() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Scheduling Preview for Non-Premium Users */}
+        <FeatureGate 
+          feature="scheduling"
+          upgradeMessage="Unlock advanced scheduling features including time slot management, drag & drop scheduling, and team coordination tools."
+        >
+          <div />
+        </FeatureGate>
 
         {/* Calendar or List View */}
         <Card className="border-0 bg-white/40 backdrop-blur-sm shadow-xl">

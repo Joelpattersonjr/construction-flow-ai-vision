@@ -7,7 +7,7 @@ import { UpgradeDialog } from './UpgradeDialog';
 import { SubscriptionService } from '@/services/subscriptionService';
 
 interface FeatureGateProps {
-  feature: 'version_control' | 'collaboration' | 'advanced_analytics' | 'time_tracking';
+  feature: 'version_control' | 'collaboration' | 'advanced_analytics' | 'time_tracking' | 'scheduling';
   children: ReactNode;
   fallback?: ReactNode;
   showUpgradePrompt?: boolean;
@@ -66,7 +66,7 @@ export const FeatureGate = ({
 
         <div className="flex items-center justify-center gap-2">
           <Badge variant="outline">Current: {currentTier}</Badge>
-          <Badge>Required: {feature === 'time_tracking' ? 'Enterprise' : 'Pro or Enterprise'}</Badge>
+          <Badge>Required: {feature === 'time_tracking' || feature === 'scheduling' ? 'Pro or Enterprise' : 'Pro or Enterprise'}</Badge>
         </div>
 
         <Button

@@ -17,6 +17,7 @@ export interface SubscriptionInfo {
     collaboration: boolean;
     advanced_analytics: boolean;
     time_tracking: boolean;
+    scheduling: boolean;
   };
   limits: {
     max_versions_per_file: number;
@@ -151,6 +152,7 @@ export class SubscriptionService {
           collaboration: false,
           advanced_analytics: false,
           time_tracking: false,
+          scheduling: false,
         },
         limits: (limitsData as any) || {
           max_versions_per_file: 5,
@@ -244,6 +246,7 @@ export class SubscriptionService {
         collaboration: true,
         advanced_analytics: true,
         time_tracking: newTier === 'enterprise',
+        scheduling: newTier === 'pro' || newTier === 'enterprise',
       };
 
       const { error } = await supabase
@@ -286,6 +289,7 @@ export class SubscriptionService {
       collaboration: 'Real-time collaborative editing with live cursors and presence',
       advanced_analytics: 'Detailed analytics and reporting on file usage and team activity',
       time_tracking: 'Advanced time tracking and reporting with detailed analytics',
+      scheduling: 'Advanced scheduling with time slot management, drag & drop, and team scheduling capabilities',
     };
     return descriptions[featureName] || featureName;
   }
