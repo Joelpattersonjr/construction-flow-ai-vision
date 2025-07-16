@@ -136,9 +136,9 @@ const Help = () => {
             <span className="text-xl font-bold tracking-tight">ConexusPM</span>
           </button>
           <div className="flex items-center space-x-4">
-            <Button variant="ghost" onClick={() => navigate('/')}>
+            <Button variant="ghost" onClick={() => navigate(-1)}>
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Home
+              Back
             </Button>
             <Button variant="ghost" onClick={() => navigate('/auth')} className="font-medium">
               Sign In
