@@ -1,0 +1,75 @@
+{
+  "common": {
+    "loading": "Laden...",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "back": "Zurück",
+    "close": "Schließen",
+    "confirm": "Bestätigen",
+    "yes": "Ja",
+    "no": "Nein"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "projects": "Projekte",
+    "tasks": "Aufgaben",
+    "files": "Dateien",
+    "calendar": "Kalender",
+    "profile": "Profil",
+    "settings": "Einstellungen",
+    "logout": "Abmelden"
+  },
+  "profile": {
+    "title": "Profil-Einstellungen",
+    "subtitle": "Verwalten Sie Ihre Kontoeinstellungen und Präferenzen",
+    "information": "Profil-Informationen",
+    "informationDesc": "Aktualisieren Sie Ihre persönlichen Informationen und Profilbild",
+    "fullName": "Vollständiger Name",
+    "jobTitle": "Berufsbezeichnung",
+    "email": "E-Mail",
+    "emailNote": "E-Mail kann von dieser Seite nicht geändert werden",
+    "appearance": "Erscheinungsbild",
+    "appearanceDesc": "Passen Sie das Aussehen der Anwendung an",
+    "theme": "Design",
+    "notifications": "Benachrichtigungen",
+    "notificationsDesc": "Konfigurieren Sie, wann und wie Sie Benachrichtigungen erhalten",
+    "emailNotifications": "E-Mail-Benachrichtigungen",
+    "pushNotifications": "Push-Benachrichtigungen",
+    "taskAssignments": "Aufgabenzuweisungen",
+    "dueDateReminders": "Fälligkeitserinnerungen",
+    "projectUpdates": "Projekt-Updates",
+    "language": "Sprache",
+    "timezone": "Zeitzone",
+    "languageRegion": "Sprache & Region",
+    "languageRegionDesc": "Legen Sie Ihre Sprach- und Zeitzonenpräferenzen fest",
+    "saveChanges": "Änderungen Speichern",
+    "saving": "Speichern...",
+    "updated": "Profil aktualisiert",
+    "updatedDesc": "Ihr Profil wurde erfolgreich gespeichert.",
+    "saveFailed": "Speichern fehlgeschlagen",
+    "saveFailedDesc": "Profil konnte nicht gespeichert werden. Bitte versuchen Sie es erneut."
+  },
+  "themes": {
+    "light": "Hell",
+    "dark": "Dunkel",
+    "system": "System"
+  },
+  "languages": {
+    "en": "Englisch",
+    "es": "Spanisch",
+    "fr": "Französisch",
+    "de": "Deutsch"
+  },
+  "timezones": {
+    "UTC": "UTC",
+    "America/New_York": "Ostküstenzeit",
+    "America/Chicago": "Zentrale Zeit",
+    "America/Denver": "Bergzeit",
+    "America/Los_Angeles": "Pazifische Zeit",
+    "Europe/London": "London",
+    "Europe/Paris": "Paris",
+    "Asia/Tokyo": "Tokio"
+  }
+}

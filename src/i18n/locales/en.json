@@ -1,0 +1,75 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "back": "Back",
+    "close": "Close",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "projects": "Projects",
+    "tasks": "Tasks",
+    "files": "Files",
+    "calendar": "Calendar",
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Logout"
+  },
+  "profile": {
+    "title": "Profile Settings",
+    "subtitle": "Manage your account settings and preferences",
+    "information": "Profile Information",
+    "informationDesc": "Update your personal information and profile picture",
+    "fullName": "Full Name",
+    "jobTitle": "Job Title",
+    "email": "Email",
+    "emailNote": "Email cannot be changed from this page",
+    "appearance": "Appearance",
+    "appearanceDesc": "Customize how the application looks and feels",
+    "theme": "Theme",
+    "notifications": "Notifications",
+    "notificationsDesc": "Configure when and how you receive notifications",
+    "emailNotifications": "Email Notifications",
+    "pushNotifications": "Push Notifications",
+    "taskAssignments": "Task Assignments",
+    "dueDateReminders": "Due Date Reminders",
+    "projectUpdates": "Project Updates",
+    "language": "Language",
+    "timezone": "Timezone",
+    "languageRegion": "Language & Region",
+    "languageRegionDesc": "Set your language and timezone preferences",
+    "saveChanges": "Save Changes",
+    "saving": "Saving...",
+    "updated": "Profile updated",
+    "updatedDesc": "Your profile has been saved successfully.",
+    "saveFailed": "Save failed",
+    "saveFailedDesc": "Failed to save profile. Please try again."
+  },
+  "themes": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "languages": {
+    "en": "English",
+    "es": "Spanish",
+    "fr": "French",
+    "de": "German"
+  },
+  "timezones": {
+    "UTC": "UTC",
+    "America/New_York": "Eastern Time",
+    "America/Chicago": "Central Time",
+    "America/Denver": "Mountain Time",
+    "America/Los_Angeles": "Pacific Time",
+    "Europe/London": "London",
+    "Europe/Paris": "Paris",
+    "Asia/Tokyo": "Tokyo"
+  }
+}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUserPreferences } from '@/contexts/UserPreferencesContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,24 +13,15 @@ import { profileService, UserPreferences } from '@/services/profileService';
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, Save } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
-const defaultPreferences: UserPreferences = {
-  theme: 'system',
-  notifications: {
-    email: true,
-    push: true,
-    task_assignments: true,
-    due_date_reminders: true,
-    project_updates: true,
-  },
-  language: 'en',
-  timezone: 'UTC',
-};
 
 export default function Profile() {
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { t } = useTranslation();
+  const { preferences, updatePreferences } = useUserPreferences();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [profile, setProfile] = useState<any>(null);
@@ -39,7 +31,6 @@ export default function Profile() {
   const [jobTitle, setJobTitle] = useState('');
   const [email, setEmail] = useState('');
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-  const [preferences, setPreferences] = useState<UserPreferences>(defaultPreferences);
 
   useEffect(() => {
     loadProfile();
@@ -53,18 +44,11 @@ export default function Profile() {
       setJobTitle(profileData.job_title || '');
       setEmail(profileData.email || '');
       setAvatarUrl(profileData.avatar_url);
-      // Safely parse preferences with fallback to defaults
-      const userPrefs = profileData.preferences;
-      if (userPrefs && typeof userPrefs === 'object' && 'theme' in userPrefs) {
-        setPreferences(userPrefs as unknown as UserPreferences);
-      } else {
-        setPreferences(defaultPreferences);
-      }
     } catch (error) {
       console.error('Error loading profile:', error);
       toast({
-        title: "Error",
-        description: "Failed to load profile data.",
+        title: t('common.error'),
+        description: t('profile.loadFailed'),
         variant: "destructive",
       });
     } finally {
@@ -78,18 +62,17 @@ export default function Profile() {
       await profileService.updateProfile({
         full_name: fullName,
         job_title: jobTitle,
-        preferences: preferences,
       });
       
       toast({
-        title: "Profile updated",
-        description: "Your profile has been saved successfully.",
+        title: t('profile.updated'),
+        description: t('profile.updatedDesc'),
       });
     } catch (error) {
       console.error('Error saving profile:', error);
       toast({
-        title: "Save failed",
-        description: "Failed to save profile. Please try again.",
+        title: t('profile.saveFailed'),
+        description: t('profile.saveFailedDesc'),
         variant: "destructive",
       });
     } finally {
@@ -97,8 +80,17 @@ export default function Profile() {
     }
   };
 
-  const handlePreferencesChange = (newPreferences: Partial<UserPreferences>) => {
-    setPreferences(prev => ({ ...prev, ...newPreferences }));
+  const handlePreferencesChange = async (newPreferences: Partial<UserPreferences>) => {
+    try {
+      await updatePreferences(newPreferences);
+    } catch (error) {
+      console.error('Error updating preferences:', error);
+      toast({
+        title: t('profile.saveFailed'),
+        description: t('profile.saveFailedDesc'),
+        variant: "destructive",
+      });
+    }
   };
 
   const handleAvatarUpdate = (newAvatarUrl: string | null) => {
@@ -110,7 +102,7 @@ export default function Profile() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading profile...</p>
+          <p className="text-muted-foreground">{t('common.loading')}</p>
         </div>
       </div>
     );
@@ -129,11 +121,11 @@ export default function Profile() {
             }
           }}>
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back
+            {t('common.back')}
           </Button>
           <div>
-            <h1 className="text-3xl font-bold">Profile Settings</h1>
-            <p className="text-muted-foreground">Manage your account settings and preferences</p>
+            <h1 className="text-3xl font-bold">{t('profile.title')}</h1>
+            <p className="text-muted-foreground">{t('profile.subtitle')}</p>
           </div>
         </div>
 
@@ -142,9 +134,9 @@ export default function Profile() {
           <div className="md:col-span-2 space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Profile Information</CardTitle>
+                <CardTitle>{t('profile.information')}</CardTitle>
                 <CardDescription>
-                  Update your personal information and profile picture
+                  {t('profile.informationDesc')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -162,28 +154,28 @@ export default function Profile() {
                 {/* Basic Info */}
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="fullName">Full Name</Label>
+                    <Label htmlFor="fullName">{t('profile.fullName')}</Label>
                     <Input
                       id="fullName"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
-                      placeholder="Enter your full name"
+                      placeholder={t('profile.fullName')}
                     />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="jobTitle">Job Title</Label>
+                    <Label htmlFor="jobTitle">{t('profile.jobTitle')}</Label>
                     <Input
                       id="jobTitle"
                       value={jobTitle}
                       onChange={(e) => setJobTitle(e.target.value)}
-                      placeholder="Enter your job title"
+                      placeholder={t('profile.jobTitle')}
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email">{t('profile.email')}</Label>
                   <Input
                     id="email"
                     type="email"
@@ -192,7 +184,7 @@ export default function Profile() {
                     className="bg-muted"
                   />
                   <p className="text-sm text-muted-foreground">
-                    Email cannot be changed from this page
+                    {t('profile.emailNote')}
                   </p>
                 </div>
               </CardContent>
@@ -217,7 +209,7 @@ export default function Profile() {
         <div className="flex justify-end mt-8">
           <Button onClick={handleSaveProfile} disabled={saving}>
             <Save className="w-4 h-4 mr-2" />
-            {saving ? 'Saving...' : 'Save Changes'}
+            {saving ? t('profile.saving') : t('profile.saveChanges')}
           </Button>
         </div>
       </div>

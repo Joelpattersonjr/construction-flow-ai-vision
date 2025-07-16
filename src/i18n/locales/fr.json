@@ -1,0 +1,75 @@
+{
+  "common": {
+    "loading": "Chargement...",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "back": "Retour",
+    "close": "Fermer",
+    "confirm": "Confirmer",
+    "yes": "Oui",
+    "no": "Non"
+  },
+  "navigation": {
+    "dashboard": "Tableau de bord",
+    "projects": "Projets",
+    "tasks": "Tâches",
+    "files": "Fichiers",
+    "calendar": "Calendrier",
+    "profile": "Profil",
+    "settings": "Paramètres",
+    "logout": "Déconnexion"
+  },
+  "profile": {
+    "title": "Paramètres du Profil",
+    "subtitle": "Gérez les paramètres de votre compte et préférences",
+    "information": "Informations du Profil",
+    "informationDesc": "Mettez à jour vos informations personnelles et photo de profil",
+    "fullName": "Nom Complet",
+    "jobTitle": "Titre du Poste",
+    "email": "E-mail",
+    "emailNote": "L'e-mail ne peut pas être modifié depuis cette page",
+    "appearance": "Apparence",
+    "appearanceDesc": "Personnalisez l'apparence de l'application",
+    "theme": "Thème",
+    "notifications": "Notifications",
+    "notificationsDesc": "Configurez quand et comment recevoir les notifications",
+    "emailNotifications": "Notifications E-mail",
+    "pushNotifications": "Notifications Push",
+    "taskAssignments": "Assignations de Tâches",
+    "dueDateReminders": "Rappels d'Échéance",
+    "projectUpdates": "Mises à jour de Projet",
+    "language": "Langue",
+    "timezone": "Fuseau Horaire",
+    "languageRegion": "Langue et Région",
+    "languageRegionDesc": "Définissez vos préférences de langue et fuseau horaire",
+    "saveChanges": "Enregistrer les Modifications",
+    "saving": "Enregistrement...",
+    "updated": "Profil mis à jour",
+    "updatedDesc": "Votre profil a été enregistré avec succès.",
+    "saveFailed": "Échec de l'enregistrement",
+    "saveFailedDesc": "Impossible d'enregistrer le profil. Veuillez réessayer."
+  },
+  "themes": {
+    "light": "Clair",
+    "dark": "Sombre",
+    "system": "Système"
+  },
+  "languages": {
+    "en": "Anglais",
+    "es": "Espagnol",
+    "fr": "Français",
+    "de": "Allemand"
+  },
+  "timezones": {
+    "UTC": "UTC",
+    "America/New_York": "Heure de l'Est",
+    "America/Chicago": "Heure Centrale",
+    "America/Denver": "Heure des Rocheuses",
+    "America/Los_Angeles": "Heure du Pacifique",
+    "Europe/London": "Londres",
+    "Europe/Paris": "Paris",
+    "Asia/Tokyo": "Tokyo"
+  }
+}

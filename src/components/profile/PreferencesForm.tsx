@@ -5,6 +5,8 @@ import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { UserPreferences } from '@/services/profileService';
 import { useTheme } from 'next-themes';
+import { useTranslation } from 'react-i18next';
+import { DateUtils } from '@/utils/dateUtils';
 
 interface PreferencesFormProps {
   preferences: UserPreferences;
@@ -16,6 +18,7 @@ export const PreferencesForm: React.FC<PreferencesFormProps> = ({
   onPreferencesChange,
 }) => {
   const { theme, setTheme } = useTheme();
+  const { t } = useTranslation();
 
   // Sync next-themes with user preferences on mount
   useEffect(() => {
@@ -46,27 +49,29 @@ export const PreferencesForm: React.FC<PreferencesFormProps> = ({
     onPreferencesChange({ timezone });
   };
 
+  const timezones = DateUtils.getTimezones();
+
   return (
     <div className="space-y-6">
       {/* Appearance Settings */}
       <Card>
         <CardHeader>
-          <CardTitle>Appearance</CardTitle>
+          <CardTitle>{t('profile.appearance')}</CardTitle>
           <CardDescription>
-            Customize how the application looks and feels
+            {t('profile.appearanceDesc')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
-            <Label htmlFor="theme">Theme</Label>
+            <Label htmlFor="theme">{t('profile.theme')}</Label>
             <Select value={preferences.theme} onValueChange={handleThemeChange}>
               <SelectTrigger className="w-32">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="light">Light</SelectItem>
-                <SelectItem value="dark">Dark</SelectItem>
-                <SelectItem value="system">System</SelectItem>
+                <SelectItem value="light">{t('themes.light')}</SelectItem>
+                <SelectItem value="dark">{t('themes.dark')}</SelectItem>
+                <SelectItem value="system">{t('themes.system')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -76,14 +81,14 @@ export const PreferencesForm: React.FC<PreferencesFormProps> = ({
       {/* Notification Settings */}
       <Card>
         <CardHeader>
-          <CardTitle>Notifications</CardTitle>
+          <CardTitle>{t('profile.notifications')}</CardTitle>
           <CardDescription>
-            Configure when and how you receive notifications
+            {t('profile.notificationsDesc')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
-            <Label htmlFor="email-notifications">Email Notifications</Label>
+            <Label htmlFor="email-notifications">{t('profile.emailNotifications')}</Label>
             <Switch
               id="email-notifications"
               checked={preferences.notifications.email}
@@ -92,7 +97,7 @@ export const PreferencesForm: React.FC<PreferencesFormProps> = ({
           </div>
           
           <div className="flex items-center justify-between">
-            <Label htmlFor="push-notifications">Push Notifications</Label>
+            <Label htmlFor="push-notifications">{t('profile.pushNotifications')}</Label>
             <Switch
               id="push-notifications"
               checked={preferences.notifications.push}
@@ -101,7 +106,7 @@ export const PreferencesForm: React.FC<PreferencesFormProps> = ({
           </div>
           
           <div className="flex items-center justify-between">
-            <Label htmlFor="task-assignments">Task Assignments</Label>
+            <Label htmlFor="task-assignments">{t('profile.taskAssignments')}</Label>
             <Switch
               id="task-assignments"
               checked={preferences.notifications.task_assignments}
@@ -110,7 +115,7 @@ export const PreferencesForm: React.FC<PreferencesFormProps> = ({
           </div>
           
           <div className="flex items-center justify-between">
-            <Label htmlFor="due-date-reminders">Due Date Reminders</Label>
+            <Label htmlFor="due-date-reminders">{t('profile.dueDateReminders')}</Label>
             <Switch
               id="due-date-reminders"
               checked={preferences.notifications.due_date_reminders}
@@ -119,7 +124,7 @@ export const PreferencesForm: React.FC<PreferencesFormProps> = ({
           </div>
           
           <div className="flex items-center justify-between">
-            <Label htmlFor="project-updates">Project Updates</Label>
+            <Label htmlFor="project-updates">{t('profile.projectUpdates')}</Label>
             <Switch
               id="project-updates"
               checked={preferences.notifications.project_updates}
@@ -132,42 +137,39 @@ export const PreferencesForm: React.FC<PreferencesFormProps> = ({
       {/* Language & Region Settings */}
       <Card>
         <CardHeader>
-          <CardTitle>Language & Region</CardTitle>
+          <CardTitle>{t('profile.languageRegion')}</CardTitle>
           <CardDescription>
-            Set your language and timezone preferences
+            {t('profile.languageRegionDesc')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
-            <Label htmlFor="language">Language</Label>
+            <Label htmlFor="language">{t('profile.language')}</Label>
             <Select value={preferences.language} onValueChange={handleLanguageChange}>
               <SelectTrigger className="w-32">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="en">English</SelectItem>
-                <SelectItem value="es">Spanish</SelectItem>
-                <SelectItem value="fr">French</SelectItem>
-                <SelectItem value="de">German</SelectItem>
+                <SelectItem value="en">{t('languages.en')}</SelectItem>
+                <SelectItem value="es">{t('languages.es')}</SelectItem>
+                <SelectItem value="fr">{t('languages.fr')}</SelectItem>
+                <SelectItem value="de">{t('languages.de')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
           
           <div className="flex items-center justify-between">
-            <Label htmlFor="timezone">Timezone</Label>
+            <Label htmlFor="timezone">{t('profile.timezone')}</Label>
             <Select value={preferences.timezone} onValueChange={handleTimezoneChange}>
               <SelectTrigger className="w-40">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="UTC">UTC</SelectItem>
-                <SelectItem value="America/New_York">Eastern Time</SelectItem>
-                <SelectItem value="America/Chicago">Central Time</SelectItem>
-                <SelectItem value="America/Denver">Mountain Time</SelectItem>
-                <SelectItem value="America/Los_Angeles">Pacific Time</SelectItem>
-                <SelectItem value="Europe/London">London</SelectItem>
-                <SelectItem value="Europe/Paris">Paris</SelectItem>
-                <SelectItem value="Asia/Tokyo">Tokyo</SelectItem>
+                {timezones.map((tz) => (
+                  <SelectItem key={tz.value} value={tz.value}>
+                    {tz.label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>

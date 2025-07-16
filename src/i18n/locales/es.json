@@ -1,0 +1,75 @@
+{
+  "common": {
+    "loading": "Cargando...",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "back": "Atrás",
+    "close": "Cerrar",
+    "confirm": "Confirmar",
+    "yes": "Sí",
+    "no": "No"
+  },
+  "navigation": {
+    "dashboard": "Panel",
+    "projects": "Proyectos",
+    "tasks": "Tareas",
+    "files": "Archivos",
+    "calendar": "Calendario",
+    "profile": "Perfil",
+    "settings": "Configuración",
+    "logout": "Cerrar sesión"
+  },
+  "profile": {
+    "title": "Configuración del Perfil",
+    "subtitle": "Gestiona la configuración de tu cuenta y preferencias",
+    "information": "Información del Perfil",
+    "informationDesc": "Actualiza tu información personal y foto de perfil",
+    "fullName": "Nombre Completo",
+    "jobTitle": "Cargo",
+    "email": "Correo Electrónico",
+    "emailNote": "El correo electrónico no se puede cambiar desde esta página",
+    "appearance": "Apariencia",
+    "appearanceDesc": "Personaliza cómo se ve y se siente la aplicación",
+    "theme": "Tema",
+    "notifications": "Notificaciones",
+    "notificationsDesc": "Configura cuándo y cómo recibir notificaciones",
+    "emailNotifications": "Notificaciones por Correo",
+    "pushNotifications": "Notificaciones Push",
+    "taskAssignments": "Asignaciones de Tareas",
+    "dueDateReminders": "Recordatorios de Fecha Límite",
+    "projectUpdates": "Actualizaciones de Proyecto",
+    "language": "Idioma",
+    "timezone": "Zona Horaria",
+    "languageRegion": "Idioma y Región",
+    "languageRegionDesc": "Establece tus preferencias de idioma y zona horaria",
+    "saveChanges": "Guardar Cambios",
+    "saving": "Guardando...",
+    "updated": "Perfil actualizado",
+    "updatedDesc": "Tu perfil se ha guardado exitosamente.",
+    "saveFailed": "Error al guardar",
+    "saveFailedDesc": "No se pudo guardar el perfil. Inténtalo de nuevo."
+  },
+  "themes": {
+    "light": "Claro",
+    "dark": "Oscuro",
+    "system": "Sistema"
+  },
+  "languages": {
+    "en": "Inglés",
+    "es": "Español",
+    "fr": "Francés",
+    "de": "Alemán"
+  },
+  "timezones": {
+    "UTC": "UTC",
+    "America/New_York": "Hora del Este",
+    "America/Chicago": "Hora Central",
+    "America/Denver": "Hora de Montaña",
+    "America/Los_Angeles": "Hora del Pacífico",
+    "Europe/London": "Londres",
+    "Europe/Paris": "París",
+    "Asia/Tokyo": "Tokio"
+  }
+}
