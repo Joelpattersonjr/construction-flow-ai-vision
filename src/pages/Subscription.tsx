@@ -259,11 +259,11 @@ export default function Subscription() {
                 
                 return (
                   <div key={plan.id} className="relative">
-                    {plan.popular && (
-                      <Badge className="absolute -top-2 left-1/2 transform -translate-x-1/2 z-10">
-                        Most Popular
-                      </Badge>
-                    )}
+                     {plan.popular && (
+                       <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-10 bg-primary text-primary-foreground px-3 py-1 rounded-full shadow-lg">
+                         Most Popular
+                       </Badge>
+                     )}
                     <PricingCard
                       title={plan.title}
                       price={plan.price}
