@@ -88,7 +88,7 @@ export const UpgradeDialog = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Crown className="h-6 w-6 text-primary" />
@@ -107,7 +107,7 @@ export const UpgradeDialog = ({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2">
           {SUBSCRIPTION_PLANS.map((plan) => (
             <Card 
               key={plan.id} 
