@@ -10,6 +10,7 @@ import {
   Video, 
   MessageCircle, 
   ArrowRight,
+  ArrowLeft,
   CheckCircle,
   Clock,
   Users,
@@ -135,6 +136,10 @@ const Help = () => {
             <span className="text-xl font-bold tracking-tight">ConexusPM</span>
           </button>
           <div className="flex items-center space-x-4">
+            <Button variant="ghost" onClick={() => navigate('/')}>
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Home
+            </Button>
             <Button variant="ghost" onClick={() => navigate('/auth')} className="font-medium">
               Sign In
             </Button>
