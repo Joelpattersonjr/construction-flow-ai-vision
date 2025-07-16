@@ -29,7 +29,7 @@ export const PricingCard: React.FC<PricingCardProps> = ({
     <Card className={`relative border-2 ${isPopular ? 'border-primary' : 'hover:border-primary'} transition-colors`}>
       <CardHeader>
         <CardTitle className="text-lg">{title}</CardTitle>
-        <div className="text-2xl font-bold">{price}<span className="text-sm font-normal">/month</span></div>
+        <div className="text-2xl font-bold">{price}{!price.includes('Custom') && <span className="text-sm font-normal">/month</span>}</div>
         {subtitle && <div className="text-sm text-muted-foreground">{subtitle}</div>}
       </CardHeader>
       <CardContent>
