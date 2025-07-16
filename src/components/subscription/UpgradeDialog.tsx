@@ -34,7 +34,7 @@ export const UpgradeDialog = ({
   const { upgradeSubscription, subscription } = useSubscription();
   const { toast } = useToast();
 
-  const handleUpgrade = async (planId: 'pro' | 'enterprise') => {
+  const handleUpgrade = async (planId: 'basic' | 'premium' | 'professional' | 'enterprise') => {
     setIsUpgrading(planId);
     try {
       const { data, error } = await supabase.functions.invoke('create-checkout', {
@@ -60,8 +60,10 @@ export const UpgradeDialog = ({
 
   const getPlanIcon = (planId: string) => {
     switch (planId) {
-      case 'pro':
+      case 'premium':
         return <Zap className="h-5 w-5 text-blue-600" />;
+      case 'professional':
+        return <Star className="h-5 w-5 text-indigo-600" />;
       case 'enterprise':
         return <Crown className="h-5 w-5 text-purple-600" />;
       default:
@@ -74,10 +76,12 @@ export const UpgradeDialog = ({
   };
 
   const getUpgradablePlans = () => {
-    const currentTier = subscription?.subscription_tier || 'free';
+    const currentTier = subscription?.subscription_tier || 'basic';
     return SUBSCRIPTION_PLANS.filter(plan => {
-      if (currentTier === 'free') return plan.id !== 'free';
-      if (currentTier === 'pro') return plan.id === 'enterprise';
+      if (currentTier === 'trial') return plan.id !== 'trial';
+      if (currentTier === 'basic') return ['premium', 'professional', 'enterprise'].includes(plan.id);
+      if (currentTier === 'premium') return ['professional', 'enterprise'].includes(plan.id);
+      if (currentTier === 'professional') return plan.id === 'enterprise';
       return false;
     });
   };
@@ -152,10 +156,10 @@ export const UpgradeDialog = ({
                   </div>
                 </div>
 
-                {plan.id !== 'free' && !isPlanCurrent(plan.id) && getUpgradablePlans().some(p => p.id === plan.id) && (
+                {plan.id !== 'trial' && !isPlanCurrent(plan.id) && getUpgradablePlans().some(p => p.id === plan.id) && (
                   <Button
                     className="w-full mt-4"
-                    onClick={() => handleUpgrade(plan.id as 'pro' | 'enterprise')}
+                    onClick={() => handleUpgrade(plan.id as 'basic' | 'premium' | 'professional' | 'enterprise')}
                     disabled={isUpgrading !== null}
                     variant={plan.popular ? 'default' : 'outline'}
                   >
@@ -169,9 +173,9 @@ export const UpgradeDialog = ({
                   </Button>
                 )}
 
-                {plan.id === 'free' && (
+                {plan.id === 'trial' && (
                   <Button className="w-full mt-4" variant="ghost" disabled>
-                    Free Plan
+                    Trial Plan
                   </Button>
                 )}
               </CardContent>

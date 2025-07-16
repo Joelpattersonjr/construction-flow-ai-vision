@@ -13,7 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 interface SubscriptionUpgradeDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  requiredTier?: 'pro' | 'enterprise';
+  requiredTier?: 'premium' | 'professional' | 'enterprise';
   feature?: string;
 }
 
@@ -26,7 +26,7 @@ export const SubscriptionUpgradeDialog: React.FC<SubscriptionUpgradeDialogProps>
   const [loading, setLoading] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const handleUpgrade = async (tier: 'pro' | 'enterprise') => {
+  const handleUpgrade = async (tier: 'basic' | 'premium' | 'professional' | 'enterprise') => {
     setLoading(tier);
     try {
       const { data, error } = await supabase.functions.invoke('create-checkout', {
@@ -60,13 +60,13 @@ export const SubscriptionUpgradeDialog: React.FC<SubscriptionUpgradeDialogProps>
           </DialogTitle>
           {feature && (
             <p className="text-muted-foreground">
-              {feature} requires a {requiredTier === 'enterprise' ? 'Enterprise' : 'Pro or Enterprise'} subscription.
+              {feature} requires a {requiredTier === 'enterprise' ? 'Enterprise' : 'Premium or higher'} subscription.
             </p>
           )}
         </DialogHeader>
 
         <div className="grid md:grid-cols-2 gap-4">
-          {SUBSCRIPTION_PLANS.filter(plan => plan.id !== 'free').map((plan) => (
+          {SUBSCRIPTION_PLANS.filter(plan => plan.id !== 'trial' && plan.id !== 'basic').map((plan) => (
             <Card 
               key={plan.id} 
               className={`relative ${plan.popular ? 'border-primary' : ''}`}
@@ -93,7 +93,7 @@ export const SubscriptionUpgradeDialog: React.FC<SubscriptionUpgradeDialogProps>
                 </ul>
 
                 <Button
-                  onClick={() => handleUpgrade(plan.id as 'pro' | 'enterprise')}
+                  onClick={() => handleUpgrade(plan.id as 'premium' | 'professional' | 'enterprise')}
                   disabled={loading !== null}
                   className="w-full"
                   variant={plan.popular ? 'default' : 'outline'}

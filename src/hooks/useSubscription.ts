@@ -36,7 +36,7 @@ export const useSubscription = () => {
     return hasFeature(featureName);
   };
 
-  const upgradeSubscription = async (newTier: 'pro' | 'enterprise') => {
+  const upgradeSubscription = async (newTier: 'basic' | 'premium' | 'professional' | 'enterprise') => {
     try {
       const result = await SubscriptionService.upgradeSubscription(newTier);
       if (result.success) {

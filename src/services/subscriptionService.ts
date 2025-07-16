@@ -9,7 +9,7 @@ export interface TrialInfo {
 }
 
 export interface SubscriptionInfo {
-  subscription_tier: 'free' | 'trial' | 'pro' | 'enterprise';
+  subscription_tier: 'trial' | 'basic' | 'premium' | 'professional' | 'enterprise';
   subscription_status: 'active' | 'trial' | 'trial_expired' | 'cancelled' | 'expired';
   subscription_expires_at: string | null;
   subscription_features: {
@@ -28,7 +28,7 @@ export interface SubscriptionInfo {
 }
 
 export interface SubscriptionPlan {
-  id: 'free' | 'trial' | 'pro' | 'enterprise';
+  id: 'trial' | 'basic' | 'premium' | 'professional' | 'enterprise';
   name: string;
   price: string;
   features: string[];
@@ -43,24 +43,24 @@ export interface SubscriptionPlan {
 export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
   {
     id: 'trial',
-    name: '30-Day Trial',
+    name: 'Trial',
     price: 'Free for 30 days',
     features: [
       'Full version control access',
-      'Team collaboration (up to 5 collaborators)',
+      'Team collaboration (up to 10 collaborators)',
       'Real-time editing',
-      '90 days version history',
-      'All trial features',
+      '30 days version history',
+      'All premium features',
       'Standard Support',
     ],
     limits: {
       max_versions_per_file: 50,
-      max_collaborators: 5,
-      version_history_days: 90,
+      max_collaborators: 10,
+      version_history_days: 30,
     },
   },
   {
-    id: 'free',
+    id: 'basic',
     name: 'Basic',
     price: '$69.99/month',
     features: [
@@ -78,9 +78,9 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
     },
   },
   {
-    id: 'pro',
+    id: 'premium',
     name: 'Premium',
-    price: '$99.99/month',
+    price: '$199.99/month',
     features: [
       'Advanced version control',
       'Real-time collaboration',
@@ -88,6 +88,8 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
       '10 collaborators max',
       '1 year version history',
       'Advanced analytics',
+      'Time tracking',
+      'Scheduling features',
       'Priority support',
     ],
     limits: {
@@ -98,19 +100,40 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
     popular: true,
   },
   {
-    id: 'enterprise',
-    name: 'Enterprise',
+    id: 'professional',
+    name: 'Professional',
     price: '$399.99/month',
     features: [
+      'Everything in Premium',
+      'Up to 100 versions per file',
+      '25 collaborators max',
+      '2 years version history',
+      'Advanced time tracking & reporting',
+      'Advanced scheduling',
+      'Custom integrations',
+      'Priority support',
+    ],
+    limits: {
+      max_versions_per_file: 100,
+      max_collaborators: 25,
+      version_history_days: 730,
+    },
+  },
+  {
+    id: 'enterprise',
+    name: 'Enterprise',
+    price: '$499.99/month',
+    features: [
+      'Everything in Professional',
       'Unlimited version control',
       'Unlimited collaboration',
       'Unlimited versions per file',
       'Unlimited collaborators',
       'Unlimited version history',
-      'Advanced time tracking & reporting',
       'Advanced analytics & reporting',
       'Custom integrations',
       'Dedicated support',
+      'SLA guarantee',
     ],
     limits: {
       max_versions_per_file: -1,
@@ -144,7 +167,7 @@ export class SubscriptionService {
       if (!companyData) return null;
 
       return {
-        subscription_tier: (companyData.subscription_tier as 'free' | 'trial' | 'pro' | 'enterprise') || 'free',
+        subscription_tier: (companyData.subscription_tier as 'trial' | 'basic' | 'premium' | 'professional' | 'enterprise') || 'basic',
         subscription_status: (companyData.subscription_status as 'active' | 'trial' | 'trial_expired' | 'cancelled' | 'expired') || 'active',
         subscription_expires_at: companyData.subscription_expires_at,
         subscription_features: (companyData.subscription_features as any) || {
@@ -234,7 +257,7 @@ export class SubscriptionService {
     }
   }
 
-  static async upgradeSubscription(newTier: 'pro' | 'enterprise'): Promise<{ success: boolean; error?: string }> {
+  static async upgradeSubscription(newTier: 'basic' | 'premium' | 'professional' | 'enterprise'): Promise<{ success: boolean; error?: string }> {
     try {
       const companyId = await this.getCurrentCompanyId();
       if (!companyId) {
@@ -242,11 +265,11 @@ export class SubscriptionService {
       }
 
       const features = {
-        version_control: true,
+        version_control: newTier !== 'basic',
         collaboration: true,
-        advanced_analytics: true,
-        time_tracking: newTier === 'enterprise',
-        scheduling: newTier === 'pro' || newTier === 'enterprise',
+        advanced_analytics: newTier === 'premium' || newTier === 'professional' || newTier === 'enterprise',
+        time_tracking: newTier === 'premium' || newTier === 'professional' || newTier === 'enterprise',
+        scheduling: newTier === 'premium' || newTier === 'professional' || newTier === 'enterprise',
       };
 
       const { error } = await supabase
