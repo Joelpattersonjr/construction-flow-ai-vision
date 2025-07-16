@@ -26,14 +26,7 @@ export const PricingCard: React.FC<PricingCardProps> = ({
   disabled = false,
 }) => {
   return (
-    <Card className={`relative border-2 ${isPopular ? 'border-primary' : 'hover:border-primary'} transition-colors ${isPopular ? 'mt-6' : ''}`}>
-      {isPopular && (
-        <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 z-10">
-          <span className="bg-primary text-primary-foreground text-xs px-4 py-2 rounded-full whitespace-nowrap shadow-lg">
-            Most Popular
-          </span>
-        </div>
-      )}
+    <Card className={`relative border-2 ${isPopular ? 'border-primary' : 'hover:border-primary'} transition-colors`}>
       <CardHeader>
         <CardTitle className="text-lg">{title}</CardTitle>
         <div className="text-2xl font-bold">{price}<span className="text-sm font-normal">/month</span></div>
