@@ -1397,6 +1397,10 @@ export type Database = {
         Args: { p_user_id: string; p_date: string }
         Returns: number
       }
+      can_create_project: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
       check_schedule_overlap: {
         Args: {
           p_user_id: string
