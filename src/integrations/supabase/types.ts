@@ -1464,6 +1464,10 @@ export type Database = {
         Args: { company_id_param: number }
         Returns: Json
       }
+      get_usage_stats: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
       get_user_company_from_jwt: {
         Args: Record<PropertyKey, never>
         Returns: number

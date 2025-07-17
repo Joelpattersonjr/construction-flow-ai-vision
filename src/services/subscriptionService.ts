@@ -23,6 +23,17 @@ export interface SubscriptionInfo {
     max_versions_per_file: number;
     max_collaborators: number;
     version_history_days: number;
+    max_projects: number;
+    max_users: number;
+    max_storage_gb: number;
+    max_files_per_project: number;
+    max_tasks_per_project: number;
+  };
+  usage: {
+    current_projects: number;
+    current_users: number;
+    current_storage_bytes: number;
+    current_storage_gb: number;
   };
   trial_info?: TrialInfo;
 }
@@ -155,7 +166,7 @@ export class SubscriptionService {
       }
 
       const { data: limitsData } = await supabase.rpc('get_subscription_limits');
-      
+      const { data: usageData } = await supabase.rpc('get_usage_stats');
       
       // Get detailed subscription info from companies table
       const { data: companyData } = await supabase
@@ -181,6 +192,17 @@ export class SubscriptionService {
           max_versions_per_file: 5,
           max_collaborators: 2,
           version_history_days: 30,
+          max_projects: 3,
+          max_users: 5,
+          max_storage_gb: 1,
+          max_files_per_project: 100,
+          max_tasks_per_project: 50,
+        },
+        usage: (usageData as any) || {
+          current_projects: 0,
+          current_users: 0,
+          current_storage_bytes: 0,
+          current_storage_gb: 0,
         },
         trial_info: subscriptionData?.trial_info || {
           is_trial: false,
@@ -254,6 +276,63 @@ export class SubscriptionService {
     } catch (error) {
       console.error('Error checking collaborator limit:', error);
       return { allowed: false, current: 0, limit: 2 };
+    }
+  }
+
+  static async checkProjectLimit(): Promise<{ allowed: boolean; current: number; limit: number }> {
+    try {
+      const { data, error } = await supabase.rpc('can_create_project');
+      if (error) throw error;
+
+      const subscription = await this.getCurrentSubscription();
+      const limit = subscription?.limits.max_projects || 0;
+      const current = subscription?.usage.current_projects || 0;
+
+      return {
+        allowed: data,
+        current,
+        limit
+      };
+    } catch (error) {
+      console.error('Error checking project limit:', error);
+      return { allowed: false, current: 0, limit: 0 };
+    }
+  }
+
+  static async checkUserLimit(): Promise<{ allowed: boolean; current: number; limit: number }> {
+    try {
+      const { data, error } = await supabase.rpc('can_add_user');
+      if (error) throw error;
+
+      const subscription = await this.getCurrentSubscription();
+      const limit = subscription?.limits.max_users || 0;
+      const current = subscription?.usage.current_users || 0;
+
+      return {
+        allowed: data,
+        current,
+        limit
+      };
+    } catch (error) {
+      console.error('Error checking user limit:', error);
+      return { allowed: false, current: 0, limit: 0 };
+    }
+  }
+
+  static async checkStorageLimit(): Promise<{ allowed: boolean; current: number; limit: number }> {
+    try {
+      const subscription = await this.getCurrentSubscription();
+      const limitGb = subscription?.limits.max_storage_gb || 0;
+      const currentGb = subscription?.usage.current_storage_gb || 0;
+
+      return {
+        allowed: limitGb === -1 || currentGb < limitGb,
+        current: currentGb,
+        limit: limitGb
+      };
+    } catch (error) {
+      console.error('Error checking storage limit:', error);
+      return { allowed: false, current: 0, limit: 0 };
     }
   }
 

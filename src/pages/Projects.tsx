@@ -21,6 +21,9 @@ import { MobileHeader } from '@/components/mobile/MobileHeader';
 import { MobileProjectCard } from '@/components/mobile/MobileProjectCard';
 import { useOfflineStorage } from '@/hooks/useOfflineStorage';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { LimitGate } from '@/components/subscription/LimitGate';
+import { UsageDashboard } from '@/components/subscription/UsageDashboard';
+import { useSubscriptionLimits } from '@/hooks/useSubscriptionLimits';
 
 interface Project {
   id: string;
@@ -78,6 +81,7 @@ const Projects: React.FC = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { isOnline, saveOfflineData, loadOfflineData } = useOfflineStorage();
+  const { enforceLimit } = useSubscriptionLimits();
 
   const [newProject, setNewProject] = useState({
     name: '',
@@ -218,6 +222,12 @@ const Projects: React.FC = () => {
   }, []);
 
   const handleCreateProject = async () => {
+    // Check project limit before allowing creation
+    const canCreate = await enforceLimit('projects');
+    if (!canCreate) {
+      return;
+    }
+
     if (!newProject.name.trim()) {
       toast({
         title: "Project name required",
@@ -457,6 +467,9 @@ const Projects: React.FC = () => {
               <span className="text-sm text-amber-800">Viewing cached data (offline)</span>
             </div>
           )}
+
+          {/* Usage Dashboard */}
+          <UsageDashboard />
 
           {/* Quick Stats */}
           <div className="grid grid-cols-2 gap-4">
