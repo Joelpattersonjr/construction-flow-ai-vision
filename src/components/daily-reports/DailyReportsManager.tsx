@@ -344,7 +344,7 @@ export function DailyReportsManager() {
         </Card>
 
         {/* Summary Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8 shadow-2xl rounded-2xl p-6 bg-white/10 backdrop-blur-sm border border-white/20">
           <Card className="border-0 bg-white/70 backdrop-blur-xl shadow-xl border-white/20">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
