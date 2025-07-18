@@ -1,6 +1,29 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft } from 'lucide-react';
 import { DailyReportsManager } from '@/components/daily-reports/DailyReportsManager';
+import AppHeader from '@/components/navigation/AppHeader';
 
 export default function DailyReports() {
-  return <DailyReportsManager />;
+  const navigate = useNavigate();
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <AppHeader />
+      <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <div className="mb-6">
+          <Button
+            variant="ghost"
+            onClick={() => navigate('/projects')}
+            className="mb-4"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Projects
+          </Button>
+        </div>
+        <DailyReportsManager />
+      </main>
+    </div>
+  );
 }
