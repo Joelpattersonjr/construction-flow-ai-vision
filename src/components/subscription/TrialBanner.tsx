@@ -18,7 +18,7 @@ export const TrialBanner = ({ subscriptionInfo, onUpgrade }: TrialBannerProps) =
   const trialInfo = subscriptionInfo.trial_info;
   
   // Don't show banner if not on trial or trial expired
-  if (!trialInfo?.is_trial_active && subscriptionInfo.subscription_tier !== 'trial') {
+  if (!trialInfo?.is_trial_active) {
     return null;
   }
 

@@ -86,16 +86,10 @@ const Index = () => {
     }
     
     switch (tier) {
-      case 'premium':
+      case 'pro':
         return (
           <Badge variant="default" className="gap-1 bg-gradient-to-r from-primary to-blue-600 text-white shadow-lg">
-            <Zap className="h-3 w-3" />Premium
-          </Badge>
-        );
-      case 'professional':
-        return (
-          <Badge variant="default" className="gap-1 bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg">
-            <Star className="h-3 w-3" />Professional
+            <Zap className="h-3 w-3" />Pro
           </Badge>
         );
       case 'enterprise':
@@ -105,7 +99,7 @@ const Index = () => {
           </Badge>
         );
       default:
-        return <Badge variant="outline" className="border-primary/20 text-primary">Basic</Badge>;
+        return <Badge variant="outline" className="border-primary/20 text-primary">Free</Badge>;
     }
   };
 

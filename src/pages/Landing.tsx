@@ -136,90 +136,59 @@ const Landing = () => {
 
   const pricingPlans = [
     {
-      name: "Trial",
+      name: "Free",
       price: "Free",
-      period: "30-day trial",
-      description: "Try all premium features for free",
+      period: "forever",
+      description: "Perfect for individuals and small teams",
       features: [
-        "Full Premium Features",
-        "Team Collaboration (10 members)",
-        "Real-time Collaboration",
-        "Version Control (50 versions)",
-        "Standard Support",
-        "30 days version history"
+        "3 Projects",
+        "5 Team Members",
+        "1 GB Storage",
+        "100 Files per Project",
+        "50 Tasks per Project",
+        "5 File Versions",
+        "Basic Support"
       ],
       popular: false,
-      cta: "Start Free Trial"
+      cta: "Start Free"
     },
     {
-      name: "Basic",
-      price: "$69.99",
-      period: "per month",
-      description: "Perfect for small teams and growing businesses",
-      features: [
-        "Basic File Management",
-        "Version Control (5 versions)",
-        "Team Collaboration (5 members)",
-        "Basic Support",
-        "90 days version history"
-      ],
-      popular: false,
-      cta: "Start Basic Plan"
-    },
-    {
-      name: "Premium",
-      price: "$199.99", 
+      name: "Pro",
+      price: "$29.99",
       period: "per month",
       description: "Enhanced features for growing teams",
       features: [
-        "Advanced File Management",
+        "25 Projects",
+        "25 Team Members", 
+        "10 GB Storage",
+        "1,000 Files per Project",
+        "500 Tasks per Project",
+        "50 File Versions",
         "Real-time Collaboration",
-        "Version Control (50 versions)",
-        "Team Collaboration (10 members)",
         "Advanced Analytics",
-        "Time Tracking",
-        "Scheduling Features",
-        "Priority Support",
-        "1 year version history"
+        "Priority Support"
       ],
       popular: true,
-      cta: "Start Premium Plan"
-    },
-    {
-      name: "Professional",
-      price: "$399.99",
-      period: "per month",
-      description: "Advanced features for professional teams",
-      features: [
-        "Everything in Premium",
-        "Version Control (100 versions)",
-        "Team Collaboration (25 members)",
-        "Advanced Time Tracking",
-        "Advanced Scheduling",
-        "Custom Integrations",
-        "Priority Support",
-        "2 years version history"
-      ],
-      popular: false,
-      cta: "Start Professional Plan"
+      cta: "Start Pro Plan"
     },
     {
       name: "Enterprise",
-      price: "$499.99",
-      period: "per month",
+      price: "Custom",
+      period: "pricing",
       description: "Complete solution for large organizations",
       features: [
-        "Everything in Professional",
-        "Unlimited Version Control",
+        "Unlimited Projects",
         "Unlimited Team Members",
         "Unlimited Storage",
+        "Unlimited Files & Tasks",
+        "Unlimited File Versions",
         "Advanced Security",
         "Custom Integrations",
         "Dedicated Support",
         "SLA Guarantee"
       ],
       popular: false,
-      cta: "Start Enterprise Plan"
+      cta: "Contact Sales"
     }
   ];
 

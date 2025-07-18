@@ -30,7 +30,7 @@ export default function Subscription() {
   const currentTier = subscription?.subscription_tier?.toLowerCase() || 'free';
   const subscriptionEnd = subscription?.subscription_expires_at;
 
-  const handleUpgrade = async (newTier: 'basic' | 'premium' | 'professional' | 'enterprise') => {
+  const handleUpgrade = async (newTier: 'pro' | 'enterprise') => {
     if (newTier === 'enterprise') {
       setShowContactSales(true);
       return;
@@ -66,70 +66,54 @@ export default function Subscription() {
 
   const plans = [
     {
-      id: 'basic',
-      title: 'Basic',
-      price: '$69.99',
-      subtitle: 'Per month',
+      id: 'free',
+      title: 'Free',
+      price: 'Free',
+      subtitle: 'Forever',
       features: [
-        'Basic File Management',
-        '5 Projects',
+        '3 Projects',
         '5 Team Members',
-        'Basic Support',
-        'Limited Storage (1GB)',
-        'Email Support'
+        '1 GB Storage',
+        '100 Files per Project',
+        '50 Tasks per Project',
+        '5 File Versions',
+        'Basic Support'
       ],
       popular: false
     },
     {
-      id: 'premium',
-      title: 'Premium',
-      price: '$199.99',
+      id: 'pro',
+      title: 'Pro',
+      price: '$29.99',
       subtitle: 'Per month',
       features: [
-        'Advanced File Management',
-        '10 Projects',
-        '50 Team Members',
+        '25 Projects',
+        '25 Team Members',
+        '10 GB Storage',
+        '1,000 Files per Project',
+        '500 Tasks per Project',
+        '50 File Versions',
         'Real-time Collaboration',
-        'Version Control (50 versions)',
-        'Priority Support',
         'Advanced Analytics',
-        '100GB Storage'
+        'Priority Support'
       ],
       popular: true
     },
     {
-      id: 'professional',
-      title: 'Professional',
-      price: '$399.99',
-      subtitle: 'Per month',
-      features: [
-        'Everything in Premium',
-        '20 Projects',
-        '50 Team Members',
-        'Advanced Integrations',
-        'Custom Workflows',
-        'Enhanced Security',
-        '500GB Storage',
-        'Phone Support'
-      ],
-      popular: false
-    },
-    {
       id: 'enterprise',
       title: 'Enterprise',
-      price: 'Custom Pricing',
+      price: 'Custom',
       subtitle: 'Contact Sales',
       features: [
-        'Everything in Professional',
         'Unlimited Projects',
         'Unlimited Team Members',
         'Unlimited Storage',
+        'Unlimited Files & Tasks',
+        'Unlimited File Versions',
         'Advanced Security',
         'Custom Integrations',
         'Dedicated Support',
-        'Custom Branding',
-        'SLA Guarantee',
-        'Dedicated Account Manager'
+        'SLA Guarantee'
       ],
       popular: false
     }
@@ -213,19 +197,16 @@ export default function Subscription() {
                   <div className="flex items-center gap-2">
                     <Users className="w-4 h-4 text-muted-foreground" />
                     <span>
-                      {currentTier === 'free' ? '3 Members' :
-                       currentTier === 'basic' ? '5 Members' :
-                       currentTier === 'premium' ? '50 Members' :
+                      {currentTier === 'free' ? '5 Members' :
+                       currentTier === 'pro' ? '25 Members' :
                        'Unlimited Members'}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <HardDrive className="w-4 h-4 text-muted-foreground" />
                     <span>
-                      {currentTier === 'free' ? '500MB Storage' :
-                       currentTier === 'basic' ? '1GB Storage' :
-                       currentTier === 'premium' ? '100GB Storage' :
-                       currentTier === 'professional' ? '500GB Storage' :
+                      {currentTier === 'free' ? '1 GB Storage' :
+                       currentTier === 'pro' ? '10 GB Storage' :
                        'Unlimited Storage'}
                     </span>
                   </div>
@@ -233,7 +214,6 @@ export default function Subscription() {
                     <Shield className="w-4 h-4 text-muted-foreground" />
                     <span>
                       {currentTier === 'free' ? 'Basic Security' :
-                       currentTier === 'basic' ? 'Basic Security' :
                        'Advanced Security'}
                     </span>
                   </div>
@@ -241,7 +221,6 @@ export default function Subscription() {
                     <Zap className="w-4 h-4 text-muted-foreground" />
                     <span>
                       {currentTier === 'free' ? 'Basic Features' :
-                       currentTier === 'basic' ? 'Basic Features' :
                        'Advanced Features'}
                     </span>
                   </div>
@@ -260,7 +239,7 @@ export default function Subscription() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {plans.map((plan) => {
                 const isCurrentPlan = plan.id === currentTier;
                 const canUpgrade = plan.id !== currentTier;

@@ -155,7 +155,7 @@ export const UsageDashboard = () => {
         isOpen={showUpgradeDialog}
         onClose={() => setShowUpgradeDialog(false)}
         feature="Get higher limits and unlock advanced features"
-        requiredTier="professional"
+        requiredTier="pro"
       />
     </>
   );

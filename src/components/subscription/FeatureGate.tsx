@@ -82,7 +82,7 @@ export const FeatureGate = ({
         isOpen={showUpgradeDialog}
         onClose={() => setShowUpgradeDialog(false)}
         feature={upgradeMessage || featureDescription}
-        requiredTier={feature === 'advanced_analytics' ? 'enterprise' : 'professional'}
+        requiredTier={feature === 'advanced_analytics' ? 'enterprise' : 'pro'}
       />
     </>
   );

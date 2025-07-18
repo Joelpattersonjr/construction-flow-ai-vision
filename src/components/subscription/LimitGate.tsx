@@ -144,7 +144,7 @@ export const LimitGate = ({
         isOpen={showUpgradeDialog}
         onClose={() => setShowUpgradeDialog(false)}
         feature={upgradeMessages[limitType]}
-        requiredTier="professional"
+        requiredTier="pro"
       />
     </>
   );
