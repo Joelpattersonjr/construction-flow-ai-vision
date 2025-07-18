@@ -144,7 +144,7 @@ export function DailyReportsAnalytics({ reports, projects }: DailyReportsAnalyti
     <div className="space-y-6">
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card className="border-0 bg-white/40 backdrop-blur-sm shadow-lg">
+        <Card className="border-0 bg-white/70 backdrop-blur-xl shadow-xl border-white/20">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -156,7 +156,7 @@ export function DailyReportsAnalytics({ reports, projects }: DailyReportsAnalyti
           </CardContent>
         </Card>
 
-        <Card className="border-0 bg-white/40 backdrop-blur-sm shadow-lg">
+        <Card className="border-0 bg-white/70 backdrop-blur-xl shadow-xl border-white/20">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -168,7 +168,7 @@ export function DailyReportsAnalytics({ reports, projects }: DailyReportsAnalyti
           </CardContent>
         </Card>
 
-        <Card className="border-0 bg-white/40 backdrop-blur-sm shadow-lg">
+        <Card className="border-0 bg-white/70 backdrop-blur-xl shadow-xl border-white/20">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -180,7 +180,7 @@ export function DailyReportsAnalytics({ reports, projects }: DailyReportsAnalyti
           </CardContent>
         </Card>
 
-        <Card className="border-0 bg-white/40 backdrop-blur-sm shadow-lg">
+        <Card className="border-0 bg-white/70 backdrop-blur-xl shadow-xl border-white/20">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -196,7 +196,7 @@ export function DailyReportsAnalytics({ reports, projects }: DailyReportsAnalyti
       {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Progress Trend */}
-        <Card className="border-0 bg-white/40 backdrop-blur-sm shadow-lg">
+        <Card className="border-0 bg-white/70 backdrop-blur-xl shadow-xl border-white/20">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <TrendingUp className="h-5 w-5" />
@@ -228,7 +228,7 @@ export function DailyReportsAnalytics({ reports, projects }: DailyReportsAnalyti
         </Card>
 
         {/* Report Status Distribution */}
-        <Card className="border-0 bg-white/40 backdrop-blur-sm shadow-lg">
+        <Card className="border-0 bg-white/70 backdrop-blur-xl shadow-xl border-white/20">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Target className="h-5 w-5" />
@@ -259,7 +259,7 @@ export function DailyReportsAnalytics({ reports, projects }: DailyReportsAnalyti
         </Card>
 
         {/* Safety Incidents by Project */}
-        <Card className="border-0 bg-white/40 backdrop-blur-sm shadow-lg">
+        <Card className="border-0 bg-white/70 backdrop-blur-xl shadow-xl border-white/20">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <AlertTriangle className="h-5 w-5" />
@@ -280,7 +280,7 @@ export function DailyReportsAnalytics({ reports, projects }: DailyReportsAnalyti
         </Card>
 
         {/* Crew Utilization */}
-        <Card className="border-0 bg-white/40 backdrop-blur-sm shadow-lg">
+        <Card className="border-0 bg-white/70 backdrop-blur-xl shadow-xl border-white/20">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Users className="h-5 w-5" />
@@ -302,7 +302,7 @@ export function DailyReportsAnalytics({ reports, projects }: DailyReportsAnalyti
       </div>
 
       {/* Project Comparison */}
-      <Card className="border-0 bg-white/40 backdrop-blur-sm shadow-lg">
+      <Card className="border-0 bg-white/70 backdrop-blur-xl shadow-xl border-white/20">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Target className="h-5 w-5" />
@@ -330,7 +330,7 @@ export function DailyReportsAnalytics({ reports, projects }: DailyReportsAnalyti
 
       {/* Weekly Summary */}
       {analytics.weeklyStats.length > 0 && (
-        <Card className="border-0 bg-white/40 backdrop-blur-sm shadow-lg">
+        <Card className="border-0 bg-white/70 backdrop-blur-xl shadow-xl border-white/20">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Calendar className="h-5 w-5" />

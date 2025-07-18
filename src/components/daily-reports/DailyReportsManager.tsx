@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import AppHeader from '@/components/navigation/AppHeader';
 import { DailyReportForm } from './DailyReportForm';
 import { DailyReportsList } from './DailyReportsList';
 import { DailyReportsAnalytics } from './DailyReportsAnalytics';
@@ -193,52 +194,33 @@ export function DailyReportsManager() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-pink-50 relative overflow-hidden">
-      <div className="absolute inset-0 opacity-30 pointer-events-none">
-        <div className="absolute top-20 left-10 w-20 h-20 bg-orange-300/20 rounded-full animate-pulse"></div>
-        <div className="absolute top-40 right-20 w-32 h-32 bg-red-300/20 rounded-full animate-bounce" style={{animationDelay: '0.5s'}}></div>
-        <div className="absolute bottom-20 left-1/4 w-16 h-16 bg-pink-300/20 rounded-full animate-pulse" style={{animationDelay: '1s'}}></div>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20">
+      <AppHeader />
       
-      <main className="container mx-auto py-8 px-4 relative z-10">
+      <main className="container mx-auto py-8 px-4">
         {/* Header */}
-        <div className="text-center mb-8 space-y-6 animate-fade-in relative">
-          <div className="relative bg-white/20 backdrop-blur-sm rounded-2xl p-8 shadow-2xl border border-white/30">
-            {/* Back Button */}
-            <div className="absolute top-6 left-6">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate(-1)}
-                className="text-gray-600 hover:text-gray-900 hover:bg-white/50"
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back
-              </Button>
-            </div>
-            
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-orange-500/10 to-red-500/10 rounded-2xl backdrop-blur-sm border border-white/20 mb-4">
-              <FileText className="h-10 w-10 text-orange-600" />
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight mb-4">
-              Daily
-              <span className="block bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-                Reports
-              </span>
-            </h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-              Track daily progress, document activities, and monitor project performance with comprehensive daily reporting.
-            </p>
+        <div className="text-center mb-8 space-y-6 animate-fade-in">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500/10 to-indigo-500/10 rounded-2xl backdrop-blur-sm border border-white/20 mb-4">
+            <FileText className="h-10 w-10 text-blue-600" />
           </div>
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight mb-4">
+            Daily
+            <span className="block bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              Reports
+            </span>
+          </h1>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+            Track daily progress, document activities, and monitor project performance with comprehensive daily reporting.
+          </p>
         </div>
 
         {/* Controls */}
-        <Card className="mb-8 border-0 bg-white/40 backdrop-blur-sm shadow-lg">
+        <Card className="mb-8 border-0 bg-white/70 backdrop-blur-xl shadow-xl border-white/20">
           <CardHeader>
             <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
               <div className="flex flex-wrap items-center gap-4">
                 <Select value={selectedView} onValueChange={(value: any) => setSelectedView(value)}>
-                  <SelectTrigger className="w-40 bg-white/60">
+                  <SelectTrigger className="w-40 bg-white/80">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -258,7 +240,7 @@ export function DailyReportsManager() {
                 </Select>
 
                 <Select value={selectedProject} onValueChange={setSelectedProject}>
-                  <SelectTrigger className="w-48 bg-white/60">
+                  <SelectTrigger className="w-48 bg-white/80">
                     <SelectValue placeholder="All Projects" />
                   </SelectTrigger>
                   <SelectContent>
@@ -272,7 +254,7 @@ export function DailyReportsManager() {
                 </Select>
 
                 <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-                  <SelectTrigger className="w-40 bg-white/60">
+                  <SelectTrigger className="w-40 bg-white/80">
                     <SelectValue placeholder="All Status" />
                   </SelectTrigger>
                   <SelectContent>
@@ -284,7 +266,7 @@ export function DailyReportsManager() {
                 </Select>
 
                 <Select value={selectedDateRange} onValueChange={setSelectedDateRange}>
-                  <SelectTrigger className="w-48 bg-white/60">
+                  <SelectTrigger className="w-48 bg-white/80">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -301,14 +283,14 @@ export function DailyReportsManager() {
                     placeholder="Search reports..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 w-64 bg-white/60"
+                    className="pl-10 w-64 bg-white/80"
                   />
                 </div>
 
                 <Button
                   variant="outline"
                   onClick={exportReports}
-                  className="bg-white/60"
+                  className="bg-white/80"
                 >
                   <Download className="w-4 h-4 mr-2" />
                   Export
@@ -316,7 +298,7 @@ export function DailyReportsManager() {
 
                 <Dialog open={showCreateForm} onOpenChange={setShowCreateForm}>
                   <DialogTrigger asChild>
-                    <Button className="bg-gradient-to-r from-orange-600 to-red-600 hover:from-red-600 hover:to-orange-600">
+                    <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-indigo-600 hover:to-blue-600">
                       <Plus className="w-4 h-4 mr-2" />
                       New Report
                     </Button>
@@ -339,7 +321,7 @@ export function DailyReportsManager() {
 
         {/* Summary Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card className="border-0 bg-white/40 backdrop-blur-sm shadow-lg">
+          <Card className="border-0 bg-white/70 backdrop-blur-xl shadow-xl border-white/20">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -351,7 +333,7 @@ export function DailyReportsManager() {
             </CardContent>
           </Card>
 
-          <Card className="border-0 bg-white/40 backdrop-blur-sm shadow-lg">
+          <Card className="border-0 bg-white/70 backdrop-blur-xl shadow-xl border-white/20">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -367,7 +349,7 @@ export function DailyReportsManager() {
             </CardContent>
           </Card>
 
-          <Card className="border-0 bg-white/40 backdrop-blur-sm shadow-lg">
+          <Card className="border-0 bg-white/70 backdrop-blur-xl shadow-xl border-white/20">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -383,7 +365,7 @@ export function DailyReportsManager() {
             </CardContent>
           </Card>
 
-          <Card className="border-0 bg-white/40 backdrop-blur-sm shadow-lg">
+          <Card className="border-0 bg-white/70 backdrop-blur-xl shadow-xl border-white/20">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>

@@ -89,7 +89,7 @@ export function DailyReportsList({ reports, loading, onReportUpdated, onReportDe
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {[...Array(6)].map((_, i) => (
-          <Card key={i} className="border-0 bg-white/40 backdrop-blur-sm shadow-lg animate-pulse">
+          <Card key={i} className="border-0 bg-white/70 backdrop-blur-xl shadow-xl border-white/20 animate-pulse">
             <CardContent className="p-6">
               <div className="space-y-4">
                 <div className="h-4 bg-gray-200 rounded"></div>
@@ -105,7 +105,7 @@ export function DailyReportsList({ reports, loading, onReportUpdated, onReportDe
 
   if (reports.length === 0) {
     return (
-      <Card className="border-0 bg-white/40 backdrop-blur-sm shadow-lg">
+      <Card className="border-0 bg-white/70 backdrop-blur-xl shadow-xl border-white/20">
         <CardContent className="p-12 text-center">
           <Calendar className="h-16 w-16 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-900 mb-2">No Daily Reports</h3>
@@ -121,7 +121,7 @@ export function DailyReportsList({ reports, loading, onReportUpdated, onReportDe
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {reports.map((report) => (
-          <Card key={report.id} className="border-0 bg-white/40 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-200">
+          <Card key={report.id} className="border-0 bg-white/70 backdrop-blur-xl shadow-xl border-white/20 hover:shadow-2xl transition-all duration-200">
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
