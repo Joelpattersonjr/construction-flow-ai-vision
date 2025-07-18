@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { ThemeProvider as NextThemesProvider } from 'next-themes';
 
 interface ThemeProviderProps {
@@ -13,14 +13,8 @@ export function ThemeProvider({
   storageKey = "app-theme",
   ...props 
 }: ThemeProviderProps) {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  // Prevent theme provider from rendering on server side
-  if (!mounted) {
+  // Check if we're on the client side and React is properly initialized
+  if (typeof window === 'undefined' || !React) {
     return <>{children}</>;
   }
 
