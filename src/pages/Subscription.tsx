@@ -30,7 +30,7 @@ export default function Subscription() {
   const currentTier = subscription?.subscription_tier?.toLowerCase() || 'free';
   const subscriptionEnd = subscription?.subscription_expires_at;
 
-  const handleUpgrade = async (newTier: 'pro' | 'enterprise') => {
+  const handleUpgrade = async (newTier: 'starter' | 'pro' | 'enterprise') => {
     if (newTier === 'enterprise') {
       setShowContactSales(true);
       return;
@@ -82,20 +82,39 @@ export default function Subscription() {
       popular: false
     },
     {
-      id: 'pro',
-      title: 'Pro',
-      price: '$29.99',
+      id: 'starter',
+      title: 'Starter',
+      price: '$19.99',
       subtitle: 'Per month',
       features: [
-        '25 Projects',
-        '25 Team Members',
-        '10 GB Storage',
-        '1,000 Files per Project',
-        '500 Tasks per Project',
-        '50 File Versions',
+        '10 Projects',
+        '15 Team Members',
+        '5 GB Storage',
+        '500 Files per Project',
+        '200 Tasks per Project',
+        '20 File Versions',
         'Real-time Collaboration',
-        'Advanced Analytics',
-        'Priority Support'
+        'Basic Analytics',
+        'Email Support'
+      ],
+      popular: false
+    },
+    {
+      id: 'pro',
+      title: 'Pro',
+      price: '$49.99',
+      subtitle: 'Per month',
+      features: [
+        '50 Projects',
+        '50 Team Members',
+        '25 GB Storage',
+        '2,000 Files per Project',
+        '1,000 Tasks per Project',
+        '50 File Versions',
+        'Advanced Collaboration',
+        'Full Analytics Suite',
+        'Priority Support',
+        'Time Tracking'
       ],
       popular: true
     },
@@ -113,7 +132,8 @@ export default function Subscription() {
         'Advanced Security',
         'Custom Integrations',
         'Dedicated Support',
-        'SLA Guarantee'
+        'SLA Guarantee',
+        'Custom Features'
       ],
       popular: false
     }
@@ -196,19 +216,21 @@ export default function Subscription() {
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div className="flex items-center gap-2">
                     <Users className="w-4 h-4 text-muted-foreground" />
-                    <span>
-                      {currentTier === 'free' ? '5 Members' :
-                       currentTier === 'pro' ? '25 Members' :
-                       'Unlimited Members'}
-                    </span>
+                     <span>
+                       {currentTier === 'free' ? '5 Members' :
+                        currentTier === 'starter' ? '15 Members' :
+                        currentTier === 'pro' ? '50 Members' :
+                        'Unlimited Members'}
+                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <HardDrive className="w-4 h-4 text-muted-foreground" />
-                    <span>
-                      {currentTier === 'free' ? '1 GB Storage' :
-                       currentTier === 'pro' ? '10 GB Storage' :
-                       'Unlimited Storage'}
-                    </span>
+                     <span>
+                       {currentTier === 'free' ? '1 GB Storage' :
+                        currentTier === 'starter' ? '5 GB Storage' :
+                        currentTier === 'pro' ? '25 GB Storage' :
+                        'Unlimited Storage'}
+                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Shield className="w-4 h-4 text-muted-foreground" />
@@ -239,7 +261,7 @@ export default function Subscription() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {plans.map((plan) => {
                 const isCurrentPlan = plan.id === currentTier;
                 const canUpgrade = plan.id !== currentTier;

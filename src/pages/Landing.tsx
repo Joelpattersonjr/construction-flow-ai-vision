@@ -153,20 +153,40 @@ const Landing = () => {
       cta: "Start Free"
     },
     {
+      name: "Starter",
+      price: "$19.99",
+      period: "per month",
+      description: "Great for small growing teams",
+      features: [
+        "10 Projects",
+        "15 Team Members",
+        "5 GB Storage",
+        "500 Files per Project",
+        "200 Tasks per Project",
+        "20 File Versions",
+        "Real-time Collaboration",
+        "Basic Analytics",
+        "Email Support"
+      ],
+      popular: false,
+      cta: "Start Starter Plan"
+    },
+    {
       name: "Pro",
-      price: "$29.99",
+      price: "$49.99",
       period: "per month",
       description: "Enhanced features for growing teams",
       features: [
-        "25 Projects",
-        "25 Team Members", 
-        "10 GB Storage",
-        "1,000 Files per Project",
-        "500 Tasks per Project",
+        "50 Projects",
+        "50 Team Members", 
+        "25 GB Storage",
+        "2,000 Files per Project",
+        "1,000 Tasks per Project",
         "50 File Versions",
-        "Real-time Collaboration",
-        "Advanced Analytics",
-        "Priority Support"
+        "Advanced Collaboration",
+        "Full Analytics Suite",
+        "Priority Support",
+        "Time Tracking"
       ],
       popular: true,
       cta: "Start Pro Plan"
@@ -185,7 +205,8 @@ const Landing = () => {
         "Advanced Security",
         "Custom Integrations",
         "Dedicated Support",
-        "SLA Guarantee"
+        "SLA Guarantee",
+        "Custom Features"
       ],
       popular: false,
       cta: "Contact Sales"

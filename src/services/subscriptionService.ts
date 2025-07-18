@@ -9,7 +9,7 @@ export interface TrialInfo {
 }
 
 export interface SubscriptionInfo {
-  subscription_tier: 'free' | 'pro' | 'enterprise';
+  subscription_tier: 'free' | 'starter' | 'pro' | 'enterprise';
   subscription_status: 'active' | 'trial' | 'trial_expired' | 'cancelled' | 'expired';
   subscription_expires_at: string | null;
   subscription_features: {
@@ -39,7 +39,7 @@ export interface SubscriptionInfo {
 }
 
 export interface SubscriptionPlan {
-  id: 'free' | 'pro' | 'enterprise';
+  id: 'free' | 'starter' | 'pro' | 'enterprise';
   name: string;
   price: string;
   features: string[];
@@ -82,28 +82,55 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
     },
   },
   {
-    id: 'pro',
-    name: 'Pro',
-    price: '$29.99/month',
+    id: 'starter',
+    name: 'Starter',
+    price: '$19.99/month',
     features: [
-      '25 Projects',
-      '25 Team Members',
-      '10 GB Storage',
-      '1,000 Files per Project',
-      '500 Tasks per Project',
-      '50 File Versions',
+      '10 Projects',
+      '15 Team Members',
+      '5 GB Storage',
+      '500 Files per Project',
+      '200 Tasks per Project',
+      '20 File Versions',
       'Real-time Collaboration',
-      'Advanced Analytics',
-      'Priority Support'
+      'Basic Analytics',
+      'Email Support'
     ],
     limits: {
-      max_projects: 25,
-      max_users: 25,
-      max_storage_gb: 10,
-      max_files_per_project: 1000,
-      max_tasks_per_project: 500,
-      max_versions_per_file: 50,
+      max_projects: 10,
+      max_users: 15,
+      max_storage_gb: 5,
+      max_files_per_project: 500,
+      max_tasks_per_project: 200,
+      max_versions_per_file: 20,
       max_collaborators: 10,
+      version_history_days: 180,
+    },
+  },
+  {
+    id: 'pro',
+    name: 'Pro',
+    price: '$49.99/month',
+    features: [
+      '50 Projects',
+      '50 Team Members',
+      '25 GB Storage',
+      '2,000 Files per Project',
+      '1,000 Tasks per Project',
+      '50 File Versions',
+      'Advanced Collaboration',
+      'Full Analytics Suite',
+      'Priority Support',
+      'Time Tracking'
+    ],
+    limits: {
+      max_projects: 50,
+      max_users: 50,
+      max_storage_gb: 25,
+      max_files_per_project: 2000,
+      max_tasks_per_project: 1000,
+      max_versions_per_file: 50,
+      max_collaborators: 25,
       version_history_days: 365,
     },
     popular: true,
@@ -121,7 +148,8 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
       'Advanced Security',
       'Custom Integrations',
       'Dedicated Support',
-      'SLA Guarantee'
+      'SLA Guarantee',
+      'Custom Features'
     ],
     limits: {
       max_projects: -1,
@@ -160,7 +188,7 @@ export class SubscriptionService {
       if (!companyData) return null;
 
       return {
-        subscription_tier: (companyData.subscription_tier as 'free' | 'pro' | 'enterprise') || 'free',
+        subscription_tier: (companyData.subscription_tier as 'free' | 'starter' | 'pro' | 'enterprise') || 'free',
         subscription_status: (companyData.subscription_status as 'active' | 'trial' | 'trial_expired' | 'cancelled' | 'expired') || 'active',
         subscription_expires_at: companyData.subscription_expires_at,
         subscription_features: (companyData.subscription_features as any) || {
@@ -318,7 +346,7 @@ export class SubscriptionService {
     }
   }
 
-  static async upgradeSubscription(newTier: 'pro' | 'enterprise'): Promise<{ success: boolean; error?: string }> {
+  static async upgradeSubscription(newTier: 'starter' | 'pro' | 'enterprise'): Promise<{ success: boolean; error?: string }> {
     try {
       // Enterprise plan is handled via contact sales dialog
       if (newTier === 'enterprise') {
