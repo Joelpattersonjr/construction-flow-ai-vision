@@ -222,6 +222,19 @@ export function DailyReportsManager() {
       <AppHeader />
       
       <main className="container mx-auto py-8 px-4">
+        {/* Back Button */}
+        <div className="mb-6">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate(-1)}
+            className="flex items-center space-x-2 bg-white/30 backdrop-blur-sm hover:bg-white/50 transition-all duration-300 border border-white/20 text-slate-700"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            <span className="hidden sm:inline">Back</span>
+          </Button>
+        </div>
+
         {/* Header */}
         <div className="text-center mb-8 space-y-6 animate-fade-in shadow-2xl bg-white/30 backdrop-blur-sm rounded-3xl p-8 border border-white/20">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500/10 to-indigo-500/10 rounded-2xl backdrop-blur-sm border border-white/20 mb-4">
