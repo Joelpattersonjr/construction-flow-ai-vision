@@ -9,7 +9,7 @@ export default function DailyReports() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20">
       <AppHeader />
       <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
         <div className="mb-6">
@@ -22,7 +22,9 @@ export default function DailyReports() {
             Back to Projects
           </Button>
         </div>
-        <DailyReportsManager />
+        <div className="relative bg-white/20 backdrop-blur-sm rounded-2xl p-8 shadow-2xl border border-white/30">
+          <DailyReportsManager />
+        </div>
       </main>
     </div>
   );
