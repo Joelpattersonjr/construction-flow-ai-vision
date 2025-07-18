@@ -345,7 +345,7 @@ export function DailyReportsManager() {
 
         {/* Summary Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card className="border-0 bg-white/70 backdrop-blur-xl shadow-xl border-white/20">
+          <Card className="border-0 bg-white/70 backdrop-blur-xl border-white/20">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -357,7 +357,7 @@ export function DailyReportsManager() {
             </CardContent>
           </Card>
 
-          <Card className="border-0 bg-white/70 backdrop-blur-xl shadow-xl border-white/20">
+          <Card className="border-0 bg-white/70 backdrop-blur-xl border-white/20">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -373,7 +373,7 @@ export function DailyReportsManager() {
             </CardContent>
           </Card>
 
-          <Card className="border-0 bg-white/70 backdrop-blur-xl shadow-xl border-white/20">
+          <Card className="border-0 bg-white/70 backdrop-blur-xl border-white/20">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -389,7 +389,7 @@ export function DailyReportsManager() {
             </CardContent>
           </Card>
 
-          <Card className="border-0 bg-white/70 backdrop-blur-xl shadow-xl border-white/20">
+          <Card className="border-0 bg-white/70 backdrop-blur-xl border-white/20">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
