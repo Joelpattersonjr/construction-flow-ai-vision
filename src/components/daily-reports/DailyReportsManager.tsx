@@ -76,13 +76,10 @@ export function DailyReportsManager() {
       const { data: user } = await supabase.auth.getUser();
       if (!user.user) return;
 
+      // First get the daily reports
       let query = supabase
         .from('daily_reports')
-        .select(`
-          *,
-          projects!daily_reports_project_id_fkey (name),
-          profiles!daily_reports_created_by_fkey (full_name)
-        `)
+        .select('*')
         .order('report_date', { ascending: false });
 
       // Apply project filter
@@ -103,10 +100,37 @@ export function DailyReportsManager() {
           .lte('report_date', format(endOfMonth(now), 'yyyy-MM-dd'));
       }
 
-      const { data, error } = await query;
+      const { data: reportsData, error: reportsError } = await query;
+      if (reportsError) throw reportsError;
 
-      if (error) throw error;
-      setReports((data || []) as unknown as DailyReport[]);
+      // If we have reports, get the project and profile data separately
+      if (reportsData && reportsData.length > 0) {
+        const projectIds = [...new Set(reportsData.map(r => r.project_id))];
+        const userIds = [...new Set(reportsData.map(r => r.created_by))];
+
+        // Get project names
+        const { data: projectsData } = await supabase
+          .from('projects')
+          .select('id, name')
+          .in('id', projectIds);
+
+        // Get profile names
+        const { data: profilesData } = await supabase
+          .from('profiles')
+          .select('id, full_name')
+          .in('id', userIds);
+
+        // Combine the data
+        const enrichedReports = reportsData.map(report => ({
+          ...report,
+          projects: projectsData?.find(p => p.id === report.project_id) || { name: 'Unknown Project' },
+          profiles: profilesData?.find(p => p.id === report.created_by) || { full_name: 'Unknown User' }
+        }));
+
+        setReports(enrichedReports as unknown as DailyReport[]);
+      } else {
+        setReports([]);
+      }
     } catch (error) {
       console.error('Error loading reports:', error);
       toast({
