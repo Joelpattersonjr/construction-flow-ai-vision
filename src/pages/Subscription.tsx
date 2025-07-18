@@ -16,7 +16,7 @@ import {
   Users,
   HardDrive,
   Shield,
-  Zap
+  Bolt
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -240,7 +240,7 @@ export default function Subscription() {
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Zap className="w-4 h-4 text-muted-foreground" />
+                    <Bolt className="w-4 h-4 text-muted-foreground" />
                     <span>
                       {currentTier === 'free' ? 'Basic Features' :
                        'Advanced Features'}

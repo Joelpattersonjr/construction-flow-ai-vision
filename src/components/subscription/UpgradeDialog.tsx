@@ -9,7 +9,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Check, Crown, Zap, Star } from 'lucide-react';
+import { Check, Crown, Bolt, Star } from 'lucide-react';
 import { SUBSCRIPTION_PLANS, SubscriptionPlan } from '@/services/subscriptionService';
 import { useSubscription } from '@/hooks/useSubscription';
 import { supabase } from '@/integrations/supabase/client';
@@ -61,7 +61,7 @@ export const UpgradeDialog = ({
   const getPlanIcon = (planId: string) => {
     switch (planId) {
       case 'pro':
-        return <Zap className="h-5 w-5 text-blue-600" />;
+        return <Bolt className="h-5 w-5 text-blue-600" />;
       case 'enterprise':
         return <Crown className="h-5 w-5 text-purple-600" />;
       default:

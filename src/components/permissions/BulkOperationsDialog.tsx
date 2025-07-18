@@ -17,7 +17,7 @@ import {
   Clock, 
   ArrowRight,
   Undo2,
-  Zap
+  Bolt
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -258,7 +258,7 @@ const BulkOperationsDialog: React.FC<BulkOperationsDialogProps> = ({
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm" disabled={selectedMembers.length === 0}>
-          <Zap className="h-4 w-4 mr-2" />
+          <Bolt className="h-4 w-4 mr-2" />
           Bulk Operations
         </Button>
       </DialogTrigger>

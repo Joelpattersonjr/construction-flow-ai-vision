@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Clock, Star, Zap } from 'lucide-react';
+import { Clock, Star, Rocket } from 'lucide-react';
 import { SubscriptionInfo } from '@/services/subscriptionService';
 import { useNavigate } from 'react-router-dom';
 
@@ -93,7 +93,7 @@ export const TrialBanner = ({ subscriptionInfo, onUpgrade }: TrialBannerProps) =
             </div>
             
             <Button onClick={handleUpgrade} className="gap-2">
-              <Zap className="h-4 w-4" />
+              <Rocket className="h-4 w-4" />
               Upgrade Now
             </Button>
           </div>

@@ -1,13 +1,13 @@
 import React from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { HelpCircle, Info, Lightbulb, Zap } from 'lucide-react';
+import { HelpCircle, Info, Lightbulb, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface FeatureTooltipProps {
   title: string;
   description: string;
   children: React.ReactNode;
-  icon?: 'info' | 'help' | 'lightbulb' | 'zap';
+  icon?: 'info' | 'help' | 'lightbulb' | 'sparkles';
   position?: 'top' | 'bottom' | 'left' | 'right';
   className?: string;
 }
@@ -16,7 +16,7 @@ const iconMap = {
   info: Info,
   help: HelpCircle,
   lightbulb: Lightbulb,
-  zap: Zap
+  sparkles: Sparkles
 };
 
 export function FeatureTooltip({ 
@@ -63,7 +63,7 @@ export function TaskManagementTooltip({ children }: { children: React.ReactNode 
     <FeatureTooltip
       title="Advanced Task Management"
       description="Create, assign, and track tasks with deadlines, priorities, and dependencies. Use our Kanban boards and Gantt charts for visual project planning."
-      icon="zap"
+      icon="sparkles"
     >
       {children}
     </FeatureTooltip>
@@ -112,7 +112,7 @@ export function IntegrationsTooltip({ children }: { children: React.ReactNode })
     <FeatureTooltip
       title="Seamless Integrations"
       description="Connect with your favorite tools including Slack, GitHub, Google Drive, and 100+ other apps. Automate workflows with our API and Zapier integration."
-      icon="zap"
+      icon="sparkles"
       position="bottom"
     >
       {children}

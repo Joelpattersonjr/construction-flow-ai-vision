@@ -10,7 +10,7 @@ import { SubscriptionService, SubscriptionInfo } from '@/services/subscriptionSe
 import { useAuthState } from '@/hooks/useAuthState';
 import { 
   Star, 
-  Zap, 
+  Sparkles, 
   Building2, 
   Calendar, 
   FileText, 
@@ -89,7 +89,7 @@ const Index = () => {
       case 'pro':
         return (
           <Badge variant="default" className="gap-1 bg-gradient-to-r from-primary to-blue-600 text-white shadow-lg">
-            <Zap className="h-3 w-3" />Pro
+            <Sparkles className="h-3 w-3" />Pro
           </Badge>
         );
       case 'enterprise':
@@ -204,7 +204,7 @@ const Index = () => {
             
             {/* Floating action icons */}
             <div className="absolute -top-4 -right-4 bg-primary text-white p-3 rounded-full shadow-lg animate-bounce">
-              <Zap className="h-6 w-6" />
+              <Sparkles className="h-6 w-6" />
             </div>
             <div className="absolute -bottom-4 -left-4 bg-green-500 text-white p-3 rounded-full shadow-lg animate-pulse">
               <CheckCircle2 className="h-6 w-6" />

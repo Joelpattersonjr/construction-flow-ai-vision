@@ -14,7 +14,7 @@ import {
   Layers,
   Database,
   Shield,
-  Zap,
+  Bolt,
   Settings
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -261,7 +261,7 @@ const Documentation = () => {
                   <span className="text-gray-700">OAuth 2.0 authentication</span>
                 </div>
                 <div className="flex items-center space-x-3">
-                  <Zap className="h-5 w-5 text-primary" />
+                  <Bolt className="h-5 w-5 text-primary" />
                   <span className="text-gray-700">Real-time webhooks support</span>
                 </div>
                 <div className="flex items-center space-x-3">

@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { AlertTriangle, Bug, Database, Zap } from 'lucide-react';
+import { AlertTriangle, Bug, Database, Bolt } from 'lucide-react';
 
 const ErrorTesting = () => {
   const { toast } = useToast();
@@ -118,7 +118,7 @@ const ErrorTesting = () => {
     {
       title: "Async Error",
       description: "Test asynchronous operation error",
-      icon: Zap,
+      icon: Bolt,
       action: testAsyncError,
       color: "text-purple-500"
     },
@@ -132,7 +132,7 @@ const ErrorTesting = () => {
     {
       title: "Success Toast",
       description: "Test success notification",
-      icon: Zap,
+      icon: Bolt,
       action: testSuccessToast,
       color: "text-green-500"
     }

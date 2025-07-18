@@ -12,7 +12,7 @@ import {
   Upload, 
   Network, 
   Timer, 
-  Zap, 
+  TrendingUp, 
   BarChart3,
   Smartphone,
   FileText
@@ -407,7 +407,7 @@ const PerformanceTesting = () => {
 
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <Zap className="h-4 w-4 text-green-500" />
+                  <TrendingUp className="h-4 w-4 text-green-500" />
                   <span className="text-sm font-medium">Throughput</span>
                 </div>
                 <div className="text-2xl font-bold text-green-600">
@@ -463,7 +463,7 @@ const PerformanceTesting = () => {
       <Card className="bg-green-50 border-green-200">
         <CardHeader>
           <CardTitle className="text-green-800 flex items-center gap-2">
-            <Zap className="h-5 w-5" />
+            <TrendingUp className="h-5 w-5" />
             Performance Optimization Tips
           </CardTitle>
         </CardHeader>
