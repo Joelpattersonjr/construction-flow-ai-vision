@@ -44,144 +44,142 @@ const App: React.FC = () => {
   console.log('🔥 App component rendering');
   
   return (
-    <React.StrictMode>
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider>
-          <AuthProvider>
-            <UserPreferencesProvider>
-              <TooltipProvider>
-                <Toaster />
-                <Sonner />
-                <BrowserRouter>
-                  <Routes>
-                    <Route path="/auth" element={<Auth />} />
-                    <Route path="/signup" element={<Signup />} />
-                    <Route path="/" element={<Landing />} />
-                    <Route 
-                      path="/dashboard" 
-                      element={
-                        <ProtectedRoute>
-                          <Index />
-                        </ProtectedRoute>
-                      } 
-                    />
-                    <Route 
-                      path="/admin" 
-                      element={
-                        <ProtectedRoute>
-                          <AdminDashboard />
-                        </ProtectedRoute>
-                      } 
-                    />
-                    <Route 
-                      path="/projects" 
-                      element={
-                        <ProtectedRoute>
-                          <Projects />
-                        </ProtectedRoute>
-                      } 
-                    />
-                    <Route 
-                      path="/projects/:projectId" 
-                      element={
-                        <ProtectedRoute>
-                          <ProjectDetails />
-                        </ProtectedRoute>
-                      } 
-                    />
-                    <Route 
-                      path="/files" 
-                      element={
-                        <ProtectedRoute>
-                          <FileManagement />
-                        </ProtectedRoute>
-                      } 
-                    />
-                    <Route 
-                      path="/tasks" 
-                      element={
-                        <ProtectedRoute>
-                          <Tasks />
-                        </ProtectedRoute>
-                      } 
-                    />
-                    <Route 
-                      path="/projects/:projectId/permissions" 
-                      element={
-                        <ProtectedRoute>
-                          <ProjectPermissions />
-                        </ProtectedRoute>
-                      } 
-                    />
-                    <Route 
-                      path="/calendar" 
-                      element={
-                        <ProtectedRoute>
-                          <Calendar />
-                        </ProtectedRoute>
-                      } 
-                    />
-                     <Route 
-                      path="/schedule-builder" 
-                      element={
-                        <ProtectedRoute>
-                          <ScheduleBuilder />
-                        </ProtectedRoute>
-                      } 
-                    />
-                    <Route 
-                      path="/daily-reports" 
-                      element={
-                        <ProtectedRoute>
-                          <DailyReports />
-                        </ProtectedRoute>
-                      } 
-                    />
-                    <Route 
-                      path="/profile"
-                      element={
-                        <ProtectedRoute>
-                          <Profile />
-                        </ProtectedRoute>
-                      } 
-                    />
-                    <Route 
-                      path="/subscription"
-                      element={
-                        <ProtectedRoute>
-                          <Subscription />
-                        </ProtectedRoute>
-                      } 
-                    />
-                    <Route path="/privacy" element={<Privacy />} />
-                    <Route path="/terms" element={<Terms />} />
-                    <Route path="/about" element={<About />} />
-                    <Route path="/contact" element={<Contact />} />
-                  <Route path="/help" element={<Help />} />
-                  <Route path="/getting-started" element={<GettingStarted />} />
-                  <Route path="/documentation" element={<Documentation />} />
-                    <Route 
-                      path="/testing" 
-                      element={
-                        <ProtectedRoute>
-                          <Testing />
-                        </ProtectedRoute>
-                      } 
-                    />
-                    <Route path="/success" element={<PaymentSuccess />} />
-                    <Route path="/cancel" element={<PaymentCancel />} />
-                    <Route path="/test" element={<div>TEST ROUTE WORKS</div>} />
-                    <Route path="/invite/:token" element={<InviteAcceptance />} />
-                    {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                </BrowserRouter>
-              </TooltipProvider>
-            </UserPreferencesProvider>
-          </AuthProvider>
-        </ThemeProvider>
-      </QueryClientProvider>
-    </React.StrictMode>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
+        <AuthProvider>
+          <UserPreferencesProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <Routes>
+                  <Route path="/auth" element={<Auth />} />
+                  <Route path="/signup" element={<Signup />} />
+                  <Route path="/" element={<Landing />} />
+                  <Route 
+                    path="/dashboard" 
+                    element={
+                      <ProtectedRoute>
+                        <Index />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/admin" 
+                    element={
+                      <ProtectedRoute>
+                        <AdminDashboard />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/projects" 
+                    element={
+                      <ProtectedRoute>
+                        <Projects />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/projects/:projectId" 
+                    element={
+                      <ProtectedRoute>
+                        <ProjectDetails />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/files" 
+                    element={
+                      <ProtectedRoute>
+                        <FileManagement />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/tasks" 
+                    element={
+                      <ProtectedRoute>
+                        <Tasks />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/projects/:projectId/permissions" 
+                    element={
+                      <ProtectedRoute>
+                        <ProjectPermissions />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/calendar" 
+                    element={
+                      <ProtectedRoute>
+                        <Calendar />
+                      </ProtectedRoute>
+                    } 
+                  />
+                   <Route 
+                    path="/schedule-builder" 
+                    element={
+                      <ProtectedRoute>
+                        <ScheduleBuilder />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/daily-reports" 
+                    element={
+                      <ProtectedRoute>
+                        <DailyReports />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/profile"
+                    element={
+                      <ProtectedRoute>
+                        <Profile />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/subscription"
+                    element={
+                      <ProtectedRoute>
+                        <Subscription />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route path="/privacy" element={<Privacy />} />
+                  <Route path="/terms" element={<Terms />} />
+                  <Route path="/about" element={<About />} />
+                  <Route path="/contact" element={<Contact />} />
+                <Route path="/help" element={<Help />} />
+                <Route path="/getting-started" element={<GettingStarted />} />
+                <Route path="/documentation" element={<Documentation />} />
+                  <Route 
+                    path="/testing" 
+                    element={
+                      <ProtectedRoute>
+                        <Testing />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route path="/success" element={<PaymentSuccess />} />
+                  <Route path="/cancel" element={<PaymentCancel />} />
+                  <Route path="/test" element={<div>TEST ROUTE WORKS</div>} />
+                  <Route path="/invite/:token" element={<InviteAcceptance />} />
+                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </BrowserRouter>
+            </TooltipProvider>
+          </UserPreferencesProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 };
 
