@@ -228,20 +228,26 @@ export function DailyReportsManager() {
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back
           </Button>
-          <div className="text-center space-y-6 animate-fade-in shadow-2xl bg-white/30 backdrop-blur-sm rounded-3xl p-8 border border-white/20 flex-1">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500/10 to-indigo-500/10 rounded-2xl backdrop-blur-sm border border-white/20 mb-4">
-              <FileText className="h-10 w-10 text-blue-600" />
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight mb-4">
-              Daily
-              <span className="block bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                Reports
-              </span>
-            </h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-              Track daily progress, document activities, and monitor project performance with comprehensive daily reporting.
-            </p>
+          <div>
+            <h1 className="text-3xl font-bold">Daily Reports</h1>
+            <p className="text-muted-foreground">Track daily progress and monitor project performance</p>
           </div>
+        </div>
+
+        {/* Hero Section */}
+        <div className="text-center mb-8 space-y-6 animate-fade-in shadow-2xl bg-white/30 backdrop-blur-sm rounded-3xl p-8 border border-white/20">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500/10 to-indigo-500/10 rounded-2xl backdrop-blur-sm border border-white/20 mb-4">
+            <FileText className="h-10 w-10 text-blue-600" />
+          </div>
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight mb-4">
+            Daily
+            <span className="block bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              Reports
+            </span>
+          </h2>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+            Track daily progress, document activities, and monitor project performance with comprehensive daily reporting.
+          </p>
         </div>
 
         {/* Controls */}
