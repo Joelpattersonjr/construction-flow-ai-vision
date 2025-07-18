@@ -15,7 +15,8 @@ import {
   Shield,
   Zap,
   Globe,
-  Star
+  Star,
+  Rocket
 } from 'lucide-react';
 import { TourTrigger } from '@/components/ProductTour';
 import { LiveChatWidget } from '@/components/LiveChatWidget';
@@ -303,7 +304,7 @@ const Landing = () => {
                   className="w-full h-auto rounded-xl shadow-lg"
                 />
                 <div className="absolute -top-4 -right-4 bg-primary text-white p-3 rounded-full shadow-lg animate-bounce">
-                  <Zap className="h-6 w-6" />
+                  <Rocket className="h-6 w-6" />
                 </div>
                 <div className="absolute -bottom-4 -left-4 bg-green-500 text-white p-3 rounded-full shadow-lg animate-pulse">
                   <CheckCircle className="h-6 w-6" />
