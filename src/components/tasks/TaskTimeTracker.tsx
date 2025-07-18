@@ -176,7 +176,7 @@ export const TaskTimeTracker: React.FC<TaskTimeTrackerProps> = ({
   return (
     <FeatureGate 
       feature="time_tracking"
-      upgradeMessage="Time tracking is available exclusively to Enterprise subscribers. Track your time, generate detailed reports, and gain insights into your productivity."
+      upgradeMessage="Time tracking is available to Pro and Enterprise subscribers. Track your time, generate detailed reports, and gain insights into your productivity."
     >
       <Card>
       <CardHeader>

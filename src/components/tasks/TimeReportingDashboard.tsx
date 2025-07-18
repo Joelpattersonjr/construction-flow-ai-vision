@@ -108,7 +108,7 @@ export const TimeReportingDashboard: React.FC = () => {
   return (
     <FeatureGate 
       feature="time_tracking"
-      upgradeMessage="Advanced time reporting and analytics are available exclusively to Enterprise subscribers. Get detailed insights into your team's productivity and time allocation."
+      upgradeMessage="Advanced time reporting and analytics are available to Pro and Enterprise subscribers. Get detailed insights into your team's productivity and time allocation."
     >
       <div className="space-y-6">
       <div className="flex items-center justify-between">
