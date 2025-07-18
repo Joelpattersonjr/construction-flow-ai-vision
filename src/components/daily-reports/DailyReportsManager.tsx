@@ -76,13 +76,10 @@ export function DailyReportsManager() {
       const { data: user } = await supabase.auth.getUser();
       if (!user.user) return;
 
+      // First get the daily reports
       let query = supabase
         .from('daily_reports')
-        .select(`
-          *,
-          projects:project_id (name),
-          profiles:created_by (full_name)
-        `)
+        .select('*')
         .order('report_date', { ascending: false });
 
       // Apply project filter
@@ -103,10 +100,36 @@ export function DailyReportsManager() {
           .lte('report_date', format(endOfMonth(now), 'yyyy-MM-dd'));
       }
 
-      const { data, error } = await query;
+      const { data: reportsData, error } = await query;
 
       if (error) throw error;
-      setReports((data || []) as unknown as DailyReport[]);
+
+      // Manually fetch project and user data for each report
+      const reportsWithDetails = await Promise.all(
+        (reportsData || []).map(async (report) => {
+          // Get project name
+          const { data: projectData } = await supabase
+            .from('projects')
+            .select('name')
+            .eq('id', report.project_id)
+            .single();
+
+          // Get creator name
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('full_name')
+            .eq('id', report.created_by)
+            .single();
+
+          return {
+            ...report,
+            projects: { name: projectData?.name || 'Unknown Project' },
+            profiles: { full_name: profileData?.full_name || 'Unknown User' }
+          };
+        })
+      );
+
+      setReports(reportsWithDetails as DailyReport[]);
     } catch (error) {
       console.error('Error loading reports:', error);
       toast({
