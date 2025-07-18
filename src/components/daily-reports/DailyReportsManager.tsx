@@ -223,19 +223,24 @@ export function DailyReportsManager() {
       
       <main className="container mx-auto py-8 px-4">
         {/* Header */}
-        <div className="flex items-center gap-4 mb-8">
-          <Button variant="outline" size="sm" onClick={() => navigate(-1)}>
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold">Daily Reports</h1>
-            <p className="text-muted-foreground">Track daily progress and monitor project performance</p>
-          </div>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold mb-2">Daily Reports</h1>
+          <p className="text-muted-foreground">Track daily progress and monitor project performance</p>
         </div>
 
         {/* Hero Section */}
-        <div className="text-center mb-8 space-y-6 animate-fade-in shadow-2xl bg-white/30 backdrop-blur-sm rounded-3xl p-8 border border-white/20">
+        <div className="relative text-center mb-8 space-y-6 animate-fade-in shadow-2xl bg-white/30 backdrop-blur-sm rounded-3xl p-8 border border-white/20">
+          {/* Back Button in top left corner */}
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => navigate(-1)}
+            className="absolute top-4 left-4"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back
+          </Button>
+          
           <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500/10 to-indigo-500/10 rounded-2xl backdrop-blur-sm border border-white/20 mb-4">
             <FileText className="h-10 w-10 text-blue-600" />
           </div>
