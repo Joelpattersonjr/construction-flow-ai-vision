@@ -226,12 +226,11 @@ export function DailyReportsManager() {
         <div className="mb-6">
           <Button
             variant="ghost"
-            size="sm"
             onClick={() => navigate(-1)}
-            className="flex items-center space-x-2 bg-white/30 backdrop-blur-sm hover:bg-white/50 transition-all duration-300 border border-white/20 text-slate-700"
+            className="mb-4"
           >
-            <ArrowLeft className="h-4 w-4" />
-            <span className="hidden sm:inline">Back</span>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
           </Button>
         </div>
 
