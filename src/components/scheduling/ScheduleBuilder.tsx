@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Clock, Users, BarChart3, Plus, Edit, Trash2 } from 'lucide-react';
+import { Calendar, Clock, Users, BarChart3, Plus, Edit, Trash2, Download, FileText, Table } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -13,6 +14,7 @@ import { TaskScheduleForm } from './TaskScheduleForm';
 import { TeamScheduleView } from './TeamScheduleView';
 import { ScheduleAnalytics } from './ScheduleAnalytics';
 import { scheduleService } from '@/services/scheduleService';
+import { scheduleExportService } from '@/services/scheduleExportService';
 import { ScheduleSlot } from '@/types/scheduling';
 import { useToast } from '@/hooks/use-toast';
 import { format, addDays, startOfWeek } from 'date-fns';
@@ -126,6 +128,40 @@ export function ScheduleBuilder() {
     setCurrentDate(prev => addDays(prev, direction === 'next' ? 1 : -1));
   };
 
+  const handleExport = async (format: 'pdf' | 'excel') => {
+    try {
+      const { data: user } = await supabase.auth.getUser();
+      if (!user.user) return;
+
+      // Get user profile for name
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('full_name')
+        .eq('id', user.user.id)
+        .single();
+
+      const userName = profile?.full_name || user.user.email || 'Unknown User';
+
+      if (format === 'pdf') {
+        scheduleExportService.exportDayToPDF(currentDate, scheduleSlots, userName);
+      } else {
+        scheduleExportService.exportToExcel(currentDate, scheduleSlots, userName);
+      }
+
+      toast({
+        title: "Success",
+        description: `Schedule exported to ${format.toUpperCase()} successfully.`,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to export schedule.",
+        variant: "destructive",
+      });
+    }
+  };
+
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden">
       <div className="absolute inset-0 opacity-30 pointer-events-none">
@@ -207,37 +243,56 @@ export function ScheduleBuilder() {
                 </Select>
 
                 {selectedView === 'day' && (
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id="24-hour-coverage"
-                      checked={is24HourCoverage}
-                      onCheckedChange={setIs24HourCoverage}
-                    />
-                    <Label htmlFor="24-hour-coverage" className="text-sm font-medium">
-                      24-Hour Coverage
-                    </Label>
-                  </div>
-                )}
-
-                {selectedView === 'day' && (
-                  <Dialog open={showTaskForm} onOpenChange={setShowTaskForm}>
-                    <DialogTrigger asChild>
-                      <Button className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-indigo-600 hover:to-purple-600">
-                        <Plus className="w-4 h-4 mr-2" />
-                        Schedule Task
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-md">
-                      <DialogHeader>
-                        <DialogTitle>Schedule New Task</DialogTitle>
-                      </DialogHeader>
-                      <TaskScheduleForm
-                        date={format(currentDate, 'yyyy-MM-dd')}
-                        onSubmit={handleSlotCreate}
-                        onCancel={() => setShowTaskForm(false)}
+                  <>
+                    <div className="flex items-center space-x-2">
+                      <Switch
+                        id="24-hour-coverage"
+                        checked={is24HourCoverage}
+                        onCheckedChange={setIs24HourCoverage}
                       />
-                    </DialogContent>
-                  </Dialog>
+                      <Label htmlFor="24-hour-coverage" className="text-sm font-medium">
+                        24-Hour Coverage
+                      </Label>
+                    </div>
+
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline" className="bg-white/60">
+                          <Download className="w-4 h-4 mr-2" />
+                          Export
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => handleExport('pdf')}>
+                          <FileText className="w-4 h-4 mr-2" />
+                          Export to PDF
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleExport('excel')}>
+                          <Table className="w-4 h-4 mr-2" />
+                          Export to Excel
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+
+                    <Dialog open={showTaskForm} onOpenChange={setShowTaskForm}>
+                      <DialogTrigger asChild>
+                        <Button className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-indigo-600 hover:to-purple-600">
+                          <Plus className="w-4 h-4 mr-2" />
+                          Schedule Task
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-md">
+                        <DialogHeader>
+                          <DialogTitle>Schedule New Task</DialogTitle>
+                        </DialogHeader>
+                        <TaskScheduleForm
+                          date={format(currentDate, 'yyyy-MM-dd')}
+                          onSubmit={handleSlotCreate}
+                          onCancel={() => setShowTaskForm(false)}
+                        />
+                      </DialogContent>
+                    </Dialog>
+                  </>
                 )}
               </div>
             </div>
