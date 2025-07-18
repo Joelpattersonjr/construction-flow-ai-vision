@@ -194,14 +194,15 @@ export function DailyReportsManager() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Daily Reports</h1>
-        <p className="text-gray-600 max-w-2xl mx-auto">
-          Track daily progress, document activities, and monitor project performance with comprehensive daily reporting.
-        </p>
-      </div>
+    <div className="relative bg-white/20 backdrop-blur-sm rounded-2xl p-8 shadow-2xl border border-white/30">
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Daily Reports</h1>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            Track daily progress, document activities, and monitor project performance with comprehensive daily reporting.
+          </p>
+        </div>
 
       {/* Controls */}
       <Card>
@@ -369,22 +370,23 @@ export function DailyReportsManager() {
       </div>
 
       {/* Main Content */}
-      {selectedView === 'list' && (
-        <DailyReportsList
-          reports={filteredReports}
-          loading={loading}
-          onReportUpdated={handleReportUpdated}
-          onReportDeleted={handleReportDeleted}
-          projects={projects}
-        />
-      )}
+        {selectedView === 'list' && (
+          <DailyReportsList
+            reports={filteredReports}
+            loading={loading}
+            onReportUpdated={handleReportUpdated}
+            onReportDeleted={handleReportDeleted}
+            projects={projects}
+          />
+        )}
 
-      {selectedView === 'analytics' && (
-        <DailyReportsAnalytics
-          reports={filteredReports}
-          projects={projects}
-        />
-      )}
+        {selectedView === 'analytics' && (
+          <DailyReportsAnalytics
+            reports={filteredReports}
+            projects={projects}
+          />
+        )}
+      </div>
     </div>
   );
 }

@@ -22,9 +22,7 @@ export default function DailyReports() {
             Back to Projects
           </Button>
         </div>
-        <div className="relative bg-white/20 backdrop-blur-sm rounded-2xl p-8 shadow-2xl border border-white/30">
-          <DailyReportsManager />
-        </div>
+        <DailyReportsManager />
       </main>
     </div>
   );
