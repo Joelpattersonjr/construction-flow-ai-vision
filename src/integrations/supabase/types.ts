@@ -221,6 +221,119 @@ export type Database = {
           },
         ]
       }
+      daily_report_team_members: {
+        Row: {
+          created_at: string
+          daily_report_id: string
+          hours_worked: number | null
+          id: string
+          role_description: string | null
+          tasks_completed: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          daily_report_id: string
+          hours_worked?: number | null
+          id?: string
+          role_description?: string | null
+          tasks_completed?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          daily_report_id?: string
+          hours_worked?: number | null
+          id?: string
+          role_description?: string | null
+          tasks_completed?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daily_report_team_members_daily_report_id_fkey"
+            columns: ["daily_report_id"]
+            isOneToOne: false
+            referencedRelation: "daily_reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      daily_reports: {
+        Row: {
+          created_at: string
+          created_by: string
+          crew_count: number | null
+          delays_issues: string | null
+          equipment_status: string | null
+          id: string
+          materials_delivered: string | null
+          overall_progress_percentage: number | null
+          photos_taken: number | null
+          progress_summary: string | null
+          project_id: string
+          report_date: string
+          safety_incidents: number | null
+          status: string | null
+          temperature_high: number | null
+          temperature_low: number | null
+          updated_at: string
+          visitors: string | null
+          weather_conditions: string | null
+          work_completed: string | null
+          work_hours_end: string | null
+          work_hours_start: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          crew_count?: number | null
+          delays_issues?: string | null
+          equipment_status?: string | null
+          id?: string
+          materials_delivered?: string | null
+          overall_progress_percentage?: number | null
+          photos_taken?: number | null
+          progress_summary?: string | null
+          project_id: string
+          report_date: string
+          safety_incidents?: number | null
+          status?: string | null
+          temperature_high?: number | null
+          temperature_low?: number | null
+          updated_at?: string
+          visitors?: string | null
+          weather_conditions?: string | null
+          work_completed?: string | null
+          work_hours_end?: string | null
+          work_hours_start?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          crew_count?: number | null
+          delays_issues?: string | null
+          equipment_status?: string | null
+          id?: string
+          materials_delivered?: string | null
+          overall_progress_percentage?: number | null
+          photos_taken?: number | null
+          progress_summary?: string | null
+          project_id?: string
+          report_date?: string
+          safety_incidents?: number | null
+          status?: string | null
+          temperature_high?: number | null
+          temperature_low?: number | null
+          updated_at?: string
+          visitors?: string | null
+          weather_conditions?: string | null
+          work_completed?: string | null
+          work_hours_end?: string | null
+          work_hours_start?: string | null
+        }
+        Relationships: []
+      }
       documents: {
         Row: {
           category: string | null
