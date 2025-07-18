@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, Users, BarChart3, Plus, Edit, Trash2 } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -22,6 +24,7 @@ export function ScheduleBuilder() {
   const [loading, setLoading] = useState(false);
   const [showTaskForm, setShowTaskForm] = useState(false);
   const [editingSlot, setEditingSlot] = useState<ScheduleSlot | null>(null);
+  const [is24HourCoverage, setIs24HourCoverage] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -204,6 +207,19 @@ export function ScheduleBuilder() {
                 </Select>
 
                 {selectedView === 'day' && (
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="24-hour-coverage"
+                      checked={is24HourCoverage}
+                      onCheckedChange={setIs24HourCoverage}
+                    />
+                    <Label htmlFor="24-hour-coverage" className="text-sm font-medium">
+                      24-Hour Coverage
+                    </Label>
+                  </div>
+                )}
+
+                {selectedView === 'day' && (
                   <Dialog open={showTaskForm} onOpenChange={setShowTaskForm}>
                     <DialogTrigger asChild>
                       <Button className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-indigo-600 hover:to-purple-600">
@@ -238,6 +254,7 @@ export function ScheduleBuilder() {
             onSlotDelete={handleSlotDelete}
             editingSlot={editingSlot}
             setEditingSlot={setEditingSlot}
+            is24HourCoverage={is24HourCoverage}
           />
         )}
 

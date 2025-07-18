@@ -17,6 +17,7 @@ interface DayScheduleViewProps {
   onSlotDelete: (slotId: string) => void;
   editingSlot: ScheduleSlot | null;
   setEditingSlot: (slot: ScheduleSlot | null) => void;
+  is24HourCoverage: boolean;
 }
 
 export function DayScheduleView({
@@ -26,11 +27,14 @@ export function DayScheduleView({
   onSlotUpdate,
   onSlotDelete,
   editingSlot,
-  setEditingSlot
+  setEditingSlot,
+  is24HourCoverage
 }: DayScheduleViewProps) {
   const [draggedSlot, setDraggedSlot] = useState<ScheduleSlot | null>(null);
 
-  const timeSlots = scheduleService.generateTimeSlots(7, 19, 30); // 7 AM to 7 PM, 30-min intervals
+  const timeSlots = is24HourCoverage 
+    ? scheduleService.generateTimeSlots(0, 24, 30) // 24-hour coverage: 00:00 to 23:30
+    : scheduleService.generateTimeSlots(7, 19, 30); // Standard: 7 AM to 7 PM, 30-min intervals
 
   const getSlotForTime = (time: string): ScheduleSlot | null => {
     return slots.find(slot => {
