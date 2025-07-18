@@ -223,7 +223,7 @@ export function DailyReportsManager() {
       
       <main className="container mx-auto py-8 px-4">
         {/* Header */}
-        <div className="text-center mb-8 space-y-6 animate-fade-in">
+        <div className="text-center mb-8 space-y-6 animate-fade-in shadow-2xl bg-white/30 backdrop-blur-sm rounded-3xl p-8 border border-white/20">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500/10 to-indigo-500/10 rounded-2xl backdrop-blur-sm border border-white/20 mb-4">
             <FileText className="h-10 w-10 text-blue-600" />
           </div>
