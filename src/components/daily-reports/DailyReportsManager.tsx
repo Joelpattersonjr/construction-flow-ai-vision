@@ -80,8 +80,8 @@ export function DailyReportsManager() {
         .from('daily_reports')
         .select(`
           *,
-          projects:project_id (name),
-          profiles:created_by (full_name)
+          projects!daily_reports_project_id_fkey (name),
+          profiles!daily_reports_created_by_fkey (full_name)
         `)
         .order('report_date', { ascending: false });
 
