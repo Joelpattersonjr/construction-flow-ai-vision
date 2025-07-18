@@ -25,6 +25,7 @@ import ProjectPermissions from "./pages/ProjectPermissions";
 import Tasks from "./pages/Tasks";
 import Calendar from "./pages/Calendar";
 import ScheduleBuilder from "./pages/ScheduleBuilder";
+import DailyReports from "./pages/DailyReports";
 import Profile from "./pages/Profile";
 import Subscription from "./pages/Subscription";
 import PaymentSuccess from "./pages/PaymentSuccess";
@@ -120,11 +121,19 @@ const App: React.FC = () => {
                         </ProtectedRoute>
                       } 
                     />
-                    <Route 
+                     <Route 
                       path="/schedule-builder" 
                       element={
                         <ProtectedRoute>
                           <ScheduleBuilder />
+                        </ProtectedRoute>
+                      } 
+                    />
+                    <Route 
+                      path="/daily-reports" 
+                      element={
+                        <ProtectedRoute>
+                          <DailyReports />
                         </ProtectedRoute>
                       } 
                     />
