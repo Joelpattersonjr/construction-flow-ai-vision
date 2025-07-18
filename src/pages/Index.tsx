@@ -18,7 +18,8 @@ import {
   ArrowRight,
   BarChart3,
   Users,
-  Clock
+  Clock,
+  ClipboardList
 } from 'lucide-react';
 
 const Index = () => {
@@ -139,6 +140,15 @@ const Index = () => {
       path: "/files", 
       cta: "Manage Files",
       gradient: "from-orange-500 to-red-500"
+    },
+    {
+      icon: ClipboardList,
+      title: "Daily Reports",
+      description: "Track daily project progress",
+      details: "Create and manage daily construction reports with progress tracking.",
+      path: "/daily-reports",
+      cta: "View Reports",
+      gradient: "from-yellow-500 to-amber-500"
     }
   ];
 
@@ -192,7 +202,7 @@ const Index = () => {
               {/* Quick Stats or Actions */}
               <div className="flex flex-col sm:flex-row gap-4">
                 <div className="text-center p-4 bg-white/30 backdrop-blur-sm rounded-xl border border-white/20">
-                  <div className="text-2xl font-bold text-primary">4</div>
+                  <div className="text-2xl font-bold text-primary">5</div>
                   <div className="text-sm text-gray-600">Active Tools</div>
                 </div>
                 <div className="text-center p-4 bg-white/30 backdrop-blur-sm rounded-xl border border-white/20">
