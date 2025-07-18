@@ -181,7 +181,7 @@ export function ScheduleBuilder() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => navigate(-1)}
+                onClick={() => navigate('/projects')}
                 className="text-gray-600 hover:text-gray-900 hover:bg-white/50"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
