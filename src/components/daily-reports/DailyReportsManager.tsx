@@ -194,210 +194,197 @@ export function DailyReportsManager() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20">
-      <AppHeader />
-      
-      <main className="container mx-auto py-8 px-4">
-        {/* Header */}
-        <div className="text-center mb-8 space-y-6 animate-fade-in">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500/10 to-indigo-500/10 rounded-2xl backdrop-blur-sm border border-white/20 mb-4">
-            <FileText className="h-10 w-10 text-blue-600" />
-          </div>
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight mb-4">
-            Daily
-            <span className="block bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-              Reports
-            </span>
-          </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-            Track daily progress, document activities, and monitor project performance with comprehensive daily reporting.
-          </p>
-        </div>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="text-center mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Daily Reports</h1>
+        <p className="text-gray-600 max-w-2xl mx-auto">
+          Track daily progress, document activities, and monitor project performance with comprehensive daily reporting.
+        </p>
+      </div>
 
-        {/* Controls */}
-        <Card className="mb-8 border-0 bg-white/70 backdrop-blur-xl shadow-xl border-white/20">
-          <CardHeader>
-            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
-              <div className="flex flex-wrap items-center gap-4">
-                <Select value={selectedView} onValueChange={(value: any) => setSelectedView(value)}>
-                  <SelectTrigger className="w-40 bg-white/80">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="list">
-                      <div className="flex items-center gap-2">
-                        <FileText className="w-4 h-4" />
-                        Reports List
-                      </div>
+      {/* Controls */}
+      <Card>
+        <CardHeader>
+          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+            <div className="flex flex-wrap items-center gap-4">
+              <Select value={selectedView} onValueChange={(value: any) => setSelectedView(value)}>
+                <SelectTrigger className="w-40">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="list">
+                    <div className="flex items-center gap-2">
+                      <FileText className="w-4 h-4" />
+                      Reports List
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="analytics">
+                    <div className="flex items-center gap-2">
+                      <TrendingUp className="w-4 h-4" />
+                      Analytics
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select value={selectedProject} onValueChange={setSelectedProject}>
+                <SelectTrigger className="w-48">
+                  <SelectValue placeholder="All Projects" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Projects</SelectItem>
+                  {projects.map((project) => (
+                    <SelectItem key={project.id} value={project.id}>
+                      {project.name}
                     </SelectItem>
-                    <SelectItem value="analytics">
-                      <div className="flex items-center gap-2">
-                        <TrendingUp className="w-4 h-4" />
-                        Analytics
-                      </div>
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
+                  ))}
+                </SelectContent>
+              </Select>
 
-                <Select value={selectedProject} onValueChange={setSelectedProject}>
-                  <SelectTrigger className="w-48 bg-white/80">
-                    <SelectValue placeholder="All Projects" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Projects</SelectItem>
-                    {projects.map((project) => (
-                      <SelectItem key={project.id} value={project.id}>
-                        {project.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+                <SelectTrigger className="w-40">
+                  <SelectValue placeholder="All Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="draft">Draft</SelectItem>
+                  <SelectItem value="submitted">Submitted</SelectItem>
+                  <SelectItem value="approved">Approved</SelectItem>
+                </SelectContent>
+              </Select>
 
-                <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-                  <SelectTrigger className="w-40 bg-white/80">
-                    <SelectValue placeholder="All Status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Status</SelectItem>
-                    <SelectItem value="draft">Draft</SelectItem>
-                    <SelectItem value="submitted">Submitted</SelectItem>
-                    <SelectItem value="approved">Approved</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                <Select value={selectedDateRange} onValueChange={setSelectedDateRange}>
-                  <SelectTrigger className="w-48 bg-white/80">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="current-month">Current Month</SelectItem>
-                    <SelectItem value="all">All Time</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="flex items-center gap-4">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                  <Input
-                    placeholder="Search reports..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 w-64 bg-white/80"
-                  />
-                </div>
-
-                <Button
-                  variant="outline"
-                  onClick={exportReports}
-                  className="bg-white/80"
-                >
-                  <Download className="w-4 h-4 mr-2" />
-                  Export
-                </Button>
-
-                <Dialog open={showCreateForm} onOpenChange={setShowCreateForm}>
-                  <DialogTrigger asChild>
-                    <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-indigo-600 hover:to-blue-600">
-                      <Plus className="w-4 h-4 mr-2" />
-                      New Report
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-                    <DialogHeader>
-                      <DialogTitle>Create Daily Report</DialogTitle>
-                    </DialogHeader>
-                    <DailyReportForm
-                      projects={projects}
-                      onSubmit={handleReportCreated}
-                      onCancel={() => setShowCreateForm(false)}
-                    />
-                  </DialogContent>
-                </Dialog>
-              </div>
+              <Select value={selectedDateRange} onValueChange={setSelectedDateRange}>
+                <SelectTrigger className="w-48">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="current-month">Current Month</SelectItem>
+                  <SelectItem value="all">All Time</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-          </CardHeader>
+
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Input
+                  placeholder="Search reports..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 w-64"
+                />
+              </div>
+
+              <Button
+                variant="outline"
+                onClick={exportReports}
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Export
+              </Button>
+
+              <Dialog open={showCreateForm} onOpenChange={setShowCreateForm}>
+                <DialogTrigger asChild>
+                  <Button>
+                    <Plus className="w-4 h-4 mr-2" />
+                    New Report
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Create Daily Report</DialogTitle>
+                  </DialogHeader>
+                  <DailyReportForm
+                    projects={projects}
+                    onSubmit={handleReportCreated}
+                    onCancel={() => setShowCreateForm(false)}
+                  />
+                </DialogContent>
+              </Dialog>
+            </div>
+          </div>
+        </CardHeader>
+      </Card>
+
+      {/* Summary Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Total Reports</p>
+                <p className="text-2xl font-bold text-gray-900">{filteredReports.length}</p>
+              </div>
+              <FileText className="h-8 w-8 text-orange-600" />
+            </div>
+          </CardContent>
         </Card>
 
-        {/* Summary Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card className="border-0 bg-white/70 backdrop-blur-xl shadow-xl border-white/20">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Total Reports</p>
-                  <p className="text-2xl font-bold text-gray-900">{filteredReports.length}</p>
-                </div>
-                <FileText className="h-8 w-8 text-orange-600" />
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Avg Progress</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {filteredReports.length > 0 
+                    ? Math.round(filteredReports.reduce((sum, r) => sum + (r.overall_progress_percentage || 0), 0) / filteredReports.length)
+                    : 0}%
+                </p>
               </div>
-            </CardContent>
-          </Card>
+              <TrendingUp className="h-8 w-8 text-green-600" />
+            </div>
+          </CardContent>
+        </Card>
 
-          <Card className="border-0 bg-white/70 backdrop-blur-xl shadow-xl border-white/20">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Avg Progress</p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {filteredReports.length > 0 
-                      ? Math.round(filteredReports.reduce((sum, r) => sum + (r.overall_progress_percentage || 0), 0) / filteredReports.length)
-                      : 0}%
-                  </p>
-                </div>
-                <TrendingUp className="h-8 w-8 text-green-600" />
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Safety Incidents</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {filteredReports.reduce((sum, r) => sum + (r.safety_incidents || 0), 0)}
+                </p>
               </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-0 bg-white/70 backdrop-blur-xl shadow-xl border-white/20">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Safety Incidents</p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {filteredReports.reduce((sum, r) => sum + (r.safety_incidents || 0), 0)}
-                  </p>
-                </div>
-                <div className="h-8 w-8 bg-red-100 rounded-full flex items-center justify-center">
-                  <span className="text-red-600 font-bold text-sm">!</span>
-                </div>
+              <div className="h-8 w-8 bg-red-100 rounded-full flex items-center justify-center">
+                <span className="text-red-600 font-bold text-sm">!</span>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </CardContent>
+        </Card>
 
-          <Card className="border-0 bg-white/70 backdrop-blur-xl shadow-xl border-white/20">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Active Projects</p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {new Set(filteredReports.map(r => r.project_id)).size}
-                  </p>
-                </div>
-                <Calendar className="h-8 w-8 text-blue-600" />
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Active Projects</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {new Set(filteredReports.map(r => r.project_id)).size}
+                </p>
               </div>
-            </CardContent>
-          </Card>
-        </div>
+              <Calendar className="h-8 w-8 text-blue-600" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
-        {/* Main Content */}
-        {selectedView === 'list' && (
-          <DailyReportsList
-            reports={filteredReports}
-            loading={loading}
-            onReportUpdated={handleReportUpdated}
-            onReportDeleted={handleReportDeleted}
-            projects={projects}
-          />
-        )}
+      {/* Main Content */}
+      {selectedView === 'list' && (
+        <DailyReportsList
+          reports={filteredReports}
+          loading={loading}
+          onReportUpdated={handleReportUpdated}
+          onReportDeleted={handleReportDeleted}
+          projects={projects}
+        />
+      )}
 
-        {selectedView === 'analytics' && (
-          <DailyReportsAnalytics
-            reports={filteredReports}
-            projects={projects}
-          />
-        )}
-      </main>
+      {selectedView === 'analytics' && (
+        <DailyReportsAnalytics
+          reports={filteredReports}
+          projects={projects}
+        />
+      )}
     </div>
   );
 }
