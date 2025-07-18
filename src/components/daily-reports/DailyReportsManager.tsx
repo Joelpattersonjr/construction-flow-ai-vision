@@ -220,11 +220,40 @@ export function DailyReportsManager() {
     <div className="relative bg-white/20 backdrop-blur-sm rounded-2xl p-8 shadow-2xl border border-white/30">
       <div className="space-y-6">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Daily Reports</h1>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Track daily progress, document activities, and monitor project performance with comprehensive daily reporting.
-          </p>
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Daily Reports</h1>
+            <p className="text-gray-600">
+              Track daily progress, document activities, and monitor project performance with comprehensive daily reporting.
+            </p>
+          </div>
+          <div className="flex items-center gap-4">
+            <Button
+              variant="outline"
+              onClick={exportReports}
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Export
+            </Button>
+            <Dialog open={showCreateForm} onOpenChange={setShowCreateForm}>
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Create Report
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Create Daily Report</DialogTitle>
+                </DialogHeader>
+                <DailyReportForm 
+                  projects={projects}
+                  onSubmit={handleReportCreated}
+                  onCancel={() => setShowCreateForm(false)}
+                />
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
 
       {/* Controls */}
@@ -299,33 +328,6 @@ export function DailyReportsManager() {
                   className="pl-10 w-64"
                 />
               </div>
-
-              <Button
-                variant="outline"
-                onClick={exportReports}
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Export
-              </Button>
-
-              <Dialog open={showCreateForm} onOpenChange={setShowCreateForm}>
-                <DialogTrigger asChild>
-                  <Button>
-                    <Plus className="w-4 h-4 mr-2" />
-                    New Report
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-                  <DialogHeader>
-                    <DialogTitle>Create Daily Report</DialogTitle>
-                  </DialogHeader>
-                  <DailyReportForm
-                    projects={projects}
-                    onSubmit={handleReportCreated}
-                    onCancel={() => setShowCreateForm(false)}
-                  />
-                </DialogContent>
-              </Dialog>
             </div>
           </div>
         </CardHeader>
