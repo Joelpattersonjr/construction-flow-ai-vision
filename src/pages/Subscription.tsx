@@ -84,7 +84,7 @@ export default function Subscription() {
     {
       id: 'starter',
       title: 'Starter',
-      price: '$19.99',
+      price: '$39.99',
       subtitle: 'Per month',
       features: [
         '10 Projects',
@@ -102,7 +102,7 @@ export default function Subscription() {
     {
       id: 'pro',
       title: 'Pro',
-      price: '$49.99',
+      price: '$69.99',
       subtitle: 'Per month',
       features: [
         '50 Projects',

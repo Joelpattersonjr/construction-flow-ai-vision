@@ -155,7 +155,7 @@ const Landing = () => {
     },
     {
       name: "Starter",
-      price: "$19.99",
+      price: "$39.99",
       period: "per month",
       description: "Great for small growing teams",
       features: [
@@ -174,7 +174,7 @@ const Landing = () => {
     },
     {
       name: "Pro",
-      price: "$49.99",
+      price: "$69.99",
       period: "per month",
       description: "Enhanced features for growing teams",
       features: [
