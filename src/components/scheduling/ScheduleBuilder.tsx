@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Clock, Users, BarChart3, Plus, Edit, Trash2, Download, FileText, Table } from 'lucide-react';
+import { Calendar, Clock, Users, BarChart3, Plus, Edit, Trash2, Download, FileText, Table, ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -20,6 +21,7 @@ import { useToast } from '@/hooks/use-toast';
 import { format, addDays, startOfWeek } from 'date-fns';
 
 export function ScheduleBuilder() {
+  const navigate = useNavigate();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedView, setSelectedView] = useState<'day' | 'team' | 'analytics'>('day');
   const [scheduleSlots, setScheduleSlots] = useState<ScheduleSlot[]>([]);
@@ -174,6 +176,19 @@ export function ScheduleBuilder() {
         {/* Header */}
         <div className="text-center mb-8 space-y-6 animate-fade-in relative">
           <div className="relative bg-white/20 backdrop-blur-sm rounded-2xl p-8 shadow-2xl border border-white/30">
+            {/* Back Button */}
+            <div className="absolute top-6 left-6">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate(-1)}
+                className="text-gray-600 hover:text-gray-900 hover:bg-white/50"
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back
+              </Button>
+            </div>
+            
             <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-purple-500/10 to-indigo-500/10 rounded-2xl backdrop-blur-sm border border-white/20 mb-4">
               <Clock className="h-10 w-10 text-purple-600" />
             </div>
