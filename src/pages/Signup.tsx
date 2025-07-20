@@ -149,7 +149,7 @@ const Signup = () => {
     }
   };
 
-  const handleSubscriptionChoice = async (tier: 'free' | 'pro' | 'enterprise') => {
+  const handleSubscriptionChoice = async (tier: 'free' | 'starter' | 'pro' | 'enterprise') => {
     if (tier === 'free') {
       // Redirect to main app for free tier
       toast({
@@ -201,8 +201,8 @@ const Signup = () => {
               {/* Basic Plan */}
               <Card className="relative border-2 hover:border-primary transition-colors">
                 <CardHeader>
-                  <CardTitle className="text-lg">Basic</CardTitle>
-                  <div className="text-2xl font-bold">$69.99<span className="text-sm font-normal">/month</span></div>
+                  <CardTitle className="text-lg">Starter</CardTitle>
+                  <div className="text-2xl font-bold">$59.99<span className="text-sm font-normal">/month</span></div>
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-2 text-sm">
@@ -216,9 +216,9 @@ const Signup = () => {
                   <Button 
                     className="w-full mt-4" 
                     variant="outline"
-                    onClick={() => handleSubscriptionChoice('free')}
+                    onClick={() => handleSubscriptionChoice('starter')}
                   >
-                    Start Basic
+                    Start Starter
                   </Button>
                 </CardContent>
               </Card>
@@ -231,7 +231,7 @@ const Signup = () => {
                   </span>
                 </div>
                 <CardHeader>
-                  <CardTitle className="text-lg">Premium</CardTitle>
+                  <CardTitle className="text-lg">Pro</CardTitle>
                   <div className="text-2xl font-bold">$99.99<span className="text-sm font-normal">/month</span></div>
                 </CardHeader>
                 <CardContent>
@@ -248,7 +248,7 @@ const Signup = () => {
                     className="w-full mt-4"
                     onClick={() => handleSubscriptionChoice('pro')}
                   >
-                    Start Premium
+                    Start Pro
                   </Button>
                 </CardContent>
               </Card>

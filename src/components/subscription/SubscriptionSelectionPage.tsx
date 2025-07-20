@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { PricingCard } from './PricingCard';
 
 interface SubscriptionSelectionPageProps {
-  onSubscriptionChoice: (tier: 'basic' | 'pro' | 'professional' | 'enterprise') => void;
+  onSubscriptionChoice: (tier: 'starter' | 'pro' | 'professional' | 'enterprise') => void;
   onSkip: () => void;
 }
 
@@ -67,18 +67,18 @@ export const SubscriptionSelectionPage: React.FC<SubscriptionSelectionPageProps>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 pt-8">
             <PricingCard
-              title="Basic"
-              price="$69.99"
+              title="Starter"
+              price="$59.99"
               subtitle="30-day free trial"
               features={basicFeatures}
-              buttonText="Start 30-Day Trial"
+              buttonText="Start Starter Plan"
               buttonVariant="outline"
-              onClick={() => onSubscriptionChoice('basic')}
+              onClick={() => onSubscriptionChoice('starter')}
             />
 
             <PricingCard
               title="Pro"
-              price="$199.99"
+              price="$99.99"
               features={proFeatures}
               buttonText="Start Pro Plan"
               isPopular={true}

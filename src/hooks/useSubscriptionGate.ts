@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
 type SubscriptionStatus = 'loading' | 'free' | 'trial' | 'subscribed' | 'needs_subscription';
-type SubscriptionTier = 'basic' | 'pro' | 'professional' | 'enterprise';
+type SubscriptionTier = 'starter' | 'pro' | 'professional' | 'enterprise';
 
 export const useSubscriptionGate = () => {
   const [subscriptionStatus, setSubscriptionStatus] = useState<SubscriptionStatus>('loading');
