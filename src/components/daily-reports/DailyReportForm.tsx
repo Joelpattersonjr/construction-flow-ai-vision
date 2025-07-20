@@ -6,14 +6,17 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Trash2, Users } from 'lucide-react';
+import { Plus, Trash2, Users, RefreshCw } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
+import { WeatherService } from '@/services/weatherService';
+import { cn } from '@/lib/utils';
 
 interface Project {
   id: string;
   name: string;
+  address?: string;
 }
 
 interface TeamMember {
@@ -56,6 +59,7 @@ export function DailyReportForm({ projects, onSubmit, onCancel, reportId }: Dail
   
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [companyUsers, setCompanyUsers] = useState<any[]>([]);
+  const [loadingWeather, setLoadingWeather] = useState(false);
 
   useEffect(() => {
     loadCompanyUsers();
@@ -229,6 +233,53 @@ export function DailyReportForm({ projects, onSubmit, onCancel, reportId }: Dail
     setTeamMembers(updated);
   };
 
+  const loadWeatherData = async () => {
+    const selectedProject = projects.find(p => p.id === formData.project_id);
+    
+    if (!formData.project_id || !selectedProject?.address) {
+      toast({
+        title: "Cannot load weather",
+        description: "Please select a project with an address first",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setLoadingWeather(true);
+    try {
+      const weatherData = await WeatherService.getWeatherForProject(formData.project_id, selectedProject.address);
+      
+      if (weatherData) {
+        setFormData(prev => ({
+          ...prev,
+          temperature_high: weatherData.temperature_high.toString(),
+          temperature_low: weatherData.temperature_low.toString(),
+          weather_conditions: weatherData.condition
+        }));
+        
+        toast({
+          title: "Weather loaded",
+          description: "Weather data has been populated from current conditions"
+        });
+      } else {
+        toast({
+          title: "Weather unavailable",
+          description: "Could not fetch weather data for this location",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      console.error('Error loading weather:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load weather data",
+        variant: "destructive"
+      });
+    } finally {
+      setLoadingWeather(false);
+    }
+  };
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -296,7 +347,20 @@ export function DailyReportForm({ projects, onSubmit, onCancel, reportId }: Dail
         {/* Weather & Work Hours */}
         <Card>
           <CardHeader>
-            <CardTitle>Weather & Work Hours</CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle>Weather & Work Hours</CardTitle>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={loadWeatherData}
+                disabled={loadingWeather}
+                className="flex items-center gap-2"
+              >
+                <RefreshCw className={cn("h-4 w-4", loadingWeather && "animate-spin")} />
+                Load Current Weather
+              </Button>
+            </div>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>

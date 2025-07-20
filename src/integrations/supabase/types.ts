@@ -1489,6 +1489,56 @@ export type Database = {
           },
         ]
       }
+      weather_cache: {
+        Row: {
+          condition: string | null
+          created_at: string
+          humidity: number | null
+          id: string
+          last_updated: string
+          project_id: string
+          temperature_current: number | null
+          temperature_high: number | null
+          temperature_low: number | null
+          weather_icon: string | null
+          wind_speed: number | null
+        }
+        Insert: {
+          condition?: string | null
+          created_at?: string
+          humidity?: number | null
+          id?: string
+          last_updated?: string
+          project_id: string
+          temperature_current?: number | null
+          temperature_high?: number | null
+          temperature_low?: number | null
+          weather_icon?: string | null
+          wind_speed?: number | null
+        }
+        Update: {
+          condition?: string | null
+          created_at?: string
+          humidity?: number | null
+          id?: string
+          last_updated?: string
+          project_id?: string
+          temperature_current?: number | null
+          temperature_high?: number | null
+          temperature_low?: number | null
+          weather_icon?: string | null
+          wind_speed?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "weather_cache_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -1529,6 +1579,10 @@ export type Database = {
         Returns: boolean
       }
       cleanup_expired_locks: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      cleanup_old_weather_data: {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }

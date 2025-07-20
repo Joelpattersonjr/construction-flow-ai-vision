@@ -13,6 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Plus, Folder, Calendar, MapPin, FileText, Settings, ArrowLeft, Search, Filter, Users, Clock, AlertTriangle, CheckCircle, Upload, PlusCircle, Eye, Cloud, Sun, CloudRain, Bolt, Activity, TrendingUp } from 'lucide-react';
+import { ProjectWeatherCard } from '@/components/projects/ProjectWeatherCard';
 import { useNavigate } from 'react-router-dom';
 import AppHeader from '@/components/navigation/AppHeader';
 import { ExportDialog } from '@/components/export/ExportDialog';
@@ -167,12 +168,7 @@ const Projects: React.FC = () => {
             .order('created_at', { ascending: false })
             .limit(3);
 
-          // Mock weather data (in real app, would integrate with weather API)
-          const mockWeather = {
-            temperature: Math.floor(Math.random() * 40) + 50, // 50-90°F
-            condition: ['sunny', 'cloudy', 'rainy'][Math.floor(Math.random() * 3)],
-            icon: ['sun', 'cloud', 'cloud-rain'][Math.floor(Math.random() * 3)]
-          };
+          // Weather data will be fetched by ProjectWeatherCard component
 
           // Mock project phases
           const mockPhases = [
@@ -194,7 +190,6 @@ const Projects: React.FC = () => {
               avatar_url: member.profiles.avatar_url
             })) || [],
             recentFiles: recentFiles || [],
-            weather: mockWeather,
             phases: mockPhases
           };
         })
@@ -1095,17 +1090,13 @@ const Projects: React.FC = () => {
                   )}
 
                    {/* Weather Info */}
-                   {project.weather && project.address && (
-                     <div className="flex items-center justify-between p-3 bg-slate-50/50 rounded-lg border border-slate-100">
-                       <div className="flex items-center gap-2">
-                         {getWeatherIcon(project.weather.condition)}
-                         <span className="text-sm font-medium text-slate-700">
-                           {project.weather.temperature}°F
-                         </span>
-                       </div>
-                       <span className="text-xs text-slate-500 capitalize">
-                         {project.weather.condition}
-                       </span>
+                   {project.address && (
+                     <div className="p-3 bg-slate-50/50 rounded-lg border border-slate-100">
+                       <ProjectWeatherCard 
+                         projectId={project.id} 
+                         address={project.address}
+                         className="justify-between"
+                       />
                      </div>
                    )}
 
