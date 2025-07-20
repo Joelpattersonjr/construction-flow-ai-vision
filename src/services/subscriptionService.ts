@@ -84,7 +84,7 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
   {
     id: 'starter',
     name: 'Starter',
-    price: '$39.99/month',
+    price: '$59.99/month',
     features: [
       '10 Projects',
       '15 Team Members',
@@ -110,7 +110,7 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
   {
     id: 'pro',
     name: 'Pro',
-    price: '$69.99/month',
+    price: '$99.99/month',
     features: [
       '50 Projects',
       '50 Team Members',
