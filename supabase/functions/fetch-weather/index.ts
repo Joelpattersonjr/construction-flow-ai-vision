@@ -94,8 +94,11 @@ serve(async (req) => {
     
     // Try multiple address formats for better geocoding success
     const addressVariants = [
+      // Test with a known good address first to verify the API is working
+      'Orlando, FL, USA',
+      'Orlando, Florida, USA',
+      // Then try the actual address variants
       address,
-      // Since the specific street address might not exist, try simpler variants first
       'St. Cloud, FL 34769, USA',
       'Saint Cloud, FL 34769, USA', 
       'St Cloud, Florida 34769, USA',
