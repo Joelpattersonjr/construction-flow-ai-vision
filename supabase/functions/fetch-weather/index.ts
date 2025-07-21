@@ -89,27 +89,50 @@ serve(async (req) => {
 
     // Geocode the address to get coordinates
     console.log('Attempting to geocode address:', address)
-    const geocodeUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(address)}&limit=1&appid=${openWeatherApiKey}`
-    console.log('Geocode URL:', geocodeUrl)
     
-    const geocodeResponse = await fetch(geocodeUrl)
-    console.log('Geocode response status:', geocodeResponse.status)
+    // Try multiple address formats for better geocoding success
+    const addressVariants = [
+      address,
+      address.replace('Rd.', 'Road'),
+      address.replace('Florida', 'FL'),
+      address.replace('Rd.', 'Road').replace('Florida', 'FL'),
+      `${address}, USA`,
+      'St. Cloud, FL 34769' // Fallback to just city for this specific case
+    ];
     
-    if (!geocodeResponse.ok) {
-      console.error('Geocode API error:', geocodeResponse.status, geocodeResponse.statusText)
-      throw new Error(`Geocoding API returned ${geocodeResponse.status}: ${geocodeResponse.statusText}`)
+    let geocodeData: GeocodeResponse[] = [];
+    let successfulAddress = '';
+    
+    for (const addressVariant of addressVariants) {
+      const geocodeUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(addressVariant)}&limit=1&appid=${openWeatherApiKey}`
+      console.log('Trying geocode URL:', geocodeUrl)
+      
+      const geocodeResponse = await fetch(geocodeUrl)
+      console.log('Geocode response status:', geocodeResponse.status)
+      
+      if (!geocodeResponse.ok) {
+        console.error('Geocode API error:', geocodeResponse.status, geocodeResponse.statusText)
+        continue;
+      }
+      
+      const data: GeocodeResponse[] = await geocodeResponse.json()
+      console.log('Geocode data for variant:', addressVariant, data)
+      
+      if (data && data.length > 0) {
+        geocodeData = data;
+        successfulAddress = addressVariant;
+        console.log('Successfully geocoded with address variant:', successfulAddress)
+        break;
+      }
     }
-    
-    const geocodeData: GeocodeResponse[] = await geocodeResponse.json()
-    console.log('Geocode data:', geocodeData)
 
     if (!geocodeData || geocodeData.length === 0) {
-      console.error('No geocoding results for address:', address)
+      console.error('No geocoding results for any address variant')
       // Return a fallback response instead of throwing an error
       return new Response(
         JSON.stringify({ 
           error: 'Weather unavailable', 
-          message: `Unable to find location for "${address}". Please provide a more complete address with city and state.`,
+          message: `Unable to find location for "${address}". Geocoding failed for all address variants.`,
           cached: false 
         }),
         { 

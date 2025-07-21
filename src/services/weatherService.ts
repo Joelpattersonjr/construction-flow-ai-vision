@@ -11,8 +11,14 @@ export interface WeatherData {
   cached?: boolean;
 }
 
+export interface WeatherError {
+  error: string;
+  message?: string;
+  cached: boolean;
+}
+
 export class WeatherService {
-  static async getWeatherForProject(projectId: string, address: string): Promise<WeatherData | null> {
+  static async getWeatherForProject(projectId: string, address: string): Promise<WeatherData | WeatherError | null> {
     try {
       // Call our edge function to get weather data
       const { data, error } = await supabase.functions.invoke('fetch-weather', {

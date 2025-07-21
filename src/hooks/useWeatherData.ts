@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { WeatherService, WeatherData } from '@/services/weatherService';
+import { WeatherService, WeatherData, WeatherError } from '@/services/weatherService';
 
 export const useWeatherData = (projectId: string, address?: string) => {
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
@@ -22,7 +22,17 @@ export const useWeatherData = (projectId: string, address?: string) => {
         
         // If no cached data or we have an address, fetch fresh data
         if (!weather && address) {
-          weather = await WeatherService.getWeatherForProject(projectId, address);
+          const result = await WeatherService.getWeatherForProject(projectId, address);
+          
+          // Check if the result is an error response
+          if (result && 'error' in result) {
+            console.error('Weather service returned error:', result.error, result.message);
+            setError(result.message || 'Weather service error');
+            setWeatherData(null);
+            return;
+          }
+          
+          weather = result as WeatherData;
         }
 
         setWeatherData(weather);

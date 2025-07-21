@@ -247,14 +247,14 @@ export function DailyReportForm({ projects, onSubmit, onCancel, reportId }: Dail
 
     setLoadingWeather(true);
     try {
-      const weatherData = await WeatherService.getWeatherForProject(formData.project_id, selectedProject.address);
+      const weatherResult = await WeatherService.getWeatherForProject(formData.project_id, selectedProject.address);
       
-      if (weatherData) {
+      if (weatherResult && !('error' in weatherResult)) {
         setFormData(prev => ({
           ...prev,
-          temperature_high: weatherData.temperature_high.toString(),
-          temperature_low: weatherData.temperature_low.toString(),
-          weather_conditions: weatherData.condition
+          temperature_high: weatherResult.temperature_high.toString(),
+          temperature_low: weatherResult.temperature_low.toString(),
+          weather_conditions: weatherResult.condition
         }));
         
         toast({
