@@ -33,6 +33,21 @@ serve(async (req) => {
     return new Response('ok', { headers: corsHeaders })
   }
 
+  // If it's a GET request, just return environment info for debugging
+  if (req.method === 'GET') {
+    const allEnvVars = Object.keys(Deno.env.toObject())
+    return new Response(
+      JSON.stringify({
+        message: 'Environment variables available',
+        count: allEnvVars.length,
+        variables: allEnvVars,
+        hasOpenWeather: !!Deno.env.get('OpenWeather'),
+        hasOpenWeatherApiKey: !!Deno.env.get('OPENWEATHER_API_KEY'),
+      }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    )
+  }
+
   try {
     const { address, projectId } = await req.json()
     
