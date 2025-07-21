@@ -365,19 +365,12 @@ export function DailyReportForm({ projects, onSubmit, onCancel, reportId }: Dail
           <CardContent className="space-y-4">
             <div>
               <Label htmlFor="weather_conditions">Weather Conditions</Label>
-              <Select value={formData.weather_conditions} onValueChange={(value) => setFormData({...formData, weather_conditions: value})}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select weather" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="sunny">Sunny</SelectItem>
-                  <SelectItem value="cloudy">Cloudy</SelectItem>
-                  <SelectItem value="rainy">Rainy</SelectItem>
-                  <SelectItem value="snowy">Snowy</SelectItem>
-                  <SelectItem value="windy">Windy</SelectItem>
-                  <SelectItem value="foggy">Foggy</SelectItem>
-                </SelectContent>
-              </Select>
+              <Input
+                id="weather_conditions"
+                value={formData.weather_conditions}
+                onChange={(e) => setFormData({...formData, weather_conditions: e.target.value})}
+                placeholder="Enter weather conditions or use Load Current Weather"
+              />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
