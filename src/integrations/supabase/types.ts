@@ -854,10 +854,15 @@ export type Database = {
         Row: {
           address: string | null
           company_id: number | null
+          contract_duration_days: number | null
           created_at: string
+          current_completion_date: string | null
           end_date: string | null
+          extension_history: Json | null
           id: string
           name: string | null
+          ntp_date: string | null
+          original_completion_date: string | null
           owner_company: string | null
           owner_email: string | null
           owner_id: string | null
@@ -866,14 +871,21 @@ export type Database = {
           project_number: string | null
           start_date: string | null
           status: string | null
+          total_extensions_days: number | null
+          updated_at: string | null
         }
         Insert: {
           address?: string | null
           company_id?: number | null
+          contract_duration_days?: number | null
           created_at?: string
+          current_completion_date?: string | null
           end_date?: string | null
+          extension_history?: Json | null
           id?: string
           name?: string | null
+          ntp_date?: string | null
+          original_completion_date?: string | null
           owner_company?: string | null
           owner_email?: string | null
           owner_id?: string | null
@@ -882,14 +894,21 @@ export type Database = {
           project_number?: string | null
           start_date?: string | null
           status?: string | null
+          total_extensions_days?: number | null
+          updated_at?: string | null
         }
         Update: {
           address?: string | null
           company_id?: number | null
+          contract_duration_days?: number | null
           created_at?: string
+          current_completion_date?: string | null
           end_date?: string | null
+          extension_history?: Json | null
           id?: string
           name?: string | null
+          ntp_date?: string | null
+          original_completion_date?: string | null
           owner_company?: string | null
           owner_email?: string | null
           owner_id?: string | null
@@ -898,6 +917,8 @@ export type Database = {
           project_number?: string | null
           start_date?: string | null
           status?: string | null
+          total_extensions_days?: number | null
+          updated_at?: string | null
         }
         Relationships: [
           {

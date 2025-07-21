@@ -11,6 +11,8 @@ import { supabase } from '@/integrations/supabase/client';
 import AppHeader from '@/components/navigation/AppHeader';
 import FileManager from '@/components/file-management/FileManager';
 import TeamManagementPanel from '@/components/projects/TeamManagementPanel';
+import { ContractCountdown } from '@/components/project/ContractCountdown';
+import { ContractSetupForm } from '@/components/project/ContractSetupForm';
 
 interface Project {
   id: string;
@@ -25,6 +27,12 @@ interface Project {
   owner_company: string | null;
   owner_email: string | null;
   owner_phone: string | null;
+  ntp_date?: string;
+  original_completion_date?: string;
+  current_completion_date?: string;
+  contract_duration_days?: number;
+  total_extensions_days?: number;
+  extension_history?: any[];
   fileCount?: number;
   memberCount?: number;
   hasWritePermission?: boolean;
@@ -84,7 +92,9 @@ const ProjectDetails: React.FC = () => {
         ...projectData,
         fileCount: fileCount || 0,
         memberCount: memberCount || 0,
-        hasWritePermission
+        hasWritePermission,
+        total_extensions_days: projectData.total_extensions_days || 0,
+        extension_history: Array.isArray(projectData.extension_history) ? projectData.extension_history : []
       });
 
     } catch (error) {
@@ -230,8 +240,19 @@ const ProjectDetails: React.FC = () => {
           </TabsList>
 
           <TabsContent value="overview">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card>
+            <div className="space-y-6">
+              {/* Contract Countdown Section */}
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                {project.ntp_date && project.current_completion_date ? (
+                  <ContractCountdown project={project} onUpdate={loadProject} />
+                ) : (
+                  <ContractSetupForm project={project} onUpdate={loadProject} />
+                )}
+              </div>
+              
+              {/* Project Information Grid */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <Card>
                 <CardHeader>
                   <CardTitle>Project Information</CardTitle>
                 </CardHeader>
@@ -292,6 +313,7 @@ const ProjectDetails: React.FC = () => {
                   </CardContent>
                 </Card>
               )}
+              </div>
             </div>
           </TabsContent>
 
