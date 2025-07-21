@@ -83,13 +83,27 @@ export function GanttChart({ projectId, tasks, onTaskUpdate, className }: GanttC
     switch (priority) {
       case 'critical':
       case 'high':
-        return 'bg-red-500';
+        return 'bg-destructive';
       case 'medium':
         return 'bg-orange-500';
       case 'low':
-        return 'bg-blue-500';
+        return 'bg-primary';
       default:
-        return 'bg-gray-500';
+        return 'bg-muted-foreground';
+    }
+  };
+
+  const getPriorityBorderColor = (priority: string) => {
+    switch (priority) {
+      case 'critical':
+      case 'high':
+        return 'border-destructive';
+      case 'medium':
+        return 'border-orange-500';
+      case 'low':
+        return 'border-primary';
+      default:
+        return 'border-muted-foreground';
     }
   };
 
@@ -244,10 +258,10 @@ export function GanttChart({ projectId, tasks, onTaskUpdate, className }: GanttC
                           <TooltipTrigger asChild>
                             <div
                               className={cn(
-                                "absolute top-2 h-8 rounded cursor-move transition-all duration-200",
-                                task.milestone ? "bg-yellow-500" : getProgressColor(task.progress),
-                                task.isCriticalPath && "ring-2 ring-red-400",
-                                selectedTask?.id === task.id && "ring-2 ring-blue-400"
+                                "absolute top-2 h-8 rounded cursor-move transition-all duration-200 border-2",
+                                task.milestone ? "bg-yellow-500 border-yellow-600" : `${getPriorityColor(task.priority)} ${getPriorityBorderColor(task.priority)}`,
+                                task.isCriticalPath && "ring-2 ring-destructive",
+                                selectedTask?.id === task.id && "ring-2 ring-primary"
                               )}
                               style={position}
                               draggable
@@ -257,7 +271,7 @@ export function GanttChart({ projectId, tasks, onTaskUpdate, className }: GanttC
                             >
                               {/* Progress Bar */}
                               <div
-                                className="h-full bg-green-400 rounded-l opacity-80"
+                                className="h-full bg-green-500/70 rounded-l"
                                 style={{ width: `${task.progress}%` }}
                               />
                               
@@ -274,6 +288,7 @@ export function GanttChart({ projectId, tasks, onTaskUpdate, className }: GanttC
                                 {format(task.startDate, 'MMM dd')} - {format(task.endDate, 'MMM dd')}
                               </div>
                               <div className="text-gray-500">Progress: {task.progress}%</div>
+                              <div className="text-gray-500">Priority: {task.priority}</div>
                               {task.assignee && (
                                 <div className="text-gray-500">Assigned: {task.assignee.full_name}</div>
                               )}
