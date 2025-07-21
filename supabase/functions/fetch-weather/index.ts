@@ -94,18 +94,14 @@ serve(async (req) => {
     
     // Try multiple address formats for better geocoding success
     const addressVariants = [
-      // Test with a known good address first to verify the API is working
-      'Orlando, FL, USA',
-      'Orlando, Florida, USA',
-      // Then try the actual address variants
-      address,
-      'St. Cloud, FL 34769, USA',
-      'Saint Cloud, FL 34769, USA', 
-      'St Cloud, Florida 34769, USA',
-      'Saint Cloud, Florida 34769, USA',
+      // Start with formats that work well for St. Cloud, Florida
       'St. Cloud, Florida, USA',
+      'Saint Cloud, Florida, USA',
+      'St. Cloud, FL, USA',
+      'Saint Cloud, FL, USA',
       '34769, USA', // Just the ZIP code
-      // Then try the full address variants
+      // Then try the original address and variants
+      address,
       address.replace('Rd.', 'Road'),
       address.replace('Florida', 'FL'),
       address.replace('Rd.', 'Road').replace('Florida', 'FL'),
