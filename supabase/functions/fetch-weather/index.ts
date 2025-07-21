@@ -97,7 +97,11 @@ serve(async (req) => {
       address.replace('Florida', 'FL'),
       address.replace('Rd.', 'Road').replace('Florida', 'FL'),
       `${address}, USA`,
-      'St. Cloud, FL 34769' // Fallback to just city for this specific case
+      // For the specific case, try more specific variants
+      '2374 Tybee Road, St Cloud, FL 34769',
+      '2374 Tybee Rd, Saint Cloud, FL 34769',
+      'Tybee Road, St Cloud, FL 34769',
+      'St. Cloud, FL 34769' // Last resort fallback
     ];
     
     let geocodeData: GeocodeResponse[] = [];
@@ -169,7 +173,12 @@ serve(async (req) => {
       })
 
     return new Response(
-      JSON.stringify({ ...weatherInfo, cached: false }),
+      JSON.stringify({ 
+        ...weatherInfo, 
+        cached: false,
+        geocoded_address: successfulAddress,
+        coordinates: { lat, lon }
+      }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
 
