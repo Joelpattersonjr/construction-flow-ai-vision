@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Clock, Users, BarChart3, Plus, Edit, Trash2, Download, FileText, Table, ArrowLeft } from 'lucide-react';
+import { Calendar, Clock, Users, BarChart3, Plus, Edit, Trash2, Download, FileText, Table, ArrowLeft, Network } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
@@ -14,6 +14,7 @@ import { DayScheduleView } from './DayScheduleView';
 import { TaskScheduleForm } from './TaskScheduleForm';
 import { TeamScheduleView } from './TeamScheduleView';
 import { ScheduleAnalytics } from './ScheduleAnalytics';
+import { GanttScheduleView } from './GanttScheduleView';
 import { scheduleService } from '@/services/scheduleService';
 import { scheduleExportService } from '@/services/scheduleExportService';
 import { ScheduleSlot } from '@/types/scheduling';
@@ -23,7 +24,7 @@ import { format, addDays, startOfWeek } from 'date-fns';
 export function ScheduleBuilder() {
   const navigate = useNavigate();
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [selectedView, setSelectedView] = useState<'day' | 'team' | 'analytics'>('day');
+  const [selectedView, setSelectedView] = useState<'day' | 'gantt' | 'team' | 'analytics'>('gantt');
   const [scheduleSlots, setScheduleSlots] = useState<ScheduleSlot[]>([]);
   const [loading, setLoading] = useState(false);
   const [showTaskForm, setShowTaskForm] = useState(false);
@@ -163,7 +164,6 @@ export function ScheduleBuilder() {
     }
   };
 
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden">
       <div className="absolute inset-0 opacity-30 pointer-events-none">
@@ -199,7 +199,7 @@ export function ScheduleBuilder() {
               </span>
             </h1>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-              Organize your time with precision. Drag and drop tasks, manage team schedules, and track productivity across your construction projects.
+              Organize your time with precision. View project timelines, manage dependencies, and track progress across your construction projects.
             </p>
           </div>
         </div>
@@ -209,25 +209,29 @@ export function ScheduleBuilder() {
           <CardHeader>
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="flex items-center gap-4">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => navigateDate('prev')}
-                  className="bg-white/60"
-                >
-                  ←
-                </Button>
-                <h2 className="text-lg font-semibold">
-                  {format(currentDate, 'EEEE, MMMM d, yyyy')}
-                </h2>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => navigateDate('next')}
-                  className="bg-white/60"
-                >
-                  →
-                </Button>
+                {selectedView === 'day' && (
+                  <>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => navigateDate('prev')}
+                      className="bg-white/60"
+                    >
+                      ←
+                    </Button>
+                    <h2 className="text-lg font-semibold">
+                      {format(currentDate, 'EEEE, MMMM d, yyyy')}
+                    </h2>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => navigateDate('next')}
+                      className="bg-white/60"
+                    >
+                      →
+                    </Button>
+                  </>
+                )}
               </div>
               
               <div className="flex items-center gap-4">
@@ -236,6 +240,12 @@ export function ScheduleBuilder() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="gantt">
+                      <div className="flex items-center gap-2">
+                        <Network className="w-4 h-4" />
+                        Gantt Chart
+                      </div>
+                    </SelectItem>
                     <SelectItem value="day">
                       <div className="flex items-center gap-2">
                         <Calendar className="w-4 h-4" />
@@ -315,6 +325,10 @@ export function ScheduleBuilder() {
         </Card>
 
         {/* Main Content */}
+        {selectedView === 'gantt' && (
+          <GanttScheduleView />
+        )}
+
         {selectedView === 'day' && (
           <DayScheduleView
             date={currentDate}
