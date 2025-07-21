@@ -40,7 +40,7 @@ serve(async (req) => {
       throw new Error('Address and project ID are required')
     }
 
-    const openWeatherApiKey = Deno.env.get('OPENWEATHER_API_KEY')
+    const openWeatherApiKey = Deno.env.get('OpenWeather')
     if (!openWeatherApiKey) {
       throw new Error('OpenWeather API key not configured')
     }
