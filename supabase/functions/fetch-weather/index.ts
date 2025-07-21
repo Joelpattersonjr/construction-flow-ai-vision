@@ -33,21 +33,6 @@ serve(async (req) => {
     return new Response('ok', { headers: corsHeaders })
   }
 
-  // If it's a GET request, just return environment info for debugging
-  if (req.method === 'GET') {
-    const allEnvVars = Object.keys(Deno.env.toObject())
-    return new Response(
-      JSON.stringify({
-        message: 'Environment variables available',
-        count: allEnvVars.length,
-        variables: allEnvVars,
-        hasOpenWeather: !!Deno.env.get('OpenWeather'),
-        hasOpenWeatherApiKey: !!Deno.env.get('OPENWEATHER_API_KEY'),
-      }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    )
-  }
-
   try {
     const { address, projectId } = await req.json()
     
@@ -55,32 +40,9 @@ serve(async (req) => {
       throw new Error('Address and project ID are required')
     }
 
-    // Debug environment access
-    const allEnvVars = Deno.env.toObject()
-    console.log('=== ENVIRONMENT DEBUG ===')
-    console.log('Total env vars count:', Object.keys(allEnvVars).length)
-    console.log('Environment variables:', Object.keys(allEnvVars))
-    console.log('========================')
-    
-    // Try all possible variations of the OpenWeather secret
-    const possibleKeys = ['OpenWeather', 'OPENWEATHER_API_KEY', 'OPENWEATHER', 'openweather_api_key', 'openweather']
-    let openWeatherApiKey = null
-    let foundKeyName = null
-    
-    for (const keyName of possibleKeys) {
-      const value = Deno.env.get(keyName)
-      if (value) {
-        openWeatherApiKey = value
-        foundKeyName = keyName
-        console.log(`Found OpenWeather key using: ${keyName}`)
-        break
-      }
-    }
-    
+    const openWeatherApiKey = Deno.env.get('OpenWeather')
     if (!openWeatherApiKey) {
-      const errorMsg = `OpenWeather API key not found. Tried: ${possibleKeys.join(', ')}. Available vars: ${Object.keys(allEnvVars).join(', ')}`
-      console.error(errorMsg)
-      throw new Error(errorMsg)
+      throw new Error('OpenWeather API key not configured')
     }
 
     // Initialize Supabase client
