@@ -853,13 +853,17 @@ export type Database = {
       projects: {
         Row: {
           address: string | null
+          city: string | null
           company_id: number | null
           contract_duration_days: number | null
+          country: string | null
           created_at: string
           current_completion_date: string | null
           end_date: string | null
           extension_history: Json | null
           id: string
+          latitude: number | null
+          longitude: number | null
           name: string | null
           ntp_date: string | null
           original_completion_date: string | null
@@ -870,19 +874,25 @@ export type Database = {
           owner_phone: string | null
           project_number: string | null
           start_date: string | null
+          state: string | null
           status: string | null
           total_extensions_days: number | null
           updated_at: string | null
+          zip_code: string | null
         }
         Insert: {
           address?: string | null
+          city?: string | null
           company_id?: number | null
           contract_duration_days?: number | null
+          country?: string | null
           created_at?: string
           current_completion_date?: string | null
           end_date?: string | null
           extension_history?: Json | null
           id?: string
+          latitude?: number | null
+          longitude?: number | null
           name?: string | null
           ntp_date?: string | null
           original_completion_date?: string | null
@@ -893,19 +903,25 @@ export type Database = {
           owner_phone?: string | null
           project_number?: string | null
           start_date?: string | null
+          state?: string | null
           status?: string | null
           total_extensions_days?: number | null
           updated_at?: string | null
+          zip_code?: string | null
         }
         Update: {
           address?: string | null
+          city?: string | null
           company_id?: number | null
           contract_duration_days?: number | null
+          country?: string | null
           created_at?: string
           current_completion_date?: string | null
           end_date?: string | null
           extension_history?: Json | null
           id?: string
+          latitude?: number | null
+          longitude?: number | null
           name?: string | null
           ntp_date?: string | null
           original_completion_date?: string | null
@@ -916,9 +932,11 @@ export type Database = {
           owner_phone?: string | null
           project_number?: string | null
           start_date?: string | null
+          state?: string | null
           status?: string | null
           total_extensions_days?: number | null
           updated_at?: string | null
+          zip_code?: string | null
         }
         Relationships: [
           {
@@ -1699,6 +1717,10 @@ export type Database = {
       is_user_company_admin: {
         Args: { user_id: string; company_id: number }
         Returns: boolean
+      }
+      parse_project_addresses: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
       validate_temporary_password: {
         Args: { temp_password: string; user_email: string }

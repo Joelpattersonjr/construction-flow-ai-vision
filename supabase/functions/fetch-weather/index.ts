@@ -92,19 +92,34 @@ serve(async (req) => {
     // Geocode the address to get coordinates
     console.log('Attempting to geocode address:', address)
     
-    // Try multiple address formats for better geocoding success
-    const addressVariants = [
-      // Start with formats that work well for St. Cloud, Florida
-      'St. Cloud, Florida, USA',
-      'Saint Cloud, Florida, USA',
-      'St. Cloud, FL, USA',
-      'Saint Cloud, FL, USA',
-      '34769, USA', // Just the ZIP code
-      // Then try the original address and variants
-      address,
-      address.replace('Rd.', 'Road'),
-      address.replace('Florida', 'FL'),
-      address.replace('Rd.', 'Road').replace('Florida', 'FL'),
+    // Get project details to access structured location data
+    const { data: projectData } = await supabase
+      .from('projects')
+      .select('city, state, zip_code, country, address')
+      .eq('id', projectId)
+      .single();
+
+    // Build structured address variants for better geocoding
+    const addressVariants = [];
+    
+    if (projectData) {
+      // Use structured data if available (preferred)
+      if (projectData.city && projectData.state) {
+        addressVariants.push(`${projectData.city}, ${projectData.state}, ${projectData.country || 'USA'}`);
+        if (projectData.zip_code) {
+          addressVariants.push(`${projectData.city}, ${projectData.state} ${projectData.zip_code}, ${projectData.country || 'USA'}`);
+          addressVariants.push(`${projectData.zip_code}, ${projectData.country || 'USA'}`);
+        }
+      }
+    }
+    
+    // Add fallback address variants
+    if (address) {
+      addressVariants.push(
+        address,
+        address.replace('Rd.', 'Road'),
+        address.replace('Florida', 'FL'),
+        address.replace('Rd.', 'Road').replace('Florida', 'FL'),
       `${address}, USA`,
       '2374 Tybee Road, St Cloud, FL 34769, USA',
       '2374 Tybee Rd, Saint Cloud, FL 34769, USA', 

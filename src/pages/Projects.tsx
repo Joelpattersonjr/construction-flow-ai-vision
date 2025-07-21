@@ -88,6 +88,10 @@ const Projects: React.FC = () => {
     name: '',
     project_number: '',
     address: '',
+    city: '',
+    state: '',
+    zip_code: '',
+    country: 'USA',
     start_date: '',
     end_date: '',
     status: 'planning',
@@ -232,6 +236,15 @@ const Projects: React.FC = () => {
       return;
     }
 
+    if (!newProject.city.trim() || !newProject.state.trim() || !newProject.zip_code.trim()) {
+      toast({
+        title: "Location required",
+        description: "Please provide city, state, and ZIP code for weather functionality",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setCreating(true);
     try {
       console.log('Creating project with data:', {
@@ -246,6 +259,10 @@ const Projects: React.FC = () => {
           name: newProject.name,
           project_number: newProject.project_number,
           address: newProject.address,
+          city: newProject.city,
+          state: newProject.state,
+          zip_code: newProject.zip_code,
+          country: newProject.country,
           start_date: newProject.start_date || null,
           end_date: newProject.end_date || null,
           status: newProject.status,
@@ -282,6 +299,10 @@ const Projects: React.FC = () => {
         name: '',
         project_number: '',
         address: '',
+        city: '',
+        state: '',
+        zip_code: '',
+        country: 'USA',
         start_date: '',
         end_date: '',
         status: 'planning',
@@ -538,13 +559,60 @@ const Projects: React.FC = () => {
                   </div>
                   
                   <div>
-                    <Label htmlFor="address">Address</Label>
+                    <Label htmlFor="address">Street Address</Label>
                     <Textarea
                       id="address"
                       value={newProject.address}
                       onChange={(e) => setNewProject(prev => ({ ...prev, address: e.target.value }))}
-                      placeholder="Project location"
+                      placeholder="Street address"
                       rows={2}
+                    />
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <Label htmlFor="city">City *</Label>
+                      <Input
+                        id="city"
+                        value={newProject.city}
+                        onChange={(e) => setNewProject(prev => ({ ...prev, city: e.target.value }))}
+                        placeholder="City"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="state">State *</Label>
+                      <Select 
+                        value={newProject.state} 
+                        onValueChange={(value) => setNewProject(prev => ({ ...prev, state: value }))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="State" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="FL">Florida</SelectItem>
+                          <SelectItem value="CA">California</SelectItem>
+                          <SelectItem value="TX">Texas</SelectItem>
+                          <SelectItem value="NY">New York</SelectItem>
+                          <SelectItem value="IL">Illinois</SelectItem>
+                          <SelectItem value="PA">Pennsylvania</SelectItem>
+                          <SelectItem value="OH">Ohio</SelectItem>
+                          <SelectItem value="GA">Georgia</SelectItem>
+                          <SelectItem value="NC">North Carolina</SelectItem>
+                          <SelectItem value="MI">Michigan</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="zip_code">ZIP Code *</Label>
+                    <Input
+                      id="zip_code"
+                      value={newProject.zip_code}
+                      onChange={(e) => setNewProject(prev => ({ ...prev, zip_code: e.target.value }))}
+                      placeholder="ZIP code"
+                      required
                     />
                   </div>
                   
@@ -735,16 +803,130 @@ const Projects: React.FC = () => {
                         />
                       </div>
                       
-                      <div className="grid gap-2">
-                        <Label htmlFor="address" className="font-medium text-slate-700">Address</Label>
-                        <Textarea
-                          id="address"
-                          value={newProject.address}
-                          onChange={(e) => setNewProject(prev => ({ ...prev, address: e.target.value }))}
-                          placeholder="Project location address"
-                          rows={2}
-                          className="border-slate-200 focus:border-blue-500 transition-colors"
-                        />
+                      {/* Location Information Section */}
+                      <div className="space-y-4 p-4 bg-slate-50 rounded-lg border">
+                        <h5 className="font-medium text-slate-800">Location Details</h5>
+                        
+                        <div className="grid gap-2">
+                          <Label htmlFor="address" className="font-medium text-slate-700">Street Address</Label>
+                          <Textarea
+                            id="address"
+                            value={newProject.address}
+                            onChange={(e) => setNewProject(prev => ({ ...prev, address: e.target.value }))}
+                            placeholder="Street address (e.g., 123 Main St)"
+                            rows={2}
+                            className="border-slate-200 focus:border-blue-500 transition-colors"
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="grid gap-2">
+                            <Label htmlFor="city" className="font-medium text-slate-700">City *</Label>
+                            <Input
+                              id="city"
+                              value={newProject.city}
+                              onChange={(e) => setNewProject(prev => ({ ...prev, city: e.target.value }))}
+                              placeholder="City name"
+                              className="border-slate-200 focus:border-blue-500 transition-colors"
+                              required
+                            />
+                          </div>
+                          
+                          <div className="grid gap-2">
+                            <Label htmlFor="state" className="font-medium text-slate-700">State *</Label>
+                            <Select 
+                              value={newProject.state} 
+                              onValueChange={(value) => setNewProject(prev => ({ ...prev, state: value }))}
+                            >
+                              <SelectTrigger className="border-slate-200 focus:border-blue-500">
+                                <SelectValue placeholder="Select state" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="AL">Alabama</SelectItem>
+                                <SelectItem value="AK">Alaska</SelectItem>
+                                <SelectItem value="AZ">Arizona</SelectItem>
+                                <SelectItem value="AR">Arkansas</SelectItem>
+                                <SelectItem value="CA">California</SelectItem>
+                                <SelectItem value="CO">Colorado</SelectItem>
+                                <SelectItem value="CT">Connecticut</SelectItem>
+                                <SelectItem value="DE">Delaware</SelectItem>
+                                <SelectItem value="FL">Florida</SelectItem>
+                                <SelectItem value="GA">Georgia</SelectItem>
+                                <SelectItem value="HI">Hawaii</SelectItem>
+                                <SelectItem value="ID">Idaho</SelectItem>
+                                <SelectItem value="IL">Illinois</SelectItem>
+                                <SelectItem value="IN">Indiana</SelectItem>
+                                <SelectItem value="IA">Iowa</SelectItem>
+                                <SelectItem value="KS">Kansas</SelectItem>
+                                <SelectItem value="KY">Kentucky</SelectItem>
+                                <SelectItem value="LA">Louisiana</SelectItem>
+                                <SelectItem value="ME">Maine</SelectItem>
+                                <SelectItem value="MD">Maryland</SelectItem>
+                                <SelectItem value="MA">Massachusetts</SelectItem>
+                                <SelectItem value="MI">Michigan</SelectItem>
+                                <SelectItem value="MN">Minnesota</SelectItem>
+                                <SelectItem value="MS">Mississippi</SelectItem>
+                                <SelectItem value="MO">Missouri</SelectItem>
+                                <SelectItem value="MT">Montana</SelectItem>
+                                <SelectItem value="NE">Nebraska</SelectItem>
+                                <SelectItem value="NV">Nevada</SelectItem>
+                                <SelectItem value="NH">New Hampshire</SelectItem>
+                                <SelectItem value="NJ">New Jersey</SelectItem>
+                                <SelectItem value="NM">New Mexico</SelectItem>
+                                <SelectItem value="NY">New York</SelectItem>
+                                <SelectItem value="NC">North Carolina</SelectItem>
+                                <SelectItem value="ND">North Dakota</SelectItem>
+                                <SelectItem value="OH">Ohio</SelectItem>
+                                <SelectItem value="OK">Oklahoma</SelectItem>
+                                <SelectItem value="OR">Oregon</SelectItem>
+                                <SelectItem value="PA">Pennsylvania</SelectItem>
+                                <SelectItem value="RI">Rhode Island</SelectItem>
+                                <SelectItem value="SC">South Carolina</SelectItem>
+                                <SelectItem value="SD">South Dakota</SelectItem>
+                                <SelectItem value="TN">Tennessee</SelectItem>
+                                <SelectItem value="TX">Texas</SelectItem>
+                                <SelectItem value="UT">Utah</SelectItem>
+                                <SelectItem value="VT">Vermont</SelectItem>
+                                <SelectItem value="VA">Virginia</SelectItem>
+                                <SelectItem value="WA">Washington</SelectItem>
+                                <SelectItem value="WV">West Virginia</SelectItem>
+                                <SelectItem value="WI">Wisconsin</SelectItem>
+                                <SelectItem value="WY">Wyoming</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="grid gap-2">
+                            <Label htmlFor="zip_code" className="font-medium text-slate-700">ZIP Code *</Label>
+                            <Input
+                              id="zip_code"
+                              value={newProject.zip_code}
+                              onChange={(e) => setNewProject(prev => ({ ...prev, zip_code: e.target.value }))}
+                              placeholder="ZIP/Postal code"
+                              className="border-slate-200 focus:border-blue-500 transition-colors"
+                              required
+                            />
+                          </div>
+                          
+                          <div className="grid gap-2">
+                            <Label htmlFor="country" className="font-medium text-slate-700">Country</Label>
+                            <Select 
+                              value={newProject.country} 
+                              onValueChange={(value) => setNewProject(prev => ({ ...prev, country: value }))}
+                            >
+                              <SelectTrigger className="border-slate-200 focus:border-blue-500">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="USA">United States</SelectItem>
+                                <SelectItem value="CAN">Canada</SelectItem>
+                                <SelectItem value="MEX">Mexico</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
                       </div>
                       
                       <div className="grid grid-cols-2 gap-4">
