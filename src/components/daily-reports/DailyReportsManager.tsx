@@ -18,6 +18,7 @@ import { format, startOfMonth, endOfMonth } from 'date-fns';
 interface Project {
   id: string;
   name: string;
+  address?: string;
 }
 
 interface DailyReport {
@@ -60,7 +61,7 @@ export function DailyReportsManager() {
 
       const { data, error } = await supabase
         .from('projects')
-        .select('id, name')
+        .select('id, name, address')
         .order('name');
 
       if (error) throw error;
