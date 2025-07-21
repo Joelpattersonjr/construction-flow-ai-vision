@@ -53,6 +53,12 @@ export function GanttChart({ projectId, tasks, onTaskUpdate, className }: GanttC
       };
     });
 
+    // Update critical path status
+    const criticalTasks = calculateCriticalPathForTasks(processedTasks);
+    processedTasks.forEach(task => {
+      task.isCriticalPath = criticalTasks.has(task.id);
+    });
+
     // Calculate timeline bounds
     if (processedTasks.length > 0) {
       const dates = processedTasks.flatMap(t => [t.startDate, t.endDate]);
@@ -65,6 +71,46 @@ export function GanttChart({ projectId, tasks, onTaskUpdate, className }: GanttC
 
     setGanttTasks(processedTasks);
   }, [tasks]);
+
+  const calculateCriticalPathForTasks = (taskList: GanttTask[]) => {
+    const taskMap = new Map(taskList.map(t => [t.id, t]));
+    const criticalTasks = new Set<number>();
+
+    const calculateLongestPath = (task: GanttTask, visited = new Set<number>()): number => {
+      if (visited.has(task.id)) return 0;
+      visited.add(task.id);
+
+      const taskDuration = differenceInDays(task.endDate, task.startDate);
+      let maxDepPath = 0;
+
+      task.dependencies.forEach(depId => {
+        const depTask = taskMap.get(depId);
+        if (depTask) {
+          const depPath = calculateLongestPath(depTask, new Set(visited));
+          maxDepPath = Math.max(maxDepPath, depPath);
+        }
+      });
+
+      return taskDuration + maxDepPath;
+    };
+
+    let maxDuration = 0;
+    taskList.forEach(task => {
+      const duration = calculateLongestPath(task);
+      if (duration > maxDuration) {
+        maxDuration = duration;
+      }
+    });
+
+    taskList.forEach(task => {
+      const duration = calculateLongestPath(task);
+      if (duration === maxDuration) {
+        criticalTasks.add(task.id);
+      }
+    });
+
+    return criticalTasks;
+  };
 
   // Generate timeline columns (days)
   const timelineColumns = useMemo(() => {
@@ -136,6 +182,13 @@ export function GanttChart({ projectId, tasks, onTaskUpdate, className }: GanttC
     const duration = differenceInDays(draggedTask.endDate, draggedTask.startDate);
     const newEndDate = addDays(targetDate, duration);
 
+    // Validate dependency constraints
+    const conflictingTasks = validateDependencyConstraints(draggedTask, targetDate);
+    if (conflictingTasks.length > 0) {
+      console.warn('Dependency constraint violation detected');
+      return;
+    }
+
     onTaskUpdate(draggedTask.id, {
       start_date: format(targetDate, 'yyyy-MM-dd'),
       end_date: format(newEndDate, 'yyyy-MM-dd')
@@ -144,19 +197,127 @@ export function GanttChart({ projectId, tasks, onTaskUpdate, className }: GanttC
     setDraggedTask(null);
   };
 
+  const validateDependencyConstraints = (task: GanttTask, newStartDate: Date) => {
+    const conflicts: GanttTask[] = [];
+    
+    // Check if task starts before its dependencies end
+    task.dependencies.forEach(depId => {
+      const depTask = ganttTasks.find(t => t.id === depId);
+      if (depTask && newStartDate <= depTask.endDate) {
+        conflicts.push(depTask);
+      }
+    });
+
+    // Check if dependent tasks would start before this task ends
+    const newEndDate = addDays(newStartDate, differenceInDays(task.endDate, task.startDate));
+    ganttTasks.forEach(t => {
+      if (t.dependencies.includes(task.id) && t.startDate <= newEndDate) {
+        conflicts.push(t);
+      }
+    });
+
+    return conflicts;
+  };
+
+  const calculateCriticalPath = () => {
+    // Simple critical path calculation
+    const taskMap = new Map(ganttTasks.map(t => [t.id, t]));
+    const criticalTasks = new Set<number>();
+
+    // Find longest path through dependencies
+    const calculateLongestPath = (task: GanttTask, visited = new Set<number>()): number => {
+      if (visited.has(task.id)) return 0; // Avoid cycles
+      visited.add(task.id);
+
+      const taskDuration = differenceInDays(task.endDate, task.startDate);
+      let maxDepPath = 0;
+
+      task.dependencies.forEach(depId => {
+        const depTask = taskMap.get(depId);
+        if (depTask) {
+          const depPath = calculateLongestPath(depTask, new Set(visited));
+          maxDepPath = Math.max(maxDepPath, depPath);
+        }
+      });
+
+      return taskDuration + maxDepPath;
+    };
+
+    // Mark tasks on critical path
+    let maxDuration = 0;
+    ganttTasks.forEach(task => {
+      const duration = calculateLongestPath(task);
+      if (duration > maxDuration) {
+        maxDuration = duration;
+      }
+    });
+
+    ganttTasks.forEach(task => {
+      const duration = calculateLongestPath(task);
+      if (duration === maxDuration) {
+        criticalTasks.add(task.id);
+      }
+    });
+
+    return criticalTasks;
+  };
+
+  // Calculate critical path
+  const criticalPathTasks = useMemo(() => calculateCriticalPath(), [ganttTasks]);
+
   const renderDependencyLine = (fromTask: GanttTask, toTask: GanttTask) => {
-    // Simple dependency line rendering (would need more complex logic for proper positioning)
+    const fromPosition = calculateTaskPosition(fromTask);
+    const toPosition = calculateTaskPosition(toTask);
+    
+    const fromTaskIndex = ganttTasks.findIndex(t => t.id === fromTask.id);
+    const toTaskIndex = ganttTasks.findIndex(t => t.id === toTask.id);
+    
+    const fromY = (fromTaskIndex * 48) + 24; // 48px row height, center point
+    const toY = (toTaskIndex * 48) + 24;
+    
+    // Calculate line positions
+    const fromX = parseFloat(fromPosition.left) + parseFloat(fromPosition.width);
+    const toX = parseFloat(toPosition.left);
+    
+    const lineLength = Math.abs(toX - fromX);
+    const lineHeight = Math.abs(toY - fromY);
+    
     return (
-      <div
-        key={`dep-${fromTask.id}-${toTask.id}`}
-        className="absolute h-0.5 bg-gray-400 z-10"
-        style={{
-          // Simplified positioning - would need proper calculation
-          top: '50%',
-          left: '0%',
-          width: '100%'
-        }}
-      />
+      <g key={`dep-${fromTask.id}-${toTask.id}`}>
+        {/* Horizontal line from end of first task */}
+        <line
+          x1={`${fromX}%`}
+          y1={fromY}
+          x2={`${fromX + 2}%`}
+          y2={fromY}
+          stroke="hsl(var(--muted-foreground))"
+          strokeWidth="2"
+          markerEnd="url(#arrowhead)"
+        />
+        
+        {/* Vertical connector if tasks are on different rows */}
+        {fromY !== toY && (
+          <line
+            x1={`${fromX + 2}%`}
+            y1={fromY}
+            x2={`${fromX + 2}%`}
+            y2={toY}
+            stroke="hsl(var(--muted-foreground))"
+            strokeWidth="2"
+          />
+        )}
+        
+        {/* Horizontal line to start of second task */}
+        <line
+          x1={`${fromX + 2}%`}
+          y1={toY}
+          x2={`${toX}%`}
+          y2={toY}
+          stroke="hsl(var(--muted-foreground))"
+          strokeWidth="2"
+          markerEnd="url(#arrowhead)"
+        />
+      </g>
     );
   };
 
@@ -244,6 +405,39 @@ export function GanttChart({ projectId, tasks, onTaskUpdate, className }: GanttC
               {/* Timeline Content */}
               <ScrollArea className="h-96">
                 <div className="relative min-w-max">
+                  {/* SVG for dependency lines */}
+                  <svg
+                    className="absolute inset-0 pointer-events-none z-10"
+                    style={{ 
+                      width: `${timelineColumns.length * 40}px`,
+                      height: `${ganttTasks.length * 48}px`
+                    }}
+                  >
+                    <defs>
+                      <marker
+                        id="arrowhead"
+                        markerWidth="10"
+                        markerHeight="7"
+                        refX="9"
+                        refY="3.5"
+                        orient="auto"
+                      >
+                        <polygon
+                          points="0 0, 10 3.5, 0 7"
+                          fill="hsl(var(--muted-foreground))"
+                        />
+                      </marker>
+                    </defs>
+                    
+                    {/* Render dependency lines */}
+                    {ganttTasks.flatMap(task => 
+                      task.dependencies.map(depId => {
+                        const depTask = ganttTasks.find(t => t.id === depId);
+                        return depTask ? renderDependencyLine(depTask, task) : null;
+                      })
+                    )}
+                  </svg>
+
                   {ganttTasks.map((task, index) => {
                     const position = calculateTaskPosition(task);
                     
@@ -260,7 +454,7 @@ export function GanttChart({ projectId, tasks, onTaskUpdate, className }: GanttC
                               className={cn(
                                 "absolute top-2 h-8 rounded cursor-move transition-all duration-200 border-2",
                                 task.milestone ? "bg-yellow-500 border-yellow-600" : `${getPriorityColor(task.priority)} ${getPriorityBorderColor(task.priority)}`,
-                                task.isCriticalPath && "ring-2 ring-destructive",
+                                task.isCriticalPath && "ring-2 ring-destructive shadow-lg",
                                 selectedTask?.id === task.id && "ring-2 ring-primary"
                               )}
                               style={position}
@@ -289,18 +483,23 @@ export function GanttChart({ projectId, tasks, onTaskUpdate, className }: GanttC
                               </div>
                               <div className="text-gray-500">Progress: {task.progress}%</div>
                               <div className="text-gray-500">Priority: {task.priority}</div>
+                              {task.isCriticalPath && (
+                                <div className="text-red-500 font-medium">⚠️ Critical Path</div>
+                              )}
+                              {task.dependencies.length > 0 && (
+                                <div className="text-gray-500">
+                                  Dependencies: {task.dependencies.map(depId => {
+                                    const depTask = ganttTasks.find(t => t.id === depId);
+                                    return depTask?.title || depId;
+                                  }).join(', ')}
+                                </div>
+                              )}
                               {task.assignee && (
                                 <div className="text-gray-500">Assigned: {task.assignee.full_name}</div>
                               )}
                             </div>
                           </TooltipContent>
                         </Tooltip>
-
-                        {/* Dependencies */}
-                        {task.dependencies.map(depId => {
-                          const depTask = ganttTasks.find(t => t.id === depId);
-                          return depTask ? renderDependencyLine(depTask, task) : null;
-                        })}
                       </div>
                     );
                   })}
