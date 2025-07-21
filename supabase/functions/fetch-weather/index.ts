@@ -88,12 +88,24 @@ serve(async (req) => {
     }
 
     // Geocode the address to get coordinates
+    console.log('Attempting to geocode address:', address)
     const geocodeUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(address)}&limit=1&appid=${openWeatherApiKey}`
+    console.log('Geocode URL:', geocodeUrl)
+    
     const geocodeResponse = await fetch(geocodeUrl)
+    console.log('Geocode response status:', geocodeResponse.status)
+    
+    if (!geocodeResponse.ok) {
+      console.error('Geocode API error:', geocodeResponse.status, geocodeResponse.statusText)
+      throw new Error(`Geocoding API returned ${geocodeResponse.status}: ${geocodeResponse.statusText}`)
+    }
+    
     const geocodeData: GeocodeResponse[] = await geocodeResponse.json()
+    console.log('Geocode data:', geocodeData)
 
     if (!geocodeData || geocodeData.length === 0) {
-      throw new Error('Unable to geocode address')
+      console.error('No geocoding results for address:', address)
+      throw new Error(`Unable to find location for address: ${address}. Please provide a more complete address with city and state.`)
     }
 
     const { lat, lon } = geocodeData[0]
