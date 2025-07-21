@@ -40,19 +40,32 @@ serve(async (req) => {
       throw new Error('Address and project ID are required')
     }
 
-    console.log('All environment variables:', Object.keys(Deno.env.toObject()))
+    // Debug environment access
+    const allEnvVars = Deno.env.toObject()
+    console.log('=== ENVIRONMENT DEBUG ===')
+    console.log('Total env vars count:', Object.keys(allEnvVars).length)
+    console.log('Environment variables:', Object.keys(allEnvVars))
+    console.log('========================')
     
-    // Try different possible secret names
-    const openWeatherApiKey = Deno.env.get('OpenWeather') || 
-                             Deno.env.get('OPENWEATHER_API_KEY') || 
-                             Deno.env.get('OPENWEATHER') ||
-                             Deno.env.get('openweather_api_key')
+    // Try all possible variations of the OpenWeather secret
+    const possibleKeys = ['OpenWeather', 'OPENWEATHER_API_KEY', 'OPENWEATHER', 'openweather_api_key', 'openweather']
+    let openWeatherApiKey = null
+    let foundKeyName = null
     
-    console.log('OpenWeather key found:', openWeatherApiKey ? 'Yes' : 'No')
+    for (const keyName of possibleKeys) {
+      const value = Deno.env.get(keyName)
+      if (value) {
+        openWeatherApiKey = value
+        foundKeyName = keyName
+        console.log(`Found OpenWeather key using: ${keyName}`)
+        break
+      }
+    }
+    
     if (!openWeatherApiKey) {
-      const allEnvVars = Object.keys(Deno.env.toObject())
-      console.error('Available environment variables:', allEnvVars)
-      throw new Error(`OpenWeather API key not configured. Available vars: ${allEnvVars.join(', ')}`)
+      const errorMsg = `OpenWeather API key not found. Tried: ${possibleKeys.join(', ')}. Available vars: ${Object.keys(allEnvVars).join(', ')}`
+      console.error(errorMsg)
+      throw new Error(errorMsg)
     }
 
     // Initialize Supabase client
