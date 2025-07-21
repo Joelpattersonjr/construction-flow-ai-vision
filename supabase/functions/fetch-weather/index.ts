@@ -105,7 +105,18 @@ serve(async (req) => {
 
     if (!geocodeData || geocodeData.length === 0) {
       console.error('No geocoding results for address:', address)
-      throw new Error(`Unable to find location for address: ${address}. Please provide a more complete address with city and state.`)
+      // Return a fallback response instead of throwing an error
+      return new Response(
+        JSON.stringify({ 
+          error: 'Weather unavailable', 
+          message: `Unable to find location for "${address}". Please provide a more complete address with city and state.`,
+          cached: false 
+        }),
+        { 
+          status: 200,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      )
     }
 
     const { lat, lon } = geocodeData[0]
