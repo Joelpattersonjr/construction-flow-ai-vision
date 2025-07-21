@@ -61,17 +61,18 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-    // Check if we have recent weather data for this project (less than 30 minutes old)
-    const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000).toISOString()
+    // Check if we have recent weather data for this project (less than 1 minute old for debugging)
+    const oneMinuteAgo = new Date(Date.now() - 1 * 60 * 1000).toISOString()
     
     const { data: cachedWeather } = await supabase
       .from('weather_cache')
       .select('*')
       .eq('project_id', projectId)
-      .gte('last_updated', thirtyMinutesAgo)
+      .gte('last_updated', oneMinuteAgo)
       .single()
 
     if (cachedWeather) {
+      console.log('Returning cached weather data for project:', projectId)
       return new Response(
         JSON.stringify({
           temperature_current: cachedWeather.temperature_current,
@@ -81,7 +82,8 @@ serve(async (req) => {
           humidity: cachedWeather.humidity,
           wind_speed: cachedWeather.wind_speed,
           weather_icon: cachedWeather.weather_icon,
-          cached: true
+          cached: true,
+          note: "This is cached weather data. For fresh geocoding, data must be older than 30 minutes."
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
