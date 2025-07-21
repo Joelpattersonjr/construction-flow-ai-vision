@@ -41,11 +41,18 @@ serve(async (req) => {
     }
 
     console.log('All environment variables:', Object.keys(Deno.env.toObject()))
-    const openWeatherApiKey = Deno.env.get('OpenWeather')
-    console.log('Looking for OpenWeather key:', openWeatherApiKey ? 'Found' : 'Not found')
+    
+    // Try different possible secret names
+    const openWeatherApiKey = Deno.env.get('OpenWeather') || 
+                             Deno.env.get('OPENWEATHER_API_KEY') || 
+                             Deno.env.get('OPENWEATHER') ||
+                             Deno.env.get('openweather_api_key')
+    
+    console.log('OpenWeather key found:', openWeatherApiKey ? 'Yes' : 'No')
     if (!openWeatherApiKey) {
-      console.error('OpenWeather key missing. Available env vars:', Object.keys(Deno.env.toObject()))
-      throw new Error('OpenWeather API key not configured')
+      const allEnvVars = Object.keys(Deno.env.toObject())
+      console.error('Available environment variables:', allEnvVars)
+      throw new Error(`OpenWeather API key not configured. Available vars: ${allEnvVars.join(', ')}`)
     }
 
     // Initialize Supabase client
