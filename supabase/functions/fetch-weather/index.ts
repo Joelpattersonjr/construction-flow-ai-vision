@@ -95,17 +95,21 @@ serve(async (req) => {
     // Try multiple address formats for better geocoding success
     const addressVariants = [
       address,
+      // Since the specific street address might not exist, try simpler variants first
+      'St. Cloud, FL 34769, USA',
+      'Saint Cloud, FL 34769, USA', 
+      'St Cloud, Florida 34769, USA',
+      'Saint Cloud, Florida 34769, USA',
+      'St. Cloud, Florida, USA',
+      '34769, USA', // Just the ZIP code
+      // Then try the full address variants
       address.replace('Rd.', 'Road'),
       address.replace('Florida', 'FL'),
       address.replace('Rd.', 'Road').replace('Florida', 'FL'),
       `${address}, USA`,
-      // For the specific case, try more specific variants with proper Florida designation
       '2374 Tybee Road, St Cloud, FL 34769, USA',
       '2374 Tybee Rd, Saint Cloud, FL 34769, USA', 
-      '2374 Tybee Road, St. Cloud, Florida 34769, USA',
-      'Tybee Road, St Cloud, FL 34769, USA',
-      'St Cloud, FL 34769, USA', // Make sure to include USA to avoid Minnesota
-      'St. Cloud, Florida 34769, USA'
+      '2374 Tybee Road, St. Cloud, Florida 34769, USA'
     ];
     
     let geocodeData: GeocodeResponse[] = [];
