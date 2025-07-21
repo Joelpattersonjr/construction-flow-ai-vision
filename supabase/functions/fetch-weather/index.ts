@@ -99,11 +99,13 @@ serve(async (req) => {
       address.replace('Florida', 'FL'),
       address.replace('Rd.', 'Road').replace('Florida', 'FL'),
       `${address}, USA`,
-      // For the specific case, try more specific variants
-      '2374 Tybee Road, St Cloud, FL 34769',
-      '2374 Tybee Rd, Saint Cloud, FL 34769',
-      'Tybee Road, St Cloud, FL 34769',
-      'St. Cloud, FL 34769' // Last resort fallback
+      // For the specific case, try more specific variants with proper Florida designation
+      '2374 Tybee Road, St Cloud, FL 34769, USA',
+      '2374 Tybee Rd, Saint Cloud, FL 34769, USA', 
+      '2374 Tybee Road, St. Cloud, Florida 34769, USA',
+      'Tybee Road, St Cloud, FL 34769, USA',
+      'St Cloud, FL 34769, USA', // Make sure to include USA to avoid Minnesota
+      'St. Cloud, Florida 34769, USA'
     ];
     
     let geocodeData: GeocodeResponse[] = [];
