@@ -16,6 +16,9 @@ export const ProjectWeatherCard: React.FC<ProjectWeatherCardProps> = ({
 }) => {
   const { weatherData, loading, error } = useWeatherData(projectId, address);
 
+  // Debug logging
+  console.log('Weather data received:', weatherData);
+
   if (loading) {
     return (
       <div className={`text-sm text-muted-foreground ${className}`}>
