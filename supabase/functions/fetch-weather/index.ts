@@ -40,10 +40,11 @@ serve(async (req) => {
       throw new Error('Address and project ID are required')
     }
 
+    console.log('All environment variables:', Object.keys(Deno.env.toObject()))
     const openWeatherApiKey = Deno.env.get('OpenWeather')
-    console.log('Checking OpenWeather API key...', openWeatherApiKey ? 'Found' : 'Not found')
+    console.log('Looking for OpenWeather key:', openWeatherApiKey ? 'Found' : 'Not found')
     if (!openWeatherApiKey) {
-      console.error('Available environment variables:', Object.keys(Deno.env.toObject()))
+      console.error('OpenWeather key missing. Available env vars:', Object.keys(Deno.env.toObject()))
       throw new Error('OpenWeather API key not configured')
     }
 
