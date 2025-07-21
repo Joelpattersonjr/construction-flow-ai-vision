@@ -34,14 +34,25 @@ serve(async (req) => {
   }
 
   try {
-    const { address, projectId } = await req.json()
+    console.log('=== FETCH WEATHER REQUEST ===')
+    console.log('Method:', req.method)
+    console.log('Headers:', Object.fromEntries(req.headers.entries()))
+    
+    const body = await req.json()
+    console.log('Request body:', body)
+    
+    const { address, projectId } = body
     
     if (!address || !projectId) {
+      console.error('Missing required fields:', { address, projectId })
       throw new Error('Address and project ID are required')
     }
 
     const openWeatherApiKey = Deno.env.get('OpenWeather')
+    console.log('OpenWeather API key available:', !!openWeatherApiKey)
+    
     if (!openWeatherApiKey) {
+      console.error('OpenWeather API key not found')
       throw new Error('OpenWeather API key not configured')
     }
 
