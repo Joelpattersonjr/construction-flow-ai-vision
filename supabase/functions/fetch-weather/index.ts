@@ -41,7 +41,9 @@ serve(async (req) => {
     }
 
     const openWeatherApiKey = Deno.env.get('OpenWeather')
+    console.log('Checking OpenWeather API key...', openWeatherApiKey ? 'Found' : 'Not found')
     if (!openWeatherApiKey) {
+      console.error('Available environment variables:', Object.keys(Deno.env.toObject()))
       throw new Error('OpenWeather API key not configured')
     }
 
