@@ -89,9 +89,6 @@ serve(async (req) => {
       )
     }
 
-    // Geocode the address to get coordinates
-    console.log('Attempting to geocode address:', address)
-    
     // Get project details to access structured location data
     const { data: projectData } = await supabase
       .from('projects')
@@ -125,6 +122,7 @@ serve(async (req) => {
         '2374 Tybee Rd, Saint Cloud, FL 34769, USA', 
         '2374 Tybee Road, St. Cloud, Florida 34769, USA'
       );
+    }
     
     let geocodeData: GeocodeResponse[] = [];
     let successfulAddress = '';
