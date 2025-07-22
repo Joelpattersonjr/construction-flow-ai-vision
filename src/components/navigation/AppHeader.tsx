@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Folder, Files, Users, Home, CheckSquare, Calendar, ArrowLeft } from 'lucide-react';
+import { Folder, Files, Users, Home, CheckSquare, Calendar, ArrowLeft, CheckCircle, FileText } from 'lucide-react';
 import UserProfilePopover from './UserProfilePopover';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -32,6 +32,8 @@ const AppHeader: React.FC = () => {
     { path: '/tasks', label: 'Tasks', icon: CheckSquare },
     { path: '/calendar', label: 'Calendar', icon: Calendar },
     { path: '/files', label: 'Files', icon: Files },
+    { path: '/forms', label: 'Forms', icon: FileText },
+    { path: '/approvals', label: 'Approvals', icon: CheckCircle },
     ...(profile?.company_role === 'company_admin' ? [
       { path: '/admin', label: 'Admin', icon: Users }
     ] : [])

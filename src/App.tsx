@@ -28,6 +28,7 @@ import ScheduleBuilder from "./pages/ScheduleBuilder";
 import DailyReports from "./pages/DailyReports";
 import Forms from "./pages/Forms";
 import { FormFill } from "./pages/FormFill";
+import { ApprovalDashboard } from "./pages/ApprovalDashboard";
 import Profile from "./pages/Profile";
 import Subscription from "./pages/Subscription";
 import PaymentSuccess from "./pages/PaymentSuccess";
@@ -153,8 +154,16 @@ const App: React.FC = () => {
                          <FormFill />
                        </ProtectedRoute>
                      } 
-                   />
+                    />
                    <Route 
+                     path="/approvals" 
+                     element={
+                       <ProtectedRoute>
+                         <ApprovalDashboard />
+                       </ProtectedRoute>
+                     } 
+                   />
+                   <Route
                      path="/profile"
                     element={
                       <ProtectedRoute>
