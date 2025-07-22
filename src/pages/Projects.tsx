@@ -15,7 +15,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Plus, Folder, Calendar, MapPin, FileText, Settings, ArrowLeft, Search, Filter, Users, Clock, AlertTriangle, CheckCircle, Upload, PlusCircle, Eye, Cloud, Sun, CloudRain, Bolt, Activity, TrendingUp } from 'lucide-react';
 import { ProjectWeatherCard } from '@/components/projects/ProjectWeatherCard';
 import { useNavigate } from 'react-router-dom';
-import { AppLayout } from '@/components/layout/AppLayout';
+import AppHeader from '@/components/navigation/AppHeader';
 import { ExportDialog } from '@/components/export/ExportDialog';
 import TeamCollaborationPanel from '@/components/projects/TeamCollaborationPanel';
 import { MobileHeader } from '@/components/mobile/MobileHeader';
@@ -423,10 +423,10 @@ const Projects: React.FC = () => {
 
   if (loading) {
     return (
-      <AppLayout>
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20">
-          <div className="container mx-auto py-8 px-4">
-            <div className="animate-pulse space-y-8">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20">
+        <AppHeader />
+        <div className="container mx-auto py-8 px-4">
+          <div className="animate-pulse space-y-8">
             {/* Hero skeleton */}
             <div className="text-center space-y-4">
               <div className="w-20 h-20 bg-gradient-to-br from-slate-200 to-slate-300 rounded-2xl mx-auto"></div>
@@ -453,15 +453,14 @@ const Projects: React.FC = () => {
             </div>
           </div>
         </div>
-      </AppLayout>
+      </div>
     );
   }
 
   // Mobile-optimized render
   if (isMobile) {
     return (
-      <AppLayout>
-        <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background">
         <MobileHeader 
           title="Projects"
           showBack={true}
@@ -687,19 +686,19 @@ const Projects: React.FC = () => {
             </div>
           )}
         </main>
-        </div>
-      </AppLayout>
+      </div>
     );
   }
 
   // Desktop render
   return (
-    <AppLayout>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20 relative overflow-hidden">
-        {/* Background Elements */}
-        <div className="absolute inset-0 opacity-40 bg-gradient-to-br from-slate-100/50 to-blue-100/30"></div>
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-gradient-to-br from-blue-200/20 to-purple-200/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-gradient-to-br from-purple-200/20 to-pink-200/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20 relative overflow-hidden">
+      {/* Background Elements */}
+      <div className="absolute inset-0 opacity-40 bg-gradient-to-br from-slate-100/50 to-blue-100/30"></div>
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-gradient-to-br from-blue-200/20 to-purple-200/20 rounded-full blur-3xl animate-pulse"></div>
+      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-gradient-to-br from-purple-200/20 to-pink-200/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+
+      <AppHeader />
       
       <main className="container mx-auto py-8 px-4 relative z-10">
         {/* Hero Section */}
@@ -1401,8 +1400,7 @@ const Projects: React.FC = () => {
           <TeamCollaborationPanel selectedProjectId={selectedProjectForAction} />
         </div>
       </main>
-      </div>
-    </AppLayout>
+    </div>
   );
 };
 

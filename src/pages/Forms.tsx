@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { AppLayout } from '@/components/layout/AppLayout';
+import AppHeader from "@/components/navigation/AppHeader";
 import { FormTemplatesList } from "@/components/forms/FormTemplatesList";
 import { FormBuilder } from "@/components/forms/FormBuilder";
 import { FormSubmissions } from "@/components/forms/FormSubmissions";
@@ -30,18 +30,19 @@ const Forms: React.FC = () => {
 
   if (showFormBuilder) {
     return (
-      <AppLayout>
+      <div className="min-h-screen bg-background">
         <FormBuilder 
           formId={editingFormId} 
           onClose={handleCloseBuilder}
         />
-      </AppLayout>
+      </div>
     );
   }
 
   return (
-    <AppLayout>
-      <div className="space-y-6">
+    <div className="min-h-screen bg-background">
+      <AppHeader />
+      <div className="p-6 space-y-6">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold">Dynamic Forms</h1>
@@ -88,7 +89,7 @@ const Forms: React.FC = () => {
           </TabsContent>
         </Tabs>
       </div>
-    </AppLayout>
+    </div>
   );
 };
 

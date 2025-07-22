@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { AppLayout } from '@/components/layout/AppLayout';
+import AppHeader from '@/components/navigation/AppHeader';
 import { TrialBanner } from '@/components/subscription/TrialBanner';
 import { SubscriptionService, SubscriptionInfo } from '@/services/subscriptionService';
 import { useAuthState } from '@/hooks/useAuthState';
@@ -143,15 +143,16 @@ const Index = () => {
   ];
 
   return (
-    <AppLayout>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 overflow-hidden">
-        {/* Animated background elements */}
-        <div className="absolute inset-0 opacity-30">
-          <div className="absolute top-20 left-10 w-20 h-20 bg-primary/20 rounded-full animate-pulse"></div>
-          <div className="absolute top-40 right-20 w-32 h-32 bg-blue-300/20 rounded-full animate-bounce" style={{animationDelay: '0.5s'}}></div>
-          <div className="absolute bottom-20 left-1/4 w-16 h-16 bg-purple-300/20 rounded-full animate-pulse" style={{animationDelay: '1s'}}></div>
-          <div className="absolute top-1/2 right-1/3 w-24 h-24 bg-cyan-300/20 rounded-full animate-bounce" style={{animationDelay: '1.5s'}}></div>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 opacity-30">
+        <div className="absolute top-20 left-10 w-20 h-20 bg-primary/20 rounded-full animate-pulse"></div>
+        <div className="absolute top-40 right-20 w-32 h-32 bg-blue-300/20 rounded-full animate-bounce" style={{animationDelay: '0.5s'}}></div>
+        <div className="absolute bottom-20 left-1/4 w-16 h-16 bg-purple-300/20 rounded-full animate-pulse" style={{animationDelay: '1s'}}></div>
+        <div className="absolute top-1/2 right-1/3 w-24 h-24 bg-cyan-300/20 rounded-full animate-bounce" style={{animationDelay: '1.5s'}}></div>
+      </div>
+      
+      <AppHeader />
 
       <main className="relative z-10 max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         {/* Trial Banner */}
@@ -307,7 +308,6 @@ const Index = () => {
         </div>
       </main>
     </div>
-    </AppLayout>
   );
 };
 

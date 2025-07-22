@@ -9,7 +9,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import FileManager from '@/components/file-management/FileManager';
-import { AppLayout } from '@/components/layout/AppLayout';
+import AppHeader from '@/components/navigation/AppHeader';
 
 interface Project {
   id: string;
@@ -120,14 +120,15 @@ const FileManagement = () => {
   }, [selectedProjectId, navigate]);
 
   return (
-    <AppLayout>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden">
-        {/* Animated background elements */}
-        <div className="absolute inset-0 opacity-30 pointer-events-none">
-          <div className="absolute top-20 left-10 w-20 h-20 bg-primary/20 rounded-full animate-pulse"></div>
-          <div className="absolute top-40 right-20 w-32 h-32 bg-blue-300/20 rounded-full animate-bounce" style={{animationDelay: '0.5s'}}></div>
-          <div className="absolute bottom-20 left-1/4 w-16 h-16 bg-purple-300/20 rounded-full animate-pulse" style={{animationDelay: '1s'}}></div>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 opacity-30 pointer-events-none">
+        <div className="absolute top-20 left-10 w-20 h-20 bg-primary/20 rounded-full animate-pulse"></div>
+        <div className="absolute top-40 right-20 w-32 h-32 bg-blue-300/20 rounded-full animate-bounce" style={{animationDelay: '0.5s'}}></div>
+        <div className="absolute bottom-20 left-1/4 w-16 h-16 bg-purple-300/20 rounded-full animate-pulse" style={{animationDelay: '1s'}}></div>
+      </div>
+      
+      <AppHeader />
 
       <main className="container mx-auto py-8 px-4 relative z-10">
         {/* Hero Section */}
@@ -299,8 +300,7 @@ const FileManagement = () => {
           </div>
         )}
       </main>
-      </div>
-    </AppLayout>
+    </div>
   );
 };
 

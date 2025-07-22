@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-
+import AppHeader from '@/components/navigation/AppHeader';
 import { DailyReportForm } from './DailyReportForm';
 import { DailyReportsList } from './DailyReportsList';
 import { DailyReportsAnalytics } from './DailyReportsAnalytics';
@@ -220,6 +220,7 @@ export function DailyReportsManager() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20">
+      <AppHeader />
       
       <main className="container mx-auto py-8 px-4">
         {/* Header */}

@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { AppLayout } from '@/components/layout/AppLayout';
+import AppHeader from '@/components/navigation/AppHeader';
 import ProjectPermissionsContent from '@/components/permissions/ProjectPermissionsContent';
 import { useRealtimeUpdates } from '@/hooks/useRealtimeUpdates';
 
@@ -138,8 +138,8 @@ const ProjectPermissions: React.FC = () => {
 
   if (loading) {
     return (
-      <AppLayout>
-        <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50">
+        <AppHeader />
         <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
           <div className="animate-pulse">
             <div className="h-8 bg-gray-200 rounded w-1/3 mb-4"></div>
@@ -151,15 +151,14 @@ const ProjectPermissions: React.FC = () => {
             </div>
           </div>
         </main>
-        </div>
-      </AppLayout>
+      </div>
     );
   }
 
   if (!project) {
     return (
-      <AppLayout>
-        <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50">
+        <AppHeader />
         <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
           <Card>
             <CardContent className="p-8 text-center">
@@ -168,14 +167,13 @@ const ProjectPermissions: React.FC = () => {
             </CardContent>
           </Card>
         </main>
-        </div>
-      </AppLayout>
+      </div>
     );
   }
 
   return (
-    <AppLayout>
-      <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50">
+      <AppHeader />
       <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
         <ProjectPermissionsContent
           projectId={projectId!}
@@ -186,8 +184,7 @@ const ProjectPermissions: React.FC = () => {
           onMemberAdded={handleMemberAdded}
         />
       </main>
-      </div>
-    </AppLayout>
+    </div>
   );
 };
 
