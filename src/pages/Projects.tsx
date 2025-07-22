@@ -426,7 +426,7 @@ const Projects: React.FC = () => {
       <AppLayout>
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20">
           <div className="container mx-auto py-8 px-4">
-          <div className="animate-pulse space-y-8">
+            <div className="animate-pulse space-y-8">
             {/* Hero skeleton */}
             <div className="text-center space-y-4">
               <div className="w-20 h-20 bg-gradient-to-br from-slate-200 to-slate-300 rounded-2xl mx-auto"></div>
@@ -452,7 +452,7 @@ const Projects: React.FC = () => {
               ))}
             </div>
           </div>
-          </div>
+        </div>
       </AppLayout>
     );
   }
@@ -460,7 +460,8 @@ const Projects: React.FC = () => {
   // Mobile-optimized render
   if (isMobile) {
     return (
-      <div className="min-h-screen bg-background">
+      <AppLayout>
+        <div className="min-h-screen bg-background">
         <MobileHeader 
           title="Projects"
           showBack={true}
@@ -686,7 +687,8 @@ const Projects: React.FC = () => {
             </div>
           )}
         </main>
-      </div>
+        </div>
+      </AppLayout>
     );
   }
 
