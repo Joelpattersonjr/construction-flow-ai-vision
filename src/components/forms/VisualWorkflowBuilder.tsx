@@ -11,6 +11,8 @@ import {
   Edge,
   Connection,
   NodeTypes,
+  Handle,
+  Position,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -41,54 +43,73 @@ interface VisualWorkflowBuilderProps {
 
 // Custom node components
 const ApprovalNode = ({ data }: { data: any }) => (
-  <div className="bg-background border-2 border-primary rounded-lg p-4 min-w-[200px] shadow-lg">
-    <div className="flex items-center gap-2 mb-2">
-      <User className="h-4 w-4 text-primary" />
-      <span className="font-medium text-sm">Approval Step</span>
+  <>
+    <Handle type="target" position={Position.Left} />
+    <div className="bg-background border-2 border-primary rounded-lg p-4 min-w-[200px] shadow-lg">
+      <div className="flex items-center gap-2 mb-2">
+        <User className="h-4 w-4 text-primary" />
+        <span className="font-medium text-sm">Approval Step</span>
+      </div>
+      <div className="text-xs text-muted-foreground">
+        <p>{data.label}</p>
+        {data.assignee && <p>Assignee: {data.assignee}</p>}
+      </div>
     </div>
-    <div className="text-xs text-muted-foreground">
-      <p>{data.label}</p>
-      {data.assignee && <p>Assignee: {data.assignee}</p>}
-    </div>
-  </div>
+    <Handle type="source" position={Position.Right} />
+  </>
 );
 
 const NotificationNode = ({ data }: { data: any }) => (
-  <div className="bg-background border-2 border-blue-500 rounded-lg p-4 min-w-[200px] shadow-lg">
-    <div className="flex items-center gap-2 mb-2">
-      <Mail className="h-4 w-4 text-blue-500" />
-      <span className="font-medium text-sm">Notification</span>
+  <>
+    <Handle type="target" position={Position.Left} />
+    <div className="bg-background border-2 border-blue-500 rounded-lg p-4 min-w-[200px] shadow-lg">
+      <div className="flex items-center gap-2 mb-2">
+        <Mail className="h-4 w-4 text-blue-500" />
+        <span className="font-medium text-sm">Notification</span>
+      </div>
+      <div className="text-xs text-muted-foreground">
+        <p>{data.label}</p>
+      </div>
     </div>
-    <div className="text-xs text-muted-foreground">
-      <p>{data.label}</p>
-    </div>
-  </div>
+    <Handle type="source" position={Position.Right} />
+  </>
 );
 
 const ConditionNode = ({ data }: { data: any }) => (
-  <div className="bg-background border-2 border-orange-500 rounded-lg p-4 min-w-[200px] shadow-lg">
-    <div className="flex items-center gap-2 mb-2">
-      <span className="text-orange-500 font-bold">?</span>
-      <span className="font-medium text-sm">Condition</span>
+  <>
+    <Handle type="target" position={Position.Left} />
+    <div className="bg-background border-2 border-orange-500 rounded-lg p-4 min-w-[200px] shadow-lg">
+      <div className="flex items-center gap-2 mb-2">
+        <span className="text-orange-500 font-bold">?</span>
+        <span className="font-medium text-sm">Condition</span>
+      </div>
+      <div className="text-xs text-muted-foreground">
+        <p>{data.label}</p>
+      </div>
     </div>
-    <div className="text-xs text-muted-foreground">
-      <p>{data.label}</p>
-    </div>
-  </div>
+    <Handle type="source" position={Position.Right} id="yes" />
+    <Handle type="source" position={Position.Bottom} id="no" />
+  </>
 );
 
 const StartNode = ({ data }: { data: any }) => (
-  <div className="bg-green-50 border-2 border-green-500 rounded-full p-4 min-w-[120px] text-center shadow-lg">
-    <CheckCircle className="h-6 w-6 text-green-500 mx-auto mb-1" />
-    <span className="font-medium text-sm">Start</span>
-  </div>
+  <>
+    <div className="bg-green-50 border-2 border-green-500 rounded-full p-4 min-w-[120px] text-center shadow-lg">
+      <CheckCircle className="h-6 w-6 text-green-500 mx-auto mb-1" />
+      <span className="font-medium text-sm">Start</span>
+    </div>
+    <Handle type="source" position={Position.Right} />
+  </>
 );
 
 const EndNode = ({ data }: { data: any }) => (
-  <div className="bg-red-50 border-2 border-red-500 rounded-full p-4 min-w-[120px] text-center shadow-lg">
-    <XCircle className="h-6 w-6 text-red-500 mx-auto mb-1" />
-    <span className="font-medium text-sm">End</span>
-  </div>
+  <>
+    <Handle type="target" position={Position.Left} />
+    <div className="bg-red-50 border-2 border-red-500 rounded-full p-4 min-w-[120px] text-center shadow-lg">
+      <XCircle className="h-6 w-6 text-red-500 mx-auto mb-1" />
+      <span className="font-medium text-sm">End</span>
+    </div>
+  </>
 );
 
 const nodeTypes: NodeTypes = {
