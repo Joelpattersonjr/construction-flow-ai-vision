@@ -120,11 +120,11 @@ serve(async (req) => {
         address.replace('Rd.', 'Road'),
         address.replace('Florida', 'FL'),
         address.replace('Rd.', 'Road').replace('Florida', 'FL'),
-      `${address}, USA`,
-      '2374 Tybee Road, St Cloud, FL 34769, USA',
-      '2374 Tybee Rd, Saint Cloud, FL 34769, USA', 
-      '2374 Tybee Road, St. Cloud, Florida 34769, USA'
-    ];
+        `${address}, USA`,
+        '2374 Tybee Road, St Cloud, FL 34769, USA',
+        '2374 Tybee Rd, Saint Cloud, FL 34769, USA', 
+        '2374 Tybee Road, St. Cloud, Florida 34769, USA'
+      );
     
     let geocodeData: GeocodeResponse[] = [];
     let successfulAddress = '';
