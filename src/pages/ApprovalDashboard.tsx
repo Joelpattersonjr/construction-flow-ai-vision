@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { CheckCircle, XCircle, Clock, Eye, Calendar, User, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { AppLayout } from '@/components/layout/AppLayout';
 
 interface WorkflowApproval {
   id: string;
@@ -169,7 +170,8 @@ export const ApprovalDashboard: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 animate-fade-in">
+    <AppLayout>
+      <div className="container mx-auto px-4 py-8 animate-fade-in">
       <div className="flex items-center gap-3 mb-8">
         <CheckCircle className="h-8 w-8 text-primary" />
         <div>
@@ -381,7 +383,8 @@ export const ApprovalDashboard: React.FC = () => {
           </DialogContent>
         </Dialog>
       )}
-    </div>
+      </div>
+    </AppLayout>
   );
 };
 
