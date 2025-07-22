@@ -43,3 +43,12 @@ verify_jwt = true
 
 [functions.fetch-weather]
 verify_jwt = false
+
+[functions.execute-workflow]
+verify_jwt = true
+
+[functions.handle-approval]
+verify_jwt = true
+
+[functions.trigger-workflow]
+verify_jwt = true

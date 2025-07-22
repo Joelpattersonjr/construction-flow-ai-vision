@@ -475,16 +475,37 @@ export const FormRenderer: React.FC<FormRendererProps> = ({
     };
 
     try {
-      const { error } = await supabase
+      const { data: submission, error } = await supabase
         .from('form_submissions')
         .insert({
           form_template_id: formTemplate.id,
           project_id: projectId,
           submission_data: submissionData,
           submitted_by: (await supabase.auth.getUser()).data.user?.id,
-        });
+        })
+        .select()
+        .single();
 
       if (error) throw error;
+
+      // Trigger workflows for this form submission
+      try {
+        const { data: workflowResult, error: workflowError } = await supabase.functions.invoke('trigger-workflow', {
+          body: {
+            form_submission_id: submission.id
+          }
+        });
+
+        if (workflowError) {
+          console.error('Error triggering workflows:', workflowError);
+          // Don't fail the form submission if workflow triggering fails
+        } else {
+          console.log('Workflows triggered:', workflowResult);
+        }
+      } catch (workflowError) {
+        console.error('Error triggering workflows:', workflowError);
+        // Don't fail the form submission if workflow triggering fails
+      }
 
       toast.success('Form submitted successfully!');
       onSubmit(submissionData);
