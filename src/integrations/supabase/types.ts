@@ -559,6 +559,181 @@ export type Database = {
           },
         ]
       }
+      form_field_data_sources: {
+        Row: {
+          company_id: number
+          created_at: string | null
+          created_by: string
+          data_type: string
+          data_values: Json | null
+          description: string | null
+          id: string
+          name: string
+          query_config: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          company_id: number
+          created_at?: string | null
+          created_by: string
+          data_type: string
+          data_values?: Json | null
+          description?: string | null
+          id?: string
+          name: string
+          query_config?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          company_id?: number
+          created_at?: string | null
+          created_by?: string
+          data_type?: string
+          data_values?: Json | null
+          description?: string | null
+          id?: string
+          name?: string
+          query_config?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "form_field_data_sources_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "form_field_data_sources_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      form_submissions: {
+        Row: {
+          attachments: Json | null
+          form_template_id: string
+          geolocation: Json | null
+          id: string
+          project_id: string | null
+          status: string | null
+          submission_data: Json
+          submitted_at: string | null
+          submitted_by: string
+          updated_at: string | null
+        }
+        Insert: {
+          attachments?: Json | null
+          form_template_id: string
+          geolocation?: Json | null
+          id?: string
+          project_id?: string | null
+          status?: string | null
+          submission_data?: Json
+          submitted_at?: string | null
+          submitted_by: string
+          updated_at?: string | null
+        }
+        Update: {
+          attachments?: Json | null
+          form_template_id?: string
+          geolocation?: Json | null
+          id?: string
+          project_id?: string | null
+          status?: string | null
+          submission_data?: Json
+          submitted_at?: string | null
+          submitted_by?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "form_submissions_form_template_id_fkey"
+            columns: ["form_template_id"]
+            isOneToOne: false
+            referencedRelation: "form_templates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "form_submissions_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "form_submissions_submitted_by_fkey"
+            columns: ["submitted_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      form_templates: {
+        Row: {
+          category: string | null
+          company_id: number
+          created_at: string | null
+          created_by: string
+          description: string | null
+          form_schema: Json
+          id: string
+          is_active: boolean | null
+          is_multi_page: boolean | null
+          name: string
+          styling_config: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string | null
+          company_id: number
+          created_at?: string | null
+          created_by: string
+          description?: string | null
+          form_schema?: Json
+          id?: string
+          is_active?: boolean | null
+          is_multi_page?: boolean | null
+          name: string
+          styling_config?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string | null
+          company_id?: number
+          created_at?: string | null
+          created_by?: string
+          description?: string | null
+          form_schema?: Json
+          id?: string
+          is_active?: boolean | null
+          is_multi_page?: boolean | null
+          name?: string
+          styling_config?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "form_templates_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "form_templates_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       knowledge_base: {
         Row: {
           answer: string
@@ -1574,6 +1749,153 @@ export type Database = {
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workflow_instances: {
+        Row: {
+          completion_data: Json | null
+          created_at: string | null
+          current_step: number | null
+          form_submission_id: string
+          id: string
+          status: string | null
+          updated_at: string | null
+          workflow_template_id: string
+        }
+        Insert: {
+          completion_data?: Json | null
+          created_at?: string | null
+          current_step?: number | null
+          form_submission_id: string
+          id?: string
+          status?: string | null
+          updated_at?: string | null
+          workflow_template_id: string
+        }
+        Update: {
+          completion_data?: Json | null
+          created_at?: string | null
+          current_step?: number | null
+          form_submission_id?: string
+          id?: string
+          status?: string | null
+          updated_at?: string | null
+          workflow_template_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflow_instances_form_submission_id_fkey"
+            columns: ["form_submission_id"]
+            isOneToOne: false
+            referencedRelation: "form_submissions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workflow_instances_workflow_template_id_fkey"
+            columns: ["workflow_template_id"]
+            isOneToOne: false
+            referencedRelation: "workflow_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workflow_step_actions: {
+        Row: {
+          action_taken: string | null
+          assignee_id: string | null
+          comments: string | null
+          completed_at: string | null
+          created_at: string | null
+          id: string
+          step_index: number
+          workflow_instance_id: string
+        }
+        Insert: {
+          action_taken?: string | null
+          assignee_id?: string | null
+          comments?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          step_index: number
+          workflow_instance_id: string
+        }
+        Update: {
+          action_taken?: string | null
+          assignee_id?: string | null
+          comments?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          step_index?: number
+          workflow_instance_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflow_step_actions_assignee_id_fkey"
+            columns: ["assignee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workflow_step_actions_workflow_instance_id_fkey"
+            columns: ["workflow_instance_id"]
+            isOneToOne: false
+            referencedRelation: "workflow_instances"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workflow_templates: {
+        Row: {
+          created_at: string | null
+          created_by: string
+          description: string | null
+          form_template_id: string
+          id: string
+          is_active: boolean | null
+          name: string
+          updated_at: string | null
+          workflow_steps: Json
+        }
+        Insert: {
+          created_at?: string | null
+          created_by: string
+          description?: string | null
+          form_template_id: string
+          id?: string
+          is_active?: boolean | null
+          name: string
+          updated_at?: string | null
+          workflow_steps?: Json
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string
+          description?: string | null
+          form_template_id?: string
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          updated_at?: string | null
+          workflow_steps?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflow_templates_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workflow_templates_form_template_id_fkey"
+            columns: ["form_template_id"]
+            isOneToOne: false
+            referencedRelation: "form_templates"
             referencedColumns: ["id"]
           },
         ]

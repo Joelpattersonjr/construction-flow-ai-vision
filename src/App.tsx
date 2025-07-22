@@ -26,6 +26,7 @@ import Tasks from "./pages/Tasks";
 import Calendar from "./pages/Calendar";
 import ScheduleBuilder from "./pages/ScheduleBuilder";
 import DailyReports from "./pages/DailyReports";
+import Forms from "./pages/Forms";
 import Profile from "./pages/Profile";
 import Subscription from "./pages/Subscription";
 import PaymentSuccess from "./pages/PaymentSuccess";
@@ -128,16 +129,24 @@ const App: React.FC = () => {
                       </ProtectedRoute>
                     } 
                   />
-                  <Route 
-                    path="/daily-reports" 
-                    element={
-                      <ProtectedRoute>
-                        <DailyReports />
-                      </ProtectedRoute>
-                    } 
-                  />
-                  <Route 
-                    path="/profile"
+                   <Route 
+                     path="/daily-reports" 
+                     element={
+                       <ProtectedRoute>
+                         <DailyReports />
+                       </ProtectedRoute>
+                     } 
+                   />
+                   <Route 
+                     path="/forms" 
+                     element={
+                       <ProtectedRoute>
+                         <Forms />
+                       </ProtectedRoute>
+                     } 
+                   />
+                   <Route 
+                     path="/profile"
                     element={
                       <ProtectedRoute>
                         <Profile />
