@@ -31,11 +31,15 @@ interface WorkflowNode extends Node {
     assignee?: string;
     action?: string;
     description?: string;
+  };
+}
+
+interface WorkflowEdge extends Edge {
+  data?: {
     conditionField?: string;
     conditionOperator?: string;
     conditionValue?: string;
-    ifTrue?: string;
-    ifFalse?: string;
+    label?: string;
   };
 }
 
@@ -90,6 +94,7 @@ const ConditionNode = ({ data }: { data: any }) => (
       </div>
       <div className="text-xs text-muted-foreground">
         <p>{data.label}</p>
+        <p className="text-xs mt-1 text-orange-600">Click connections to set conditions</p>
       </div>
     </div>
     <Handle type="source" position={Position.Right} id="yes" />
@@ -134,7 +139,7 @@ const initialNodes: WorkflowNode[] = [
   },
 ];
 
-const initialEdges: Edge[] = [];
+const initialEdges: WorkflowEdge[] = [];
 
 export const VisualWorkflowBuilder: React.FC<VisualWorkflowBuilderProps> = ({
   formTemplateId,
@@ -147,10 +152,19 @@ export const VisualWorkflowBuilder: React.FC<VisualWorkflowBuilderProps> = ({
   const [workflowName, setWorkflowName] = useState('');
   const [workflowDescription, setWorkflowDescription] = useState('');
   const [selectedNode, setSelectedNode] = useState<WorkflowNode | null>(null);
+  const [selectedEdge, setSelectedEdge] = useState<WorkflowEdge | null>(null);
   const [showNodeEditor, setShowNodeEditor] = useState(false);
+  const [showEdgeEditor, setShowEdgeEditor] = useState(false);
 
   const onConnect = useCallback(
-    (params: Connection) => setEdges((eds) => addEdge(params, eds)),
+    (params: Connection) => {
+      const newEdge: WorkflowEdge = {
+        ...params,
+        id: `edge-${Date.now()}`,
+        data: {},
+      };
+      setEdges((eds) => addEdge(newEdge, eds));
+    },
     [setEdges]
   );
 
@@ -181,7 +195,16 @@ export const VisualWorkflowBuilder: React.FC<VisualWorkflowBuilderProps> = ({
 
   const handleNodeClick = (event: React.MouseEvent, node: WorkflowNode) => {
     setSelectedNode(node);
+    setSelectedEdge(null);
     setShowNodeEditor(true);
+    setShowEdgeEditor(false);
+  };
+
+  const handleEdgeClick = (event: React.MouseEvent, edge: WorkflowEdge) => {
+    setSelectedEdge(edge);
+    setSelectedNode(null);
+    setShowEdgeEditor(true);
+    setShowNodeEditor(false);
   };
 
   const updateSelectedNode = (updates: Partial<WorkflowNode['data']>) => {
@@ -195,6 +218,19 @@ export const VisualWorkflowBuilder: React.FC<VisualWorkflowBuilderProps> = ({
       )
     );
     setSelectedNode({ ...selectedNode, data: { ...selectedNode.data, ...updates } });
+  };
+
+  const updateSelectedEdge = (updates: Partial<WorkflowEdge['data']>) => {
+    if (!selectedEdge) return;
+
+    setEdges((eds) =>
+      eds.map((edge) =>
+        edge.id === selectedEdge.id
+          ? { ...edge, data: { ...edge.data, ...updates } }
+          : edge
+      )
+    );
+    setSelectedEdge({ ...selectedEdge, data: { ...selectedEdge.data, ...updates } });
   };
 
   const handleSave = () => {
@@ -220,7 +256,10 @@ export const VisualWorkflowBuilder: React.FC<VisualWorkflowBuilderProps> = ({
       workflow_connections: edges.map((edge) => ({
         source: edge.source,
         target: edge.target,
-        condition: edge.label,
+        condition_field: edge.data?.conditionField,
+        condition_operator: edge.data?.conditionOperator,
+        condition_value: edge.data?.conditionValue,
+        label: edge.data?.label,
       })),
     };
 
@@ -238,6 +277,7 @@ export const VisualWorkflowBuilder: React.FC<VisualWorkflowBuilderProps> = ({
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
           onNodeClick={handleNodeClick}
+          onEdgeClick={handleEdgeClick}
           nodeTypes={nodeTypes}
           fitView
           className="bg-muted/30"
@@ -373,79 +413,6 @@ export const VisualWorkflowBuilder: React.FC<VisualWorkflowBuilderProps> = ({
                 </div>
               )}
 
-              {selectedNode.data.type === 'condition' && (
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="condition-field">Field to Check</Label>
-                    <Select
-                      value={selectedNode.data.conditionField || ''}
-                      onValueChange={(value) => updateSelectedNode({ conditionField: value })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select field to check" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="amount">Amount</SelectItem>
-                        <SelectItem value="status">Status</SelectItem>
-                        <SelectItem value="priority">Priority</SelectItem>
-                        <SelectItem value="department">Department</SelectItem>
-                        <SelectItem value="custom_field">Custom Field</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="condition-operator">Condition</Label>
-                    <Select
-                      value={selectedNode.data.conditionOperator || ''}
-                      onValueChange={(value) => updateSelectedNode({ conditionOperator: value })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select condition" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="equals">Equals</SelectItem>
-                        <SelectItem value="greater_than">Greater than</SelectItem>
-                        <SelectItem value="less_than">Less than</SelectItem>
-                        <SelectItem value="contains">Contains</SelectItem>
-                        <SelectItem value="not_equals">Not equals</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="condition-value">Value</Label>
-                    <Input
-                      id="condition-value"
-                      value={selectedNode.data.conditionValue || ''}
-                      onChange={(e) => updateSelectedNode({ conditionValue: e.target.value })}
-                      placeholder="Enter comparison value..."
-                    />
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <Label htmlFor="if-true">If True (Yes path)</Label>
-                      <Input
-                        id="if-true"
-                        value={selectedNode.data.ifTrue || ''}
-                        onChange={(e) => updateSelectedNode({ ifTrue: e.target.value })}
-                        placeholder="Action if condition is true"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="if-false">If False (No path)</Label>
-                      <Input
-                        id="if-false"
-                        value={selectedNode.data.ifFalse || ''}
-                        onChange={(e) => updateSelectedNode({ ifFalse: e.target.value })}
-                        placeholder="Action if condition is false"
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
-
               <div className="pt-4">
                 <div className="space-y-2">
                   <Label>Workflow Settings</Label>
@@ -468,6 +435,89 @@ export const VisualWorkflowBuilder: React.FC<VisualWorkflowBuilderProps> = ({
                     />
                   </div>
                 </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Edge Editor Panel */}
+      {showEdgeEditor && selectedEdge && (
+        <div className="w-80 border-l bg-background">
+          <Card className="h-full rounded-none border-0">
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                Edit Connection
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowEdgeEditor(false)}
+                >
+                  ×
+                </Button>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label htmlFor="edge-label">Connection Label</Label>
+                <Input
+                  id="edge-label"
+                  value={selectedEdge.data?.label || ''}
+                  onChange={(e) => updateSelectedEdge({ label: e.target.value })}
+                  placeholder="Optional label..."
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="condition-field">Field to Check</Label>
+                <Select
+                  value={selectedEdge.data?.conditionField || ''}
+                  onValueChange={(value) => updateSelectedEdge({ conditionField: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select field to check" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="amount">Amount</SelectItem>
+                    <SelectItem value="status">Status</SelectItem>
+                    <SelectItem value="priority">Priority</SelectItem>
+                    <SelectItem value="department">Department</SelectItem>
+                    <SelectItem value="custom_field">Custom Field</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div>
+                <Label htmlFor="condition-operator">Condition</Label>
+                <Select
+                  value={selectedEdge.data?.conditionOperator || ''}
+                  onValueChange={(value) => updateSelectedEdge({ conditionOperator: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select condition" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="equals">Equals</SelectItem>
+                    <SelectItem value="greater_than">Greater than</SelectItem>
+                    <SelectItem value="less_than">Less than</SelectItem>
+                    <SelectItem value="contains">Contains</SelectItem>
+                    <SelectItem value="not_equals">Not equals</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div>
+                <Label htmlFor="condition-value">Value</Label>
+                <Input
+                  id="condition-value"
+                  value={selectedEdge.data?.conditionValue || ''}
+                  onChange={(e) => updateSelectedEdge({ conditionValue: e.target.value })}
+                  placeholder="Enter comparison value..."
+                />
+              </div>
+
+              <div className="pt-2 text-sm text-muted-foreground">
+                <p>This connection will be followed when the condition is met.</p>
               </div>
             </CardContent>
           </Card>
