@@ -208,8 +208,8 @@ export const FormTemplatesList: React.FC<FormTemplatesListProps> = ({
                         variant="outline"
                         size="sm"
                         onClick={() => {
-                          // TODO: Implement preview functionality
-                          toast.info('Preview functionality coming soon');
+                          // Open the form renderer in preview mode
+                          window.open(`/forms/fill/${template.id}`, '_blank');
                         }}
                       >
                         <Eye className="h-4 w-4" />

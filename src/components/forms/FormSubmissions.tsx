@@ -6,9 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Eye, Download, Search, Filter, Calendar, User, FileText } from "lucide-react";
 import { formatDistanceToNow, format } from "date-fns";
 import { toast } from "sonner";
+import { PDFGenerator, usePDFGenerator } from './PDFGenerator';
 
 interface FormSubmission {
   id: string;
@@ -42,6 +44,8 @@ export const FormSubmissions: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
+  const [selectedSubmission, setSelectedSubmission] = useState<FormSubmission | null>(null);
+  const { generateBulkPDF } = usePDFGenerator();
 
   const { data: submissions, isLoading } = useQuery({
     queryKey: ['form-submissions', searchTerm, statusFilter, categoryFilter],
@@ -83,14 +87,17 @@ export const FormSubmissions: React.FC = () => {
     },
   });
 
-  const handleViewSubmission = (submissionId: string) => {
-    // TODO: Implement submission detail view
-    toast.info('Submission detail view coming soon');
+  const handleViewSubmission = (submission: FormSubmission) => {
+    setSelectedSubmission(submission);
   };
 
-  const handleExportToPDF = (submissionId: string) => {
-    // TODO: Implement PDF export
-    toast.info('PDF export functionality coming soon');
+  const handleExportAll = () => {
+    if (submissions && submissions.length > 0) {
+      generateBulkPDF(submissions);
+      toast.success('Bulk PDF export completed');
+    } else {
+      toast.error('No submissions to export');
+    }
   };
 
   if (isLoading) {
@@ -158,7 +165,7 @@ export const FormSubmissions: React.FC = () => {
                 <SelectItem value="incident">Incident</SelectItem>
               </SelectContent>
             </Select>
-            <Button variant="outline" className="w-full">
+            <Button variant="outline" className="w-full" onClick={handleExportAll}>
               <Download className="h-4 w-4 mr-2" />
               Export All
             </Button>
@@ -226,19 +233,15 @@ export const FormSubmissions: React.FC = () => {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => handleViewSubmission(submission.id)}
+                      onClick={() => handleViewSubmission(submission)}
                     >
                       <Eye className="h-4 w-4 mr-2" />
                       View
                     </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleExportToPDF(submission.id)}
-                    >
-                      <Download className="h-4 w-4 mr-2" />
-                      PDF
-                    </Button>
+                    <PDFGenerator 
+                      submission={submission}
+                      onGenerate={() => toast.success('PDF generated successfully')}
+                    />
                   </div>
                 </div>
               </CardContent>
@@ -246,6 +249,104 @@ export const FormSubmissions: React.FC = () => {
           ))
         )}
       </div>
+
+      {/* Submission Detail Dialog */}
+      <Dialog open={!!selectedSubmission} onOpenChange={(open) => {
+        if (!open) setSelectedSubmission(null);
+      }}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5" />
+              {selectedSubmission?.form_templates?.name} - Submission Details
+            </DialogTitle>
+          </DialogHeader>
+          {selectedSubmission && (
+            <div className="space-y-6">
+              {/* Submission Info */}
+              <div className="grid grid-cols-2 gap-4 p-4 bg-muted/50 rounded-lg">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Submitted By</p>
+                  <p>{selectedSubmission.profiles.full_name}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Date Submitted</p>
+                  <p>{format(new Date(selectedSubmission.submitted_at), 'PPP')}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Status</p>
+                  <Badge className={statusColors[selectedSubmission.status as keyof typeof statusColors]}>
+                    {selectedSubmission.status.replace('_', ' ')}
+                  </Badge>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Project</p>
+                  <p>{selectedSubmission.projects?.name || 'No project assigned'}</p>
+                </div>
+              </div>
+
+              {/* Form Data */}
+              <div>
+                <h3 className="text-lg font-medium mb-4">Form Responses</h3>
+                <div className="space-y-3">
+                  {Object.entries(selectedSubmission.submission_data).map(([key, value]) => {
+                    if (key === 'signatures' || key === 'geolocation' || key === 'attachments') return null;
+                    
+                    return (
+                      <div key={key} className="flex justify-between items-start p-3 bg-muted/30 rounded">
+                        <span className="font-medium text-sm text-muted-foreground min-w-[150px]">
+                          {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}:
+                        </span>
+                        <span className="text-sm flex-1 text-right">
+                          {typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value || 'N/A')}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Signatures */}
+              {selectedSubmission.submission_data.signatures && Object.keys(selectedSubmission.submission_data.signatures).length > 0 && (
+                <div>
+                  <h3 className="text-lg font-medium mb-4">Digital Signatures</h3>
+                  <div className="space-y-2">
+                    {Object.entries(selectedSubmission.submission_data.signatures).map(([fieldId, signature]) => (
+                      <div key={fieldId} className="flex justify-between items-center p-3 bg-muted/30 rounded">
+                        <span className="font-medium text-sm">{fieldId}:</span>
+                        <span className="text-sm font-mono">{signature as string}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Location */}
+              {selectedSubmission.submission_data.geolocation && (
+                <div>
+                  <h3 className="text-lg font-medium mb-4">Location Information</h3>
+                  <div className="p-3 bg-muted/30 rounded">
+                    <p className="text-sm">
+                      <strong>Coordinates:</strong> {selectedSubmission.submission_data.geolocation.lat}, {selectedSubmission.submission_data.geolocation.lng}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Actions */}
+              <div className="flex justify-end gap-2 pt-4 border-t">
+                <PDFGenerator 
+                  submission={selectedSubmission}
+                  onGenerate={() => toast.success('PDF generated successfully')}
+                />
+                <Button variant="outline" onClick={() => setSelectedSubmission(null)}>
+                  Close
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

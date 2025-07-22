@@ -4,9 +4,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Plus, GitBranch, Settings, Eye, Trash2, FileText } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
+import { VisualWorkflowBuilder } from './VisualWorkflowBuilder';
 
 interface WorkflowTemplate {
   id: string;
@@ -28,6 +30,7 @@ interface WorkflowTemplate {
 
 export const WorkflowBuilder: React.FC = () => {
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [editingWorkflow, setEditingWorkflow] = useState<string | null>(null);
 
   const { data: workflows, isLoading, refetch } = useQuery({
     queryKey: ['workflow-templates'],
@@ -180,10 +183,7 @@ export const WorkflowBuilder: React.FC = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => {
-                      // TODO: Implement workflow editor
-                      toast.info('Workflow editor coming soon');
-                    }}
+                    onClick={() => setEditingWorkflow(workflow.id)}
                     className="flex-1"
                   >
                     <Settings className="h-4 w-4 mr-2" />
@@ -214,24 +214,56 @@ export const WorkflowBuilder: React.FC = () => {
         </div>
       )}
 
-      {/* Workflow Creation Dialog - Coming Soon */}
-      {showCreateDialog && (
-        <Card className="max-w-md mx-auto mt-8">
-          <CardHeader>
-            <CardTitle>Workflow Builder</CardTitle>
-          </CardHeader>
-          <CardContent className="text-center py-8">
-            <GitBranch className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-            <h3 className="text-lg font-medium mb-2">Coming Soon</h3>
-            <p className="text-muted-foreground mb-4">
-              The visual workflow builder is under development and will be available in the next update.
-            </p>
-            <Button onClick={() => setShowCreateDialog(false)}>
-              Close
-            </Button>
-          </CardContent>
-        </Card>
-      )}
+      {/* Workflow Builder Dialog */}
+      <Dialog open={showCreateDialog || !!editingWorkflow} onOpenChange={(open) => {
+        if (!open) {
+          setShowCreateDialog(false);
+          setEditingWorkflow(null);
+        }
+      }}>
+        <DialogContent className="max-w-screen-xl h-[90vh] p-0">
+          <DialogHeader className="p-6 pb-0">
+            <DialogTitle>
+              {editingWorkflow ? 'Edit Workflow' : 'Create New Workflow'}
+            </DialogTitle>
+          </DialogHeader>
+          <VisualWorkflowBuilder
+            workflowId={editingWorkflow || undefined}
+            onSave={async (workflowData) => {
+              try {
+                if (editingWorkflow) {
+                  const { error } = await supabase
+                    .from('workflow_templates')
+                    .update(workflowData)
+                    .eq('id', editingWorkflow);
+                  if (error) throw error;
+                  toast.success('Workflow updated successfully');
+                } else {
+                  const { error } = await supabase
+                    .from('workflow_templates')
+                    .insert({
+                      ...workflowData,
+                      created_by: (await supabase.auth.getUser()).data.user?.id,
+                      company_id: 1, // TODO: Get actual company ID
+                    });
+                  if (error) throw error;
+                  toast.success('Workflow created successfully');
+                }
+                setShowCreateDialog(false);
+                setEditingWorkflow(null);
+                refetch();
+              } catch (error) {
+                console.error('Error saving workflow:', error);
+                toast.error('Failed to save workflow');
+              }
+            }}
+            onCancel={() => {
+              setShowCreateDialog(false);
+              setEditingWorkflow(null);
+            }}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
