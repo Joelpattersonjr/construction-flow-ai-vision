@@ -31,6 +31,11 @@ interface WorkflowNode extends Node {
     assignee?: string;
     action?: string;
     description?: string;
+    conditionField?: string;
+    conditionOperator?: string;
+    conditionValue?: string;
+    ifTrue?: string;
+    ifFalse?: string;
   };
 }
 
@@ -365,6 +370,79 @@ export const VisualWorkflowBuilder: React.FC<VisualWorkflowBuilderProps> = ({
                       <SelectItem value="both">Both</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+              )}
+
+              {selectedNode.data.type === 'condition' && (
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="condition-field">Field to Check</Label>
+                    <Select
+                      value={selectedNode.data.conditionField || ''}
+                      onValueChange={(value) => updateSelectedNode({ conditionField: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select field to check" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="amount">Amount</SelectItem>
+                        <SelectItem value="status">Status</SelectItem>
+                        <SelectItem value="priority">Priority</SelectItem>
+                        <SelectItem value="department">Department</SelectItem>
+                        <SelectItem value="custom_field">Custom Field</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="condition-operator">Condition</Label>
+                    <Select
+                      value={selectedNode.data.conditionOperator || ''}
+                      onValueChange={(value) => updateSelectedNode({ conditionOperator: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select condition" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="equals">Equals</SelectItem>
+                        <SelectItem value="greater_than">Greater than</SelectItem>
+                        <SelectItem value="less_than">Less than</SelectItem>
+                        <SelectItem value="contains">Contains</SelectItem>
+                        <SelectItem value="not_equals">Not equals</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="condition-value">Value</Label>
+                    <Input
+                      id="condition-value"
+                      value={selectedNode.data.conditionValue || ''}
+                      onChange={(e) => updateSelectedNode({ conditionValue: e.target.value })}
+                      placeholder="Enter comparison value..."
+                    />
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <Label htmlFor="if-true">If True (Yes path)</Label>
+                      <Input
+                        id="if-true"
+                        value={selectedNode.data.ifTrue || ''}
+                        onChange={(e) => updateSelectedNode({ ifTrue: e.target.value })}
+                        placeholder="Action if condition is true"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="if-false">If False (No path)</Label>
+                      <Input
+                        id="if-false"
+                        value={selectedNode.data.ifFalse || ''}
+                        onChange={(e) => updateSelectedNode({ ifFalse: e.target.value })}
+                        placeholder="Action if condition is false"
+                      />
+                    </div>
+                  </div>
                 </div>
               )}
 
