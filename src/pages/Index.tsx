@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import AppHeader from '@/components/navigation/AppHeader';
+
 import { TrialBanner } from '@/components/subscription/TrialBanner';
 import { SubscriptionService, SubscriptionInfo } from '@/services/subscriptionService';
 import { useAuthState } from '@/hooks/useAuthState';
@@ -125,7 +125,7 @@ const Index = () => {
       }}></div>
       </div>
       
-      <AppHeader />
+      
 
       <main className="relative z-10 max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         {/* Trial Banner */}

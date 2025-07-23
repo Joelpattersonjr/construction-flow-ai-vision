@@ -8,7 +8,7 @@ import { ArrowLeft, Calendar, MapPin, FileText, Users, Activity } from 'lucide-r
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import AppHeader from '@/components/navigation/AppHeader';
+
 import FileManager from '@/components/file-management/FileManager';
 import TeamManagementPanel from '@/components/projects/TeamManagementPanel';
 import { ContractCountdown } from '@/components/project/ContractCountdown';
@@ -131,7 +131,6 @@ const ProjectDetails: React.FC = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <AppHeader />
         <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
           <div className="animate-pulse">
             <div className="h-8 bg-gray-200 rounded w-1/3 mb-4"></div>
@@ -145,7 +144,6 @@ const ProjectDetails: React.FC = () => {
   if (!project) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <AppHeader />
         <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
           <Card>
             <CardContent className="p-8 text-center">
@@ -164,7 +162,7 @@ const ProjectDetails: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <AppHeader />
+      
       <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-6">

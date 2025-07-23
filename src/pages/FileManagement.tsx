@@ -9,7 +9,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import FileManager from '@/components/file-management/FileManager';
-import AppHeader from '@/components/navigation/AppHeader';
+
 
 interface Project {
   id: string;
@@ -128,7 +128,7 @@ const FileManagement = () => {
         <div className="absolute bottom-20 left-1/4 w-16 h-16 bg-purple-300/20 rounded-full animate-pulse" style={{animationDelay: '1s'}}></div>
       </div>
       
-      <AppHeader />
+      
 
       <main className="container mx-auto py-8 px-4 relative z-10">
         {/* Hero Section */}

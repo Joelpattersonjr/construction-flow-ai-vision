@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { TaskCalendar } from '@/components/calendar/TaskCalendar';
 import { taskService } from '@/services/taskService';
 import { useToast } from '@/hooks/use-toast';
-import AppHeader from '@/components/navigation/AppHeader';
+
 import { ExportDialog } from '@/components/export/ExportDialog';
 
 export default function CalendarView() {
@@ -157,7 +157,7 @@ export default function CalendarView() {
         <div className="absolute bottom-20 left-1/4 w-16 h-16 bg-purple-300/20 rounded-full animate-pulse" style={{animationDelay: '1s'}}></div>
       </div>
       
-      <AppHeader />
+      
       
       <main className="container mx-auto py-8 px-4 relative z-10">
         {/* Hero Section */}
