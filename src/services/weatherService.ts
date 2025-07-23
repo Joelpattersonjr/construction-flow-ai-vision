@@ -148,6 +148,66 @@ export class WeatherService {
     }
   }
 
+  static async getHistoricalWeatherForProject(
+    projectId: string, 
+    startDate: Date, 
+    endDate: Date
+  ): Promise<WeatherData[]> {
+    try {
+      const { data, error } = await supabase
+        .from('weather_cache')
+        .select('*')
+        .eq('project_id', projectId)
+        .gte('last_updated', startDate.toISOString())
+        .lte('last_updated', endDate.toISOString())
+        .order('last_updated', { ascending: false });
+
+      if (error) {
+        console.error('Error querying historical weather:', error);
+        return [];
+      }
+
+      if (!data || data.length === 0) {
+        console.log('No historical weather data found for project:', projectId);
+        return [];
+      }
+
+      return data.map(record => {
+        const lastUpdated = new Date(record.last_updated);
+        const now = new Date();
+        const ageMs = now.getTime() - lastUpdated.getTime();
+        const ageMinutes = Math.round(ageMs / 1000 / 60);
+
+        return {
+          temperature_current: record.temperature_current,
+          temperature_high: record.temperature_high,
+          temperature_low: record.temperature_low,
+          condition: record.condition,
+          humidity: record.humidity,
+          wind_speed: record.wind_speed,
+          weather_icon: record.weather_icon,
+          cached: true,
+          last_updated: record.last_updated,
+          age_minutes: ageMinutes
+        };
+      });
+    } catch (error) {
+      console.error('Error getting historical weather:', error);
+      return [];
+    }
+  }
+
+  static async getWeatherTrendsForProject(
+    projectId: string, 
+    days: number = 7
+  ): Promise<WeatherData[]> {
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
+
+    return this.getHistoricalWeatherForProject(projectId, startDate, endDate);
+  }
+
   static getWeatherIcon(condition: string): string {
     const iconMap: Record<string, string> = {
       'Clear': '☀️',
