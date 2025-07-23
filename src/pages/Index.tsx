@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -8,24 +7,13 @@ import AppHeader from '@/components/navigation/AppHeader';
 import { TrialBanner } from '@/components/subscription/TrialBanner';
 import { SubscriptionService, SubscriptionInfo } from '@/services/subscriptionService';
 import { useAuthState } from '@/hooks/useAuthState';
-import { 
-  Star, 
-  Sparkles, 
-  Building2, 
-  Calendar, 
-  FileText, 
-  CheckCircle2,
-  ArrowRight,
-  BarChart3,
-  Users,
-  Clock
-} from 'lucide-react';
-
+import { Star, Sparkles, Building2, Calendar, FileText, CheckCircle2, ArrowRight, BarChart3, Users, Clock } from 'lucide-react';
 const Index = () => {
   const navigate = useNavigate();
-  const { user } = useAuthState();
+  const {
+    user
+  } = useAuthState();
   const [subscriptionInfo, setSubscriptionInfo] = useState<SubscriptionInfo | null>(null);
-
   useEffect(() => {
     const fetchSubscription = async () => {
       if (user) {
@@ -33,23 +21,21 @@ const Index = () => {
         setSubscriptionInfo(info);
       }
     };
-
     fetchSubscription();
 
     // Add smooth scrolling and animations
     document.documentElement.style.scrollBehavior = 'smooth';
-    
+
     // Intersection Observer for scroll animations
     const observerOptions = {
       threshold: 0.1,
       rootMargin: '0px 0px -50px 0px'
     };
-
-    const observer = new IntersectionObserver((entries) => {
+    const observer = new IntersectionObserver(entries => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           entry.target.classList.add('animate-fade-in');
-          
+
           // Add staggered animations for child elements
           const children = entry.target.querySelectorAll('[data-stagger]');
           children.forEach((child, index) => {
@@ -64,106 +50,88 @@ const Index = () => {
     // Observe all cards
     const cards = document.querySelectorAll('[data-animate]');
     cards.forEach(card => observer.observe(card));
-
     return () => {
       observer.disconnect();
       document.documentElement.style.scrollBehavior = 'auto';
     };
   }, [user]);
-
   const getSubscriptionBadge = () => {
     if (!subscriptionInfo) return null;
-    
     const tier = subscriptionInfo.subscription_tier;
     const isTrialActive = subscriptionInfo.trial_info?.is_trial_active;
-    
     if (isTrialActive) {
-      return (
-        <Badge variant="secondary" className="gap-1 bg-gradient-to-r from-primary/10 to-blue-600/10 text-primary border-primary/20 animate-pulse">
+      return <Badge variant="secondary" className="gap-1 bg-gradient-to-r from-primary/10 to-blue-600/10 text-primary border-primary/20 animate-pulse">
           <Star className="h-3 w-3" />Trial
-        </Badge>
-      );
+        </Badge>;
     }
-    
     switch (tier) {
       case 'pro':
-        return (
-          <Badge variant="default" className="gap-1 bg-gradient-to-r from-primary to-blue-600 text-white shadow-lg">
+        return <Badge variant="default" className="gap-1 bg-gradient-to-r from-primary to-blue-600 text-white shadow-lg">
             <Sparkles className="h-3 w-3" />Pro
-          </Badge>
-        );
+          </Badge>;
       case 'enterprise':
-        return (
-          <Badge variant="destructive" className="gap-1 bg-gradient-to-r from-red-500 to-pink-600 text-white shadow-lg">
+        return <Badge variant="destructive" className="gap-1 bg-gradient-to-r from-red-500 to-pink-600 text-white shadow-lg">
             <Star className="h-3 w-3" />Enterprise
-          </Badge>
-        );
+          </Badge>;
       default:
         return <Badge variant="outline" className="border-primary/20 text-primary">Free</Badge>;
     }
   };
-
-  const dashboardCards = [
-    {
-      icon: Building2,
-      title: "Projects",
-      description: "Manage your construction projects",
-      details: "Create and track your construction projects with timeline management.",
-      path: "/projects",
-      cta: "View Projects",
-      gradient: "from-blue-500 to-cyan-500"
-    },
-    {
-      icon: CheckCircle2,
-      title: "Tasks", 
-      description: "Track project tasks and dependencies",
-      details: "Manage tasks across all your projects with Kanban board visualization.",
-      path: "/tasks",
-      cta: "View Tasks",
-      gradient: "from-green-500 to-emerald-500"
-    },
-    {
-      icon: Calendar,
-      title: "Calendar",
-      description: "Timeline view of task deadlines", 
-      details: "View tasks by due dates with drag-and-drop calendar interface.",
-      path: "/calendar",
-      cta: "View Calendar",
-      gradient: "from-purple-500 to-violet-500"
-    },
-    {
-      icon: FileText,
-      title: "Documents",
-      description: "AI-powered document analysis",
-      details: "Upload and analyze construction documents with AI insights.",
-      path: "/files", 
-      cta: "Manage Files",
-      gradient: "from-orange-500 to-red-500"
-    }
-  ];
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 overflow-hidden">
+  const dashboardCards = [{
+    icon: Building2,
+    title: "Projects",
+    description: "Manage your construction projects",
+    details: "Create and track your construction projects with timeline management.",
+    path: "/projects",
+    cta: "View Projects",
+    gradient: "from-blue-500 to-cyan-500"
+  }, {
+    icon: CheckCircle2,
+    title: "Tasks",
+    description: "Track project tasks and dependencies",
+    details: "Manage tasks across all your projects with Kanban board visualization.",
+    path: "/tasks",
+    cta: "View Tasks",
+    gradient: "from-green-500 to-emerald-500"
+  }, {
+    icon: Calendar,
+    title: "Calendar",
+    description: "Timeline view of task deadlines",
+    details: "View tasks by due dates with drag-and-drop calendar interface.",
+    path: "/calendar",
+    cta: "View Calendar",
+    gradient: "from-purple-500 to-violet-500"
+  }, {
+    icon: FileText,
+    title: "Documents",
+    description: "AI-powered document analysis",
+    details: "Upload and analyze construction documents with AI insights.",
+    path: "/files",
+    cta: "Manage Files",
+    gradient: "from-orange-500 to-red-500"
+  }];
+  return <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 overflow-hidden">
       {/* Animated background elements */}
       <div className="absolute inset-0 opacity-30">
         <div className="absolute top-20 left-10 w-20 h-20 bg-primary/20 rounded-full animate-pulse"></div>
-        <div className="absolute top-40 right-20 w-32 h-32 bg-blue-300/20 rounded-full animate-bounce" style={{animationDelay: '0.5s'}}></div>
-        <div className="absolute bottom-20 left-1/4 w-16 h-16 bg-purple-300/20 rounded-full animate-pulse" style={{animationDelay: '1s'}}></div>
-        <div className="absolute top-1/2 right-1/3 w-24 h-24 bg-cyan-300/20 rounded-full animate-bounce" style={{animationDelay: '1.5s'}}></div>
+        <div className="absolute top-40 right-20 w-32 h-32 bg-blue-300/20 rounded-full animate-bounce" style={{
+        animationDelay: '0.5s'
+      }}></div>
+        <div className="absolute bottom-20 left-1/4 w-16 h-16 bg-purple-300/20 rounded-full animate-pulse" style={{
+        animationDelay: '1s'
+      }}></div>
+        <div className="absolute top-1/2 right-1/3 w-24 h-24 bg-cyan-300/20 rounded-full animate-bounce" style={{
+        animationDelay: '1.5s'
+      }}></div>
       </div>
       
       <AppHeader />
 
       <main className="relative z-10 max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         {/* Trial Banner */}
-        {subscriptionInfo && (
-          <div className="mb-8" data-animate>
-            <TrialBanner 
-              subscriptionInfo={subscriptionInfo}
-              onUpgrade={() => window.location.href = '/#pricing'}
-            />
-          </div>
-        )}
+        {subscriptionInfo && <div className="mb-8" data-animate>
+            <TrialBanner subscriptionInfo={subscriptionInfo} onUpgrade={() => window.location.href = '/#pricing'} />
+          </div>}
 
         {/* Hero-style Welcome Section */}
         <div className="mb-12 text-center lg:text-left" data-animate>
@@ -176,11 +144,9 @@ const Index = () => {
                     <span className="bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
                       ConexusPM
                     </span>
-                    {user?.user_metadata?.full_name && (
-                      <span className="block text-2xl md:text-3xl lg:text-4xl mt-2 text-gray-700">
+                    {user?.user_metadata?.full_name && <span className="block text-2xl md:text-3xl lg:text-4xl mt-2 text-gray-700">
                         {user.user_metadata.full_name}!
-                      </span>
-                    )}
+                      </span>}
                   </h1>
                   {getSubscriptionBadge()}
                 </div>
@@ -203,26 +169,16 @@ const Index = () => {
             </div>
             
             {/* Floating action icons */}
-            <div className="absolute -top-4 -right-4 bg-primary text-white p-3 rounded-full shadow-lg animate-bounce">
-              <Sparkles className="h-6 w-6" />
-            </div>
-            <div className="absolute -bottom-4 -left-4 bg-green-500 text-white p-3 rounded-full shadow-lg animate-pulse">
-              <CheckCircle2 className="h-6 w-6" />
-            </div>
+            
+            
           </div>
         </div>
 
         {/* Enhanced Dashboard Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8" data-animate>
           {dashboardCards.map((card, index) => {
-            const IconComponent = card.icon;
-            return (
-              <Card 
-                key={index} 
-                className="group relative border-0 bg-white/50 backdrop-blur-sm shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-4 hover:scale-105 overflow-hidden cursor-pointer"
-                data-stagger
-                onClick={() => navigate(card.path)}
-              >
+          const IconComponent = card.icon;
+          return <Card key={index} className="group relative border-0 bg-white/50 backdrop-blur-sm shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-4 hover:scale-105 overflow-hidden cursor-pointer" data-stagger onClick={() => navigate(card.path)}>
                 {/* Gradient overlay that appears on hover */}
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-blue-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 
@@ -232,7 +188,9 @@ const Index = () => {
                 <CardHeader className="relative z-10 pb-4 space-y-6">
                   <div className="relative">
                     <div className={`relative p-3 rounded-xl bg-gradient-to-br ${card.gradient} bg-opacity-10 group-hover:bg-opacity-20 transition-all duration-300 w-fit`}>
-                      <IconComponent className={`h-14 w-14 text-white transition-all duration-300 group-hover:scale-110 group-hover:rotate-6`} style={{filter: 'drop-shadow(0 0 8px rgba(59, 130, 246, 0.5))'}} />
+                      <IconComponent className={`h-14 w-14 text-white transition-all duration-300 group-hover:scale-110 group-hover:rotate-6`} style={{
+                    filter: 'drop-shadow(0 0 8px rgba(59, 130, 246, 0.5))'
+                  }} />
                     </div>
                     <div className={`absolute inset-0 bg-gradient-to-br ${card.gradient} rounded-full blur-xl opacity-0 group-hover:opacity-50 transition-opacity duration-500`}></div>
                   </div>
@@ -251,9 +209,7 @@ const Index = () => {
                     {card.details}
                   </p>
                   
-                  <Button 
-                    className="w-full group/btn relative overflow-hidden bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary text-white transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl font-semibold" 
-                  >
+                  <Button className="w-full group/btn relative overflow-hidden bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary text-white transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl font-semibold">
                     <span className="relative z-10 flex items-center justify-center">
                       {card.cta}
                       <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-300 group-hover/btn:translate-x-1" />
@@ -267,9 +223,8 @@ const Index = () => {
                 
                 {/* Subtle shine effect */}
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-              </Card>
-            );
-          })}
+              </Card>;
+        })}
         </div>
 
 
@@ -283,23 +238,14 @@ const Index = () => {
               Explore our comprehensive documentation or get in touch with our support team for personalized assistance.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
-                size="lg"
-                className="group text-lg px-8 py-3 bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary text-white transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl font-semibold relative overflow-hidden"
-                onClick={() => navigate('/help')}
-              >
+              <Button size="lg" className="group text-lg px-8 py-3 bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary text-white transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl font-semibold relative overflow-hidden" onClick={() => navigate('/help')}>
                 <span className="relative z-10 flex items-center">
                   View Documentation
                   <ArrowRight className="ml-2 h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
                 </span>
                 <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500 skew-x-12"></div>
               </Button>
-              <Button 
-                size="lg" 
-                variant="outline"
-                className="group text-lg px-8 py-3 border-2 border-primary/20 hover:bg-primary hover:text-white transition-all duration-300 transform hover:scale-105 font-semibold relative overflow-hidden"
-                onClick={() => navigate('/contact')}
-              >
+              <Button size="lg" variant="outline" className="group text-lg px-8 py-3 border-2 border-primary/20 hover:bg-primary hover:text-white transition-all duration-300 transform hover:scale-105 font-semibold relative overflow-hidden" onClick={() => navigate('/contact')}>
                 <span className="relative z-10">Contact Support</span>
                 <div className="absolute inset-0 bg-primary translate-y-[100%] group-hover:translate-y-0 transition-transform duration-300"></div>
               </Button>
@@ -307,8 +253,6 @@ const Index = () => {
           </div>
         </div>
       </main>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
