@@ -3,51 +3,27 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { 
-  CheckCircle, 
-  ArrowRight, 
-  Building2, 
-  Users, 
-  Clock, 
-  FileText, 
-  Calendar, 
-  BarChart3,
-  Shield,
-  Zap,
-  Globe,
-  Star,
-  Rocket
-} from 'lucide-react';
+import { CheckCircle, ArrowRight, Building2, Users, Clock, FileText, Calendar, BarChart3, Shield, Zap, Globe, Star, Rocket } from 'lucide-react';
 import { TourTrigger } from '@/components/ProductTour';
 import { LiveChatWidget } from '@/components/LiveChatWidget';
-import { 
-  TaskManagementTooltip, 
-  CollaborationTooltip, 
-  AnalyticsTooltip,
-  SecurityTooltip,
-  IntegrationsTooltip,
-  MobileTooltip 
-} from '@/components/FeatureTooltips';
+import { TaskManagementTooltip, CollaborationTooltip, AnalyticsTooltip, SecurityTooltip, IntegrationsTooltip, MobileTooltip } from '@/components/FeatureTooltips';
 import constructionHero from '@/assets/construction-hero.jpg';
-
 const Landing = () => {
   const navigate = useNavigate();
-
   useEffect(() => {
     // Add smooth scrolling behavior
     document.documentElement.style.scrollBehavior = 'smooth';
-    
+
     // Intersection Observer for scroll animations
     const observerOptions = {
       threshold: 0.1,
       rootMargin: '0px 0px -100px 0px'
     };
-
-    const observer = new IntersectionObserver((entries) => {
+    const observer = new IntersectionObserver(entries => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           entry.target.classList.add('animate-fade-in-up');
-          
+
           // Add staggered animations for child elements
           const children = entry.target.querySelectorAll('[data-stagger]');
           children.forEach((child, index) => {
@@ -62,160 +38,97 @@ const Landing = () => {
     // Observe all sections and elements
     const sections = document.querySelectorAll('section[data-animate]');
     const staggerElements = document.querySelectorAll('[data-stagger-parent]');
-    
     sections.forEach(section => observer.observe(section));
     staggerElements.forEach(element => observer.observe(element));
-
     return () => {
       observer.disconnect();
       document.documentElement.style.scrollBehavior = 'auto';
     };
   }, []);
-
-  const features = [
-    {
-      icon: Building2,
-      title: "Project Management",
-      description: "Comprehensive project tracking with timelines, milestones, and progress monitoring.",
-      tooltip: TaskManagementTooltip
-    },
-    {
-      icon: Users,
-      title: "Team Collaboration",
-      description: "Real-time collaboration with team members, file sharing, and permission management.",
-      tooltip: CollaborationTooltip
-    },
-    {
-      icon: FileText,
-      title: "Document Management",
-      description: "Version control, file storage, and collaborative editing for all project documents.",
-      tooltip: SecurityTooltip
-    },
-    {
-      icon: Clock,
-      title: "Time Tracking",
-      description: "Built-in time tracking with detailed reporting and analytics for better productivity.",
-      tooltip: AnalyticsTooltip
-    },
-    {
-      icon: Calendar,
-      title: "Scheduling",
-      description: "Integrated calendar with task scheduling, deadlines, and automated reminders.",
-      tooltip: IntegrationsTooltip
-    },
-    {
-      icon: BarChart3,
-      title: "Analytics & Reporting",
-      description: "Advanced analytics and customizable reports to track project performance.",
-      tooltip: MobileTooltip
-    }
-  ];
-
-  const testimonials = [
-    {
-      name: "Sarah Johnson",
-      role: "Project Manager",
-      company: "BuildCorp Construction",
-      content: "ConexusPM has transformed how we manage our construction projects. The real-time collaboration features are game-changing.",
-      rating: 5
-    },
-    {
-      name: "Mike Chen",
-      role: "Operations Director",
-      company: "Metro Engineering",
-      content: "Finally, a project management tool that understands construction. The time tracking and document management are excellent.",
-      rating: 5
-    },
-    {
-      name: "Jennifer Rodriguez",
-      role: "Site Supervisor", 
-      company: "Apex Builders",
-      content: "Easy to use, powerful features, and great customer support. Our team productivity has increased by 30%.",
-      rating: 5
-    }
-  ];
-
-  const pricingPlans = [
-    {
-      name: "Free",
-      price: "Free",
-      period: "forever",
-      description: "Perfect for individuals and small teams",
-      features: [
-        "3 Projects",
-        "5 Team Members",
-        "1 GB Storage",
-        "100 Files per Project",
-        "50 Tasks per Project",
-        "5 File Versions",
-        "Basic Support"
-      ],
-      popular: false,
-      cta: "Start Free"
-    },
-    {
-      name: "Starter",
-      price: "$59.99",
-      period: "per month",
-      description: "Great for small growing teams",
-      features: [
-        "10 Projects",
-        "15 Team Members",
-        "5 GB Storage",
-        "500 Files per Project",
-        "200 Tasks per Project",
-        "20 File Versions",
-        "Real-time Collaboration",
-        "Basic Analytics",
-        "Email Support"
-      ],
-      popular: false,
-      cta: "Start Starter Plan"
-    },
-    {
-      name: "Pro",
-      price: "$99.99",
-      period: "per month",
-      description: "Enhanced features for growing teams",
-      features: [
-        "50 Projects",
-        "50 Team Members", 
-        "25 GB Storage",
-        "2,000 Files per Project",
-        "1,000 Tasks per Project",
-        "50 File Versions",
-        "Advanced Collaboration",
-        "Full Analytics Suite",
-        "Priority Support",
-        "Time Tracking"
-      ],
-      popular: true,
-      cta: "Start Pro Plan"
-    },
-    {
-      name: "Enterprise",
-      price: "Custom",
-      period: "pricing",
-      description: "Complete solution for large organizations",
-      features: [
-        "Unlimited Projects",
-        "Unlimited Team Members",
-        "Unlimited Storage",
-        "Unlimited Files & Tasks",
-        "Unlimited File Versions",
-        "Advanced Security",
-        "Custom Integrations",
-        "Dedicated Support",
-        "SLA Guarantee",
-        "Custom Features"
-      ],
-      popular: false,
-      cta: "Contact Sales"
-    }
-  ];
-
-  return (
-    <div className="min-h-screen bg-white">
+  const features = [{
+    icon: Building2,
+    title: "Project Management",
+    description: "Comprehensive project tracking with timelines, milestones, and progress monitoring.",
+    tooltip: TaskManagementTooltip
+  }, {
+    icon: Users,
+    title: "Team Collaboration",
+    description: "Real-time collaboration with team members, file sharing, and permission management.",
+    tooltip: CollaborationTooltip
+  }, {
+    icon: FileText,
+    title: "Document Management",
+    description: "Version control, file storage, and collaborative editing for all project documents.",
+    tooltip: SecurityTooltip
+  }, {
+    icon: Clock,
+    title: "Time Tracking",
+    description: "Built-in time tracking with detailed reporting and analytics for better productivity.",
+    tooltip: AnalyticsTooltip
+  }, {
+    icon: Calendar,
+    title: "Scheduling",
+    description: "Integrated calendar with task scheduling, deadlines, and automated reminders.",
+    tooltip: IntegrationsTooltip
+  }, {
+    icon: BarChart3,
+    title: "Analytics & Reporting",
+    description: "Advanced analytics and customizable reports to track project performance.",
+    tooltip: MobileTooltip
+  }];
+  const testimonials = [{
+    name: "Sarah Johnson",
+    role: "Project Manager",
+    company: "BuildCorp Construction",
+    content: "ConexusPM has transformed how we manage our construction projects. The real-time collaboration features are game-changing.",
+    rating: 5
+  }, {
+    name: "Mike Chen",
+    role: "Operations Director",
+    company: "Metro Engineering",
+    content: "Finally, a project management tool that understands construction. The time tracking and document management are excellent.",
+    rating: 5
+  }, {
+    name: "Jennifer Rodriguez",
+    role: "Site Supervisor",
+    company: "Apex Builders",
+    content: "Easy to use, powerful features, and great customer support. Our team productivity has increased by 30%.",
+    rating: 5
+  }];
+  const pricingPlans = [{
+    name: "Free",
+    price: "Free",
+    period: "forever",
+    description: "Perfect for individuals and small teams",
+    features: ["3 Projects", "5 Team Members", "1 GB Storage", "100 Files per Project", "50 Tasks per Project", "5 File Versions", "Basic Support"],
+    popular: false,
+    cta: "Start Free"
+  }, {
+    name: "Starter",
+    price: "$59.99",
+    period: "per month",
+    description: "Great for small growing teams",
+    features: ["10 Projects", "15 Team Members", "5 GB Storage", "500 Files per Project", "200 Tasks per Project", "20 File Versions", "Real-time Collaboration", "Basic Analytics", "Email Support"],
+    popular: false,
+    cta: "Start Starter Plan"
+  }, {
+    name: "Pro",
+    price: "$99.99",
+    period: "per month",
+    description: "Enhanced features for growing teams",
+    features: ["50 Projects", "50 Team Members", "25 GB Storage", "2,000 Files per Project", "1,000 Tasks per Project", "50 File Versions", "Advanced Collaboration", "Full Analytics Suite", "Priority Support", "Time Tracking"],
+    popular: true,
+    cta: "Start Pro Plan"
+  }, {
+    name: "Enterprise",
+    price: "Custom",
+    period: "pricing",
+    description: "Complete solution for large organizations",
+    features: ["Unlimited Projects", "Unlimited Team Members", "Unlimited Storage", "Unlimited Files & Tasks", "Unlimited File Versions", "Advanced Security", "Custom Integrations", "Dedicated Support", "SLA Guarantee", "Custom Features"],
+    popular: false,
+    cta: "Contact Sales"
+  }];
+  return <div className="min-h-screen bg-white">
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
         <div className="container mx-auto px-6 lg:px-8 h-16 flex items-center justify-between">
@@ -239,8 +152,12 @@ const Landing = () => {
         {/* Animated background elements */}
         <div className="absolute inset-0 opacity-30">
           <div className="absolute top-20 left-10 w-20 h-20 bg-primary/20 rounded-full animate-pulse"></div>
-          <div className="absolute top-40 right-20 w-32 h-32 bg-blue-300/20 rounded-full animate-bounce" style={{animationDelay: '0.5s'}}></div>
-          <div className="absolute bottom-20 left-1/4 w-16 h-16 bg-purple-300/20 rounded-full animate-pulse" style={{animationDelay: '1s'}}></div>
+          <div className="absolute top-40 right-20 w-32 h-32 bg-blue-300/20 rounded-full animate-bounce" style={{
+          animationDelay: '0.5s'
+        }}></div>
+          <div className="absolute bottom-20 left-1/4 w-16 h-16 bg-purple-300/20 rounded-full animate-pulse" style={{
+          animationDelay: '1s'
+        }}></div>
         </div>
         
         <div className="container mx-auto px-6 lg:px-8">
@@ -264,23 +181,16 @@ const Landing = () => {
               </p>
               
               <div className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start items-center animate-fade-in">
-                <Button 
-                  size="lg" 
-                  onClick={() => navigate('/signup')} 
-                  className="group text-lg px-10 py-4 bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl font-semibold relative overflow-hidden"
-                >
+                <Button size="lg" onClick={() => navigate('/signup')} className="group text-lg px-10 py-4 bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl font-semibold relative overflow-hidden">
                   <span className="relative z-10 flex items-center">
                     Start Free Trial
                     <ArrowRight className="ml-2 h-5 w-5 transition-transform duration-300 group-hover:translate-x-1 group-hover:scale-110" />
                   </span>
                   <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500 skew-x-12"></div>
                 </Button>
-                <Button 
-                  size="lg" 
-                  variant="outline" 
-                  onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })} 
-                  className="group text-lg px-10 py-4 border-2 hover:bg-primary hover:text-white transition-all duration-300 transform hover:scale-105 font-semibold relative overflow-hidden"
-                >
+                <Button size="lg" variant="outline" onClick={() => document.getElementById('features')?.scrollIntoView({
+                behavior: 'smooth'
+              })} className="group text-lg px-10 py-4 border-2 hover:bg-primary hover:text-white transition-all duration-300 transform hover:scale-105 font-semibold relative overflow-hidden">
                   <span className="relative z-10">See Features</span>
                   <div className="absolute inset-0 bg-primary translate-y-[100%] group-hover:translate-y-0 transition-transform duration-300"></div>
                 </Button>
@@ -298,17 +208,9 @@ const Landing = () => {
             {/* Right side - Hero Image */}
             <div className="relative animate-fade-in">
               <div className="relative bg-white/20 backdrop-blur-sm rounded-2xl p-8 shadow-2xl border border-white/30">
-                <img 
-                  src={constructionHero} 
-                  alt="ConexusPM Construction Management Dashboard" 
-                  className="w-full h-auto rounded-xl shadow-lg"
-                />
-                <div className="absolute -top-4 -right-4 bg-primary text-white p-3 rounded-full shadow-lg animate-bounce">
-                  <Rocket className="h-6 w-6" />
-                </div>
-                <div className="absolute -bottom-4 -left-4 bg-green-500 text-white p-3 rounded-full shadow-lg animate-pulse">
-                  <CheckCircle className="h-6 w-6" />
-                </div>
+                <img src={constructionHero} alt="ConexusPM Construction Management Dashboard" className="w-full h-auto rounded-xl shadow-lg" />
+                
+                
               </div>
             </div>
           </div>
@@ -330,9 +232,8 @@ const Landing = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10" data-stagger-parent>
             {features.map((feature, index) => {
-              const TooltipComponent = feature.tooltip;
-              return (
-                <TooltipComponent key={index}>
+            const TooltipComponent = feature.tooltip;
+            return <TooltipComponent key={index}>
                   <Card className="group relative border-0 bg-white/50 backdrop-blur-sm shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-4 hover:scale-105 overflow-hidden cursor-pointer" data-stagger>
                     {/* Gradient overlay that appears on hover */}
                     <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-blue-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -361,9 +262,8 @@ const Landing = () => {
                     {/* Subtle shine effect */}
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
                   </Card>
-                </TooltipComponent>
-              );
-            })}
+                </TooltipComponent>;
+          })}
           </div>
         </div>
       </section>
@@ -416,11 +316,7 @@ const Landing = () => {
               <div className="text-center space-y-6">
                 <h3 className="text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Ready to Get Started?</h3>
                 <p className="text-gray-600 text-lg lg:text-xl leading-relaxed">Join thousands of construction professionals who trust ConexusPM.</p>
-                <Button 
-                  size="lg" 
-                  onClick={() => navigate('/signup')} 
-                  className="group w-full text-lg py-4 font-semibold relative overflow-hidden"
-                >
+                <Button size="lg" onClick={() => navigate('/signup')} className="group w-full text-lg py-4 font-semibold relative overflow-hidden">
                   <span className="relative z-10">Start Your Free Trial</span>
                   <div className="absolute inset-0 bg-gradient-to-r from-primary to-blue-600 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-500"></div>
                 </Button>
@@ -443,14 +339,13 @@ const Landing = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-10">
-            {testimonials.map((testimonial, index) => (
-              <Card key={index} className="group border-0 shadow-lg hover:shadow-xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 cursor-pointer relative overflow-hidden">
+            {testimonials.map((testimonial, index) => <Card key={index} className="group border-0 shadow-lg hover:shadow-xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 cursor-pointer relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-blue-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 <CardContent className="pt-8 space-y-6 relative z-10">
                   <div className="flex">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="h-6 w-6 text-yellow-400 fill-current transition-transform duration-300 group-hover:scale-110" style={{transitionDelay: `${i * 100}ms`}} />
-                    ))}
+                    {[...Array(testimonial.rating)].map((_, i) => <Star key={i} className="h-6 w-6 text-yellow-400 fill-current transition-transform duration-300 group-hover:scale-110" style={{
+                  transitionDelay: `${i * 100}ms`
+                }} />)}
                   </div>
                   <p className="text-gray-600 text-lg leading-relaxed italic group-hover:text-gray-700 transition-colors duration-300">"{testimonial.content}"</p>
                   <div className="space-y-1">
@@ -460,8 +355,7 @@ const Landing = () => {
                   </div>
                 </CardContent>
                 <div className="absolute inset-0 border-2 border-transparent group-hover:border-primary/20 rounded-lg transition-all duration-500"></div>
-              </Card>
-            ))}
+              </Card>)}
           </div>
         </div>
       </section>
@@ -479,13 +373,10 @@ const Landing = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 max-w-7xl mx-auto pt-8">
-            {pricingPlans.map((plan, index) => (
-              <Card key={index} className={`group relative transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 cursor-pointer overflow-visible ${plan.popular ? 'border-primary shadow-lg' : 'border-gray-200 hover:shadow-xl'}`}>
-                {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-20">
+            {pricingPlans.map((plan, index) => <Card key={index} className={`group relative transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 cursor-pointer overflow-visible ${plan.popular ? 'border-primary shadow-lg' : 'border-gray-200 hover:shadow-xl'}`}>
+                {plan.popular && <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-20">
                     <Badge className="bg-primary text-white px-4 py-1.5 text-xs font-semibold shadow-lg">Most Popular</Badge>
-                  </div>
-                )}
+                  </div>}
                 
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-blue-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 
@@ -500,26 +391,22 @@ const Landing = () => {
                 
                 <CardContent className="relative z-10">
                   <ul className="space-y-3 mb-8">
-                    {plan.features.map((feature, featureIndex) => (
-                      <li key={featureIndex} className="flex items-center space-x-3 group-hover:translate-x-1 transition-transform duration-300" style={{transitionDelay: `${featureIndex * 50}ms`}}>
+                    {plan.features.map((feature, featureIndex) => <li key={featureIndex} className="flex items-center space-x-3 group-hover:translate-x-1 transition-transform duration-300" style={{
+                  transitionDelay: `${featureIndex * 50}ms`
+                }}>
                         <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
                         <span className="text-gray-600">{feature}</span>
-                      </li>
-                    ))}
+                      </li>)}
                   </ul>
                   
-                  <Button 
-                    className="w-full group relative overflow-hidden bg-black text-white border-black hover:bg-black hover:text-white" 
-                    onClick={() => navigate('/signup')}
-                  >
+                  <Button className="w-full group relative overflow-hidden bg-black text-white border-black hover:bg-black hover:text-white" onClick={() => navigate('/signup')}>
                     <span className="relative z-10">{plan.cta}</span>
                     <div className="absolute inset-0 bg-gradient-to-r from-primary to-blue-600 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-500"></div>
                   </Button>
                 </CardContent>
                 
                 <div className="absolute inset-0 border-2 border-transparent group-hover:border-primary/20 rounded-lg transition-all duration-500"></div>
-              </Card>
-            ))}
+              </Card>)}
           </div>
         </div>
       </section>
@@ -599,8 +486,6 @@ const Landing = () => {
       {/* Interactive Demo Components */}
       <TourTrigger />
       <LiveChatWidget />
-    </div>
-  );
+    </div>;
 };
-
 export default Landing;
