@@ -526,11 +526,6 @@ const Projects: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20 relative overflow-hidden">
       
       <main className="container mx-auto py-8 px-4 relative z-10">
-        {/* Usage Dashboard */}
-        <div className="mb-8">
-          <UsageDashboard />
-        </div>
-
         {/* Hero Section */}
         <div className="text-center mb-12">
           <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-lg">
@@ -542,6 +537,11 @@ const Projects: React.FC = () => {
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             Organize, track, and collaborate on your construction projects with powerful tools and insights.
           </p>
+        </div>
+
+        {/* Usage Dashboard */}
+        <div className="mb-8">
+          <UsageDashboard />
         </div>
 
         {/* Controls */}
