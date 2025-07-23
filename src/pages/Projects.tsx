@@ -586,7 +586,7 @@ const Projects: React.FC = () => {
           </Select>
 
           {profile?.company_role === 'company_admin' && (
-            <LimitGate>
+            <LimitGate limitType="projects">
               <Dialog open={open} onOpenChange={setOpen}>
                 <DialogTrigger asChild>
                   <Button className="whitespace-nowrap">
@@ -729,7 +729,7 @@ const Projects: React.FC = () => {
               }
             </p>
             {profile?.company_role === 'company_admin' && (
-              <LimitGate>
+              <LimitGate limitType="projects">
                 <Button onClick={() => setOpen(true)} size="lg">
                   <Plus className="h-5 w-5 mr-2" />
                   Create Your First Project
@@ -766,6 +766,7 @@ const Projects: React.FC = () => {
                       )}
                     </div>
                     <ProjectWeatherCard
+                      projectId={project.id}
                       className="ml-4"
                     />
                   </div>
