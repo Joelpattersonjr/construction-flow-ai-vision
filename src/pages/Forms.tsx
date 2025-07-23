@@ -7,11 +7,13 @@ import { FormTemplatesList } from "@/components/forms/FormTemplatesList";
 import { FormBuilder } from "@/components/forms/FormBuilder";
 import { FormSubmissions } from "@/components/forms/FormSubmissions";
 import { WorkflowBuilder } from "@/components/forms/WorkflowBuilder";
+import { AIFormTemplateGenerator } from "@/components/forms/AIFormTemplateGenerator";
 
 const Forms: React.FC = () => {
   const [activeTab, setActiveTab] = useState("templates");
   const [showFormBuilder, setShowFormBuilder] = useState(false);
   const [editingFormId, setEditingFormId] = useState<string | null>(null);
+  const [showAIGenerator, setShowAIGenerator] = useState(false);
 
   const handleCreateNewForm = () => {
     setEditingFormId(null);
@@ -26,6 +28,12 @@ const Forms: React.FC = () => {
   const handleCloseBuilder = () => {
     setShowFormBuilder(false);
     setEditingFormId(null);
+  };
+
+  const handleAITemplateGenerated = (templateId: string) => {
+    setEditingFormId(templateId);
+    setShowFormBuilder(true);
+    setShowAIGenerator(false);
   };
 
   if (showFormBuilder) {
@@ -50,10 +58,23 @@ const Forms: React.FC = () => {
               Create, manage, and automate custom forms and workflows for your construction projects
             </p>
           </div>
-          <Button onClick={handleCreateNewForm} className="flex items-center gap-2">
-            <Plus className="h-4 w-4" />
-            Create Form
-          </Button>
+          <div className="flex items-center gap-3">
+            <Button 
+              onClick={() => setShowAIGenerator(true)} 
+              className="flex items-center gap-2 bg-gradient-to-r from-primary to-primary/80"
+            >
+              <Plus className="h-4 w-4" />
+              Generate with AI
+            </Button>
+            <Button 
+              onClick={handleCreateNewForm} 
+              variant="outline"
+              className="flex items-center gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              Create Form
+            </Button>
+          </div>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -89,6 +110,14 @@ const Forms: React.FC = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* AI Template Generator */}
+      {showAIGenerator && (
+        <AIFormTemplateGenerator
+          onTemplateGenerated={handleAITemplateGenerated}
+          onClose={() => setShowAIGenerator(false)}
+        />
+      )}
     </div>
   );
 };
