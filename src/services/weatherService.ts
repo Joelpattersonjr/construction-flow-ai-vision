@@ -43,9 +43,17 @@ export class WeatherService {
         .from('weather_cache')
         .select('*')
         .eq('project_id', projectId)
-        .single();
+        .order('last_updated', { ascending: false })
+        .limit(1)
+        .maybeSingle();
 
-      if (error || !data) {
+      if (error) {
+        console.error('Error querying cached weather:', error);
+        return null;
+      }
+
+      if (!data) {
+        console.log('No cached weather data found for project:', projectId);
         return null;
       }
 
