@@ -13,7 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Plus, Folder, Calendar, MapPin, FileText, Settings, ArrowLeft, Search, Filter, Users, Clock, AlertTriangle, CheckCircle, Upload, PlusCircle, Eye, Cloud, Sun, CloudRain, Bolt, Activity, TrendingUp } from 'lucide-react';
-import { EnhancedWeatherCard } from '@/components/weather/EnhancedWeatherCard';
+import { ProjectWeatherCard } from '@/components/projects/ProjectWeatherCard';
 import { useNavigate } from 'react-router-dom';
 import { ExportDialog } from '@/components/export/ExportDialog';
 import TeamCollaborationPanel from '@/components/projects/TeamCollaborationPanel';
@@ -765,12 +765,15 @@ const Projects: React.FC = () => {
                       </div>
                     )}
                     
-                    <EnhancedWeatherCard
-                      projectId={project.id}
-                      address={project.address}
-                      showHistorical={true}
-                      className="w-full"
-                    />
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <Cloud className="h-4 w-4" />
+                      <ProjectWeatherCard
+                        projectId={project.id}
+                        projectName={project.name}
+                        address={project.address}
+                        className=""
+                      />
+                    </div>
                   </div>
                 </CardHeader>
                 
