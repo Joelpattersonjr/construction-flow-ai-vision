@@ -31,6 +31,7 @@ import { FormFill } from "./pages/FormFill";
 import { ApprovalDashboard } from "./pages/ApprovalDashboard";
 import Profile from "./pages/Profile";
 import Subscription from "./pages/Subscription";
+import { AppLayout } from "@/components/layout/AppLayout";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentCancel from "./pages/PaymentCancel";
 import About from "./pages/About";
@@ -63,7 +64,9 @@ const App: React.FC = () => {
                     path="/dashboard" 
                     element={
                       <ProtectedRoute>
-                        <Index />
+                        <AppLayout>
+                          <Index />
+                        </AppLayout>
                       </ProtectedRoute>
                     } 
                   />
@@ -71,7 +74,9 @@ const App: React.FC = () => {
                     path="/admin" 
                     element={
                       <ProtectedRoute>
-                        <AdminDashboard />
+                        <AppLayout>
+                          <AdminDashboard />
+                        </AppLayout>
                       </ProtectedRoute>
                     } 
                   />
@@ -79,7 +84,9 @@ const App: React.FC = () => {
                     path="/projects" 
                     element={
                       <ProtectedRoute>
-                        <Projects />
+                        <AppLayout>
+                          <Projects />
+                        </AppLayout>
                       </ProtectedRoute>
                     } 
                   />
@@ -87,7 +94,9 @@ const App: React.FC = () => {
                     path="/projects/:projectId" 
                     element={
                       <ProtectedRoute>
-                        <ProjectDetails />
+                        <AppLayout>
+                          <ProjectDetails />
+                        </AppLayout>
                       </ProtectedRoute>
                     } 
                   />
@@ -95,7 +104,9 @@ const App: React.FC = () => {
                     path="/files" 
                     element={
                       <ProtectedRoute>
-                        <FileManagement />
+                        <AppLayout>
+                          <FileManagement />
+                        </AppLayout>
                       </ProtectedRoute>
                     } 
                   />
@@ -103,7 +114,9 @@ const App: React.FC = () => {
                     path="/tasks" 
                     element={
                       <ProtectedRoute>
-                        <Tasks />
+                        <AppLayout>
+                          <Tasks />
+                        </AppLayout>
                       </ProtectedRoute>
                     } 
                   />
@@ -111,7 +124,9 @@ const App: React.FC = () => {
                     path="/projects/:projectId/permissions" 
                     element={
                       <ProtectedRoute>
-                        <ProjectPermissions />
+                        <AppLayout>
+                          <ProjectPermissions />
+                        </AppLayout>
                       </ProtectedRoute>
                     } 
                   />
@@ -119,7 +134,9 @@ const App: React.FC = () => {
                     path="/calendar" 
                     element={
                       <ProtectedRoute>
-                        <Calendar />
+                        <AppLayout>
+                          <Calendar />
+                        </AppLayout>
                       </ProtectedRoute>
                     } 
                   />
@@ -127,7 +144,9 @@ const App: React.FC = () => {
                     path="/schedule-builder" 
                     element={
                       <ProtectedRoute>
-                        <ScheduleBuilder />
+                        <AppLayout>
+                          <ScheduleBuilder />
+                        </AppLayout>
                       </ProtectedRoute>
                     } 
                   />
@@ -135,7 +154,9 @@ const App: React.FC = () => {
                      path="/daily-reports" 
                      element={
                        <ProtectedRoute>
-                         <DailyReports />
+                         <AppLayout>
+                           <DailyReports />
+                         </AppLayout>
                        </ProtectedRoute>
                      } 
                    />
@@ -143,7 +164,9 @@ const App: React.FC = () => {
                      path="/forms" 
                      element={
                        <ProtectedRoute>
-                         <Forms />
+                         <AppLayout>
+                           <Forms />
+                         </AppLayout>
                        </ProtectedRoute>
                      } 
                    />
@@ -159,7 +182,9 @@ const App: React.FC = () => {
                      path="/approvals" 
                      element={
                        <ProtectedRoute>
-                         <ApprovalDashboard />
+                         <AppLayout>
+                           <ApprovalDashboard />
+                         </AppLayout>
                        </ProtectedRoute>
                      } 
                    />
@@ -167,7 +192,9 @@ const App: React.FC = () => {
                      path="/profile"
                     element={
                       <ProtectedRoute>
-                        <Profile />
+                        <AppLayout>
+                          <Profile />
+                        </AppLayout>
                       </ProtectedRoute>
                     } 
                   />
@@ -175,7 +202,19 @@ const App: React.FC = () => {
                     path="/subscription"
                     element={
                       <ProtectedRoute>
-                        <Subscription />
+                        <AppLayout>
+                          <Subscription />
+                        </AppLayout>
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/testing" 
+                    element={
+                      <ProtectedRoute>
+                        <AppLayout>
+                          <Testing />
+                        </AppLayout>
                       </ProtectedRoute>
                     } 
                   />
@@ -186,14 +225,6 @@ const App: React.FC = () => {
                 <Route path="/help" element={<Help />} />
                 <Route path="/getting-started" element={<GettingStarted />} />
                 <Route path="/documentation" element={<Documentation />} />
-                  <Route 
-                    path="/testing" 
-                    element={
-                      <ProtectedRoute>
-                        <Testing />
-                      </ProtectedRoute>
-                    } 
-                  />
                   <Route path="/success" element={<PaymentSuccess />} />
                   <Route path="/cancel" element={<PaymentCancel />} />
                   <Route path="/test" element={<div>TEST ROUTE WORKS</div>} />
