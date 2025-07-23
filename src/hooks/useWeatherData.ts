@@ -6,46 +6,49 @@ export const useWeatherData = (projectId: string, address?: string) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchWeather = async () => {
-      if (!projectId) {
-        setLoading(false);
-        return;
-      }
+  const fetchWeatherData = async (forceRefresh: boolean = false) => {
+    if (!projectId) {
+      setLoading(false);
+      return;
+    }
 
-      try {
-        setLoading(true);
-        setError(null);
+    try {
+      setLoading(true);
+      setError(null);
 
-        // First try to get cached data
-        let weather = await WeatherService.getCachedWeatherForProject(projectId);
+      if (address) {
+        // If we have an address, use the main service method
+        const result = await WeatherService.getWeatherForProject(projectId, address, forceRefresh);
         
-        // If no cached data or we have an address, fetch fresh data
-        if (!weather && address) {
-          const result = await WeatherService.getWeatherForProject(projectId, address);
-          
-          // Check if the result is an error response
-          if (result && 'error' in result) {
-            console.error('Weather service returned error:', result.error, result.message);
-            setError(result.message || 'Weather service error');
-            setWeatherData(null);
-            return;
-          }
-          
-          weather = result as WeatherData;
+        // Check if the result is an error response
+        if (result && 'error' in result) {
+          console.error('Weather service returned error:', result.error, result.message);
+          setError(result.message || 'Weather service error');
+          setWeatherData(null);
+          return;
         }
-
-        setWeatherData(weather);
-      } catch (err) {
-        console.error('Error fetching weather:', err);
-        setError('Failed to fetch weather data');
-      } finally {
-        setLoading(false);
+        
+        setWeatherData(result as WeatherData);
+      } else {
+        // If no address, just try to get cached data
+        const cachedWeather = await WeatherService.getCachedWeatherForProject(projectId);
+        setWeatherData(cachedWeather);
       }
-    };
+    } catch (err) {
+      console.error('Error fetching weather:', err);
+      setError('Failed to fetch weather data');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchWeather();
+  const refreshWeather = () => {
+    fetchWeatherData(true);
+  };
+
+  useEffect(() => {
+    fetchWeatherData();
   }, [projectId, address]);
 
-  return { weatherData, loading, error };
+  return { weatherData, loading, error, refreshWeather };
 };
