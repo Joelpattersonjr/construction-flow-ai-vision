@@ -739,33 +739,39 @@ const Projects: React.FC = () => {
             {filteredAndSortedProjects.map((project) => (
               <Card key={project.id} className="group hover:shadow-2xl transition-all duration-500 bg-white/80 backdrop-blur-sm border-white/40 hover:border-blue-200/60 hover:-translate-y-1">
                 <CardHeader className="pb-4">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <CardTitle className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
-                        {project.name}
-                      </CardTitle>
-                      <div className="flex items-center gap-2 mb-3">
-                        <Badge className={`${getStatusColor(project.status)} border px-2 py-1 text-xs font-medium flex items-center gap-1`}>
-                          {getStatusIcon(project.status)}
-                          {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
-                        </Badge>
-                        {project.project_number && (
-                          <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                            {project.project_number}
-                          </span>
-                        )}
+                  <div className="flex items-start justify-between mb-3">
+                    <CardTitle className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+                      {project.name}
+                    </CardTitle>
+                    {project.project_number && (
+                      <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                        {project.project_number}
+                      </span>
+                    )}
+                  </div>
+                  
+                  <div className="flex items-center gap-2 mb-3">
+                    <Badge className={`${getStatusColor(project.status)} border px-2 py-1 text-xs font-medium flex items-center gap-1`}>
+                      {getStatusIcon(project.status)}
+                      {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
+                    </Badge>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    {project.address && (
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <MapPin className="h-4 w-4" />
+                        <span className="truncate">{project.address}</span>
                       </div>
-                      {project.address && (
-                        <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
-                          <MapPin className="h-4 w-4" />
-                          <span className="truncate">{project.address}</span>
-                        </div>
-                      )}
+                    )}
+                    
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <Cloud className="h-4 w-4" />
+                      <ProjectWeatherCard
+                        projectId={project.id}
+                        className=""
+                      />
                     </div>
-                    <ProjectWeatherCard
-                      projectId={project.id}
-                      className="ml-4"
-                    />
                   </div>
                 </CardHeader>
                 
