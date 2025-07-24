@@ -14,12 +14,22 @@ import {
 } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, RefreshCw, X } from 'lucide-react';
-import { useWeatherData } from '@/hooks/useWeatherData';
+import { MapPin, RefreshCw, Download, Share2 } from 'lucide-react';
+import { useWeatherCache } from '@/hooks/useWeatherCache';
+import { useWeatherURL } from '@/hooks/useWeatherURL';
 import { WeatherService } from '@/services/weatherService';
 import { WeatherHistoryViewer } from './WeatherHistoryViewer';
 import { WeatherTrendsChart } from './WeatherTrendsChart';
-import { Skeleton } from '@/components/ui/skeleton';
+import { WeatherAlertBanner } from './WeatherAlertBanner';
+import { WeatherExportDialog } from './WeatherExportDialog';
+import { WeatherErrorBoundaryWrapper } from './WeatherErrorBoundary';
+import { WeatherCurrentSkeleton } from './WeatherLoadingStates';
+import { 
+  WeatherMobileContainer, 
+  WeatherMobileHeader, 
+  WeatherMobileContent,
+  WeatherMobileTabs 
+} from './WeatherMobileLayout';
 
 interface WeatherAnalyticsModalProps {
   projectId: string;
@@ -36,17 +46,15 @@ export const WeatherAnalyticsModal: React.FC<WeatherAnalyticsModalProps> = ({
   isOpen,
   onClose,
 }) => {
-  const [activeTab, setActiveTab] = useState('live');
-  const { weatherData, loading, error, refreshWeather } = useWeatherData(projectId, address);
+  const [isExportOpen, setIsExportOpen] = useState(false);
+  const { urlState, updateURL, generateShareableURL } = useWeatherURL();
+  const { weatherData, loading, error, refreshWeather, prefetchHistoricalData } = useWeatherCache(projectId, address);
+  
+  const activeTab = urlState.tab || 'live';
 
   const getCurrentWeatherContent = () => {
     if (loading) {
-      return (
-        <div className="space-y-4">
-          <Skeleton className="h-24 w-full" />
-          <Skeleton className="h-16 w-full" />
-        </div>
-      );
+      return <WeatherCurrentSkeleton />;
     }
 
     if (error || !weatherData) {
@@ -82,6 +90,9 @@ export const WeatherAnalyticsModal: React.FC<WeatherAnalyticsModalProps> = ({
 
     return (
       <div className="space-y-6">
+        {/* Weather Alerts */}
+        <WeatherAlertBanner projectId={projectId} />
+        
         {/* Current Weather Display */}
         <div className="bg-card rounded-lg border p-6">
           <div className="flex items-center justify-between mb-4">
@@ -139,44 +150,110 @@ export const WeatherAnalyticsModal: React.FC<WeatherAnalyticsModalProps> = ({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden flex flex-col">
-        <DialogHeader className="shrink-0">
-          <DialogTitle className="flex items-center gap-2 text-xl">
-            Weather Analytics - {projectName}
-          </DialogTitle>
-          {address && (
-            <DialogDescription className="flex items-center gap-2 text-sm">
-              <MapPin className="h-4 w-4" />
-              {address}
-            </DialogDescription>
-          )}
-        </DialogHeader>
+    <WeatherErrorBoundaryWrapper>
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden flex flex-col md:p-6 p-0">
+          <div className="hidden md:block">
+            <DialogHeader className="shrink-0">
+              <DialogTitle className="flex items-center justify-between text-xl">
+                <span>Weather Analytics - {projectName}</span>
+                <div className="flex items-center gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setIsExportOpen(true)}
+                  >
+                    <Download className="h-4 w-4 mr-2" />
+                    Export
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => navigator.clipboard.writeText(generateShareableURL(projectId))}
+                  >
+                    <Share2 className="h-4 w-4 mr-2" />
+                    Share
+                  </Button>
+                </div>
+              </DialogTitle>
+              {address && (
+                <DialogDescription className="flex items-center gap-2 text-sm">
+                  <MapPin className="h-4 w-4" />
+                  {address}
+                </DialogDescription>
+              )}
+            </DialogHeader>
+          </div>
 
-        <div className="flex-1 overflow-hidden">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
-            <TabsList className="grid w-full grid-cols-3 shrink-0">
-              <TabsTrigger value="live">Live Weather</TabsTrigger>
-              <TabsTrigger value="history">Historical Data</TabsTrigger>
-              <TabsTrigger value="trends">Trends & Analytics</TabsTrigger>
-            </TabsList>
+          {/* Mobile Layout */}
+          <div className="md:hidden h-full">
+            <WeatherMobileContainer>
+              <WeatherMobileHeader
+                title="Weather Analytics"
+                subtitle={projectName}
+                actions={
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => setIsExportOpen(true)}
+                  >
+                    <Download className="h-4 w-4" />
+                  </Button>
+                }
+              />
+              <WeatherMobileContent>
+                <div className="space-y-4">
+                  <WeatherAlertBanner projectId={projectId} />
+                  {activeTab === 'live' && getCurrentWeatherContent()}
+                  {activeTab === 'history' && <WeatherHistoryViewer projectId={projectId} />}
+                  {activeTab === 'trends' && <WeatherTrendsChart projectId={projectId} />}
+                </div>
+              </WeatherMobileContent>
+              <WeatherMobileTabs
+                activeTab={activeTab}
+                onTabChange={(tab) => updateURL({ tab: tab as any })}
+                tabs={[
+                  { key: 'live', label: 'Live' },
+                  { key: 'history', label: 'History' },
+                  { key: 'trends', label: 'Trends' }
+                ]}
+              />
+            </WeatherMobileContainer>
+          </div>
 
-            <div className="flex-1 overflow-auto pt-4">
-              <TabsContent value="live" className="mt-0 h-full">
-                {getCurrentWeatherContent()}
-              </TabsContent>
+          {/* Desktop Layout */}
+          <div className="hidden md:block flex-1 overflow-hidden">
+            <Tabs value={activeTab} onValueChange={(tab) => updateURL({ tab: tab as any })} className="h-full flex flex-col">
+              <TabsList className="grid w-full grid-cols-3 shrink-0">
+                <TabsTrigger value="live">Live Weather</TabsTrigger>
+                <TabsTrigger value="history">Historical Data</TabsTrigger>
+                <TabsTrigger value="trends">Trends & Analytics</TabsTrigger>
+              </TabsList>
 
-              <TabsContent value="history" className="mt-0 h-full">
-                <WeatherHistoryViewer projectId={projectId} />
-              </TabsContent>
+              <div className="flex-1 overflow-auto pt-4">
+                <TabsContent value="live" className="mt-0 h-full">
+                  {getCurrentWeatherContent()}
+                </TabsContent>
 
-              <TabsContent value="trends" className="mt-0 h-full">
-                <WeatherTrendsChart projectId={projectId} />
-              </TabsContent>
-            </div>
-          </Tabs>
-        </div>
-      </DialogContent>
-    </Dialog>
+                <TabsContent value="history" className="mt-0 h-full">
+                  <WeatherHistoryViewer projectId={projectId} />
+                </TabsContent>
+
+                <TabsContent value="trends" className="mt-0 h-full">
+                  <WeatherTrendsChart projectId={projectId} />
+                </TabsContent>
+              </div>
+            </Tabs>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <WeatherExportDialog 
+        isOpen={isExportOpen}
+        onClose={() => setIsExportOpen(false)}
+        weatherData={weatherData ? [weatherData] : []}
+        projectName={projectName}
+      />
+    </WeatherErrorBoundaryWrapper>
   );
 };
