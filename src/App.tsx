@@ -40,7 +40,7 @@ import Help from "./pages/Help";
 import Documentation from "./pages/Documentation";
 import GettingStarted from "./pages/GettingStarted";
 import Testing from "./pages/Testing";
-import WeatherAnalytics from "./pages/WeatherAnalytics";
+
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -215,16 +215,6 @@ const App: React.FC = () => {
                        <ProtectedRoute>
                          <AppLayout>
                            <Testing />
-                         </AppLayout>
-                       </ProtectedRoute>
-                     } 
-                   />
-                   <Route 
-                     path="/projects/:projectId/weather" 
-                     element={
-                       <ProtectedRoute>
-                         <AppLayout>
-                           <WeatherAnalytics />
                          </AppLayout>
                        </ProtectedRoute>
                      } 

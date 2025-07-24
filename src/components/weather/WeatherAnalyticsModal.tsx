@@ -89,34 +89,34 @@ export const WeatherAnalyticsModal: React.FC<WeatherAnalyticsModalProps> = ({
     }
 
     return (
-      <div className="space-y-6">
+      <div className="space-y-4">
         {/* Weather Alerts */}
         <WeatherAlertBanner projectId={projectId} />
         
         {/* Current Weather Display */}
-        <div className="bg-card rounded-lg border p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-4">
-              <div className="text-4xl">
+        <div className="bg-card rounded-lg border p-4">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-3">
+              <div className="text-2xl">
                 {WeatherService.getWeatherIcon(weatherData.condition)}
               </div>
               <div>
-                <div className="text-3xl font-bold">
+                <div className="text-2xl font-bold">
                   {WeatherService.formatTemperature(weatherData.temperature_current)}
                 </div>
-                <div className="text-lg text-muted-foreground capitalize">
+                <div className="text-sm text-muted-foreground capitalize">
                   {weatherData.condition}
                 </div>
               </div>
             </div>
-            <div className="text-right space-y-2">
+            <div className="text-right space-y-1">
               <Badge variant="outline" className="text-xs">
                 <div className={`w-2 h-2 rounded-full ${freshnessColor} mr-1`} />
                 {freshnessText}
               </Badge>
               {address && (
                 <Button onClick={() => refreshWeather(true)} variant="outline" size="sm">
-                  <RefreshCw className="h-4 w-4 mr-2" />
+                  <RefreshCw className="h-3 w-3 mr-1" />
                   Refresh
                 </Button>
               )}
@@ -124,24 +124,24 @@ export const WeatherAnalyticsModal: React.FC<WeatherAnalyticsModalProps> = ({
           </div>
 
           {/* Weather Details Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-muted/50 rounded-lg p-3">
-              <div className="text-sm text-muted-foreground">Humidity</div>
-              <div className="text-xl font-semibold">{weatherData.humidity}%</div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+            <div className="bg-muted/50 rounded p-2">
+              <div className="text-xs text-muted-foreground">Humidity</div>
+              <div className="text-lg font-semibold">{weatherData.humidity}%</div>
             </div>
-            <div className="bg-muted/50 rounded-lg p-3">
-              <div className="text-sm text-muted-foreground">Wind Speed</div>
-              <div className="text-xl font-semibold">{weatherData.wind_speed} mph</div>
+            <div className="bg-muted/50 rounded p-2">
+              <div className="text-xs text-muted-foreground">Wind Speed</div>
+              <div className="text-lg font-semibold">{weatherData.wind_speed} mph</div>
             </div>
-            <div className="bg-muted/50 rounded-lg p-3">
-              <div className="text-sm text-muted-foreground">Feels Like</div>
-              <div className="text-xl font-semibold">
+            <div className="bg-muted/50 rounded p-2">
+              <div className="text-xs text-muted-foreground">Feels Like</div>
+              <div className="text-lg font-semibold">
                 {WeatherService.formatTemperature(weatherData.temperature_current + 2)}
               </div>
             </div>
-            <div className="bg-muted/50 rounded-lg p-3">
-              <div className="text-sm text-muted-foreground">Visibility</div>
-              <div className="text-xl font-semibold">10 mi</div>
+            <div className="bg-muted/50 rounded p-2">
+              <div className="text-xs text-muted-foreground">Visibility</div>
+              <div className="text-lg font-semibold">10 mi</div>
             </div>
           </div>
         </div>
@@ -152,20 +152,12 @@ export const WeatherAnalyticsModal: React.FC<WeatherAnalyticsModalProps> = ({
   return (
     <WeatherErrorBoundaryWrapper>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden flex flex-col md:p-6 p-0">
+        <DialogContent className="max-w-4xl max-h-[85vh] overflow-hidden flex flex-col md:p-4 p-0">
           <div className="hidden md:block">
             <DialogHeader className="shrink-0">
               <DialogTitle className="flex items-center justify-between text-xl">
                 <span>Weather Analytics - {projectName}</span>
                 <div className="flex items-center gap-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => window.open(`/projects/${projectId}/weather?tab=${activeTab}`, '_blank')}
-                  >
-                    <ExternalLink className="h-4 w-4 mr-2" />
-                    Full Page
-                  </Button>
                   <Button 
                     variant="outline" 
                     size="sm"
