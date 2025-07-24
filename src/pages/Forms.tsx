@@ -51,20 +51,20 @@ const Forms: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Back Button */}
-      <div className="absolute top-4 left-4 z-10">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => navigate(-1)}
-          className="flex items-center space-x-2"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          <span className="hidden sm:inline">Back</span>
-        </Button>
-      </div>
-      
       <div className="p-6 space-y-6">
+        {/* Back Button */}
+        <div className="mb-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate(-1)}
+            className="flex items-center space-x-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            <span className="hidden sm:inline">Back</span>
+          </Button>
+        </div>
+        
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold">Dynamic Forms</h1>
