@@ -64,7 +64,7 @@ export const WeatherAnalyticsModal: React.FC<WeatherAnalyticsModalProps> = ({
             {error || 'Weather data unavailable'}
           </p>
           {address && (
-            <Button onClick={refreshWeather} variant="outline" size="sm">
+            <Button onClick={() => refreshWeather(true)} variant="outline" size="sm">
               <RefreshCw className="h-4 w-4 mr-2" />
               Retry
             </Button>
@@ -115,7 +115,7 @@ export const WeatherAnalyticsModal: React.FC<WeatherAnalyticsModalProps> = ({
                 {freshnessText}
               </Badge>
               {address && (
-                <Button onClick={refreshWeather} variant="outline" size="sm">
+                <Button onClick={() => refreshWeather(true)} variant="outline" size="sm">
                   <RefreshCw className="h-4 w-4 mr-2" />
                   Refresh
                 </Button>
