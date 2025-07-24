@@ -222,7 +222,7 @@ export const WeatherAnalyticsModal: React.FC<WeatherAnalyticsModalProps> = ({
           </div>
 
           {/* Desktop Layout */}
-          <div className="hidden md:block flex-1 overflow-hidden">
+          <div className="hidden md:block flex-1 min-h-0">
             <Tabs value={activeTab} onValueChange={(tab) => updateURL({ tab: tab as any })} className="h-full flex flex-col">
               <TabsList className="grid w-full grid-cols-3 shrink-0">
                 <TabsTrigger value="live">Live Weather</TabsTrigger>
@@ -230,16 +230,16 @@ export const WeatherAnalyticsModal: React.FC<WeatherAnalyticsModalProps> = ({
                 <TabsTrigger value="trends">Trends & Analytics</TabsTrigger>
               </TabsList>
 
-              <div className="flex-1 overflow-hidden pt-4">
-                <TabsContent value="live" className="mt-0 h-full overflow-auto">
+              <div className="flex-1 min-h-0 pt-4">
+                <TabsContent value="live" className="mt-0 h-full overflow-auto scroll-smooth p-1">
                   {getCurrentWeatherContent()}
                 </TabsContent>
 
-                <TabsContent value="history" className="mt-0 h-full overflow-auto">
+                <TabsContent value="history" className="mt-0 h-full overflow-auto scroll-smooth p-1">
                   <WeatherHistoryViewer projectId={projectId} />
                 </TabsContent>
 
-                <TabsContent value="trends" className="mt-0 h-full overflow-auto">
+                <TabsContent value="trends" className="mt-0 h-full overflow-auto scroll-smooth p-1">
                   <WeatherTrendsChart projectId={projectId} />
                 </TabsContent>
               </div>
