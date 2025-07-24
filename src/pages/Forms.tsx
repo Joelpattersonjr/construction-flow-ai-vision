@@ -58,7 +58,7 @@ const Forms: React.FC = () => {
             variant="ghost"
             size="sm"
             onClick={() => navigate(-1)}
-            className="flex items-center space-x-2"
+            className="flex items-center space-x-2 shadow-lg hover:shadow-xl transition-shadow duration-300"
           >
             <ArrowLeft className="h-4 w-4" />
             <span className="hidden sm:inline">Back</span>
