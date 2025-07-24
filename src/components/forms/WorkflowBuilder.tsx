@@ -135,6 +135,17 @@ export const WorkflowBuilder: React.FC = () => {
   }
 
   return (
+    <>
+      {/* TEST BUTTON TO ISOLATE ISSUE */}
+      <button
+        className="bg-red-500 text-white px-4 py-2 rounded mb-4"
+        onClick={() => {
+          console.log('🔍 EXTERNAL TEST BUTTON CLICKED!');
+          alert('External test button works!');
+        }}
+      >
+        TEST BUTTON (External)
+      </button>
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
@@ -376,5 +387,6 @@ export const WorkflowBuilder: React.FC = () => {
         workflow={previewWorkflow}
       />
     </div>
+    </>
   );
 };
