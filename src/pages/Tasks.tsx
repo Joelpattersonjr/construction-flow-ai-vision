@@ -516,7 +516,7 @@ const Tasks = () => {
             </div>
             
             <div className="space-y-4">
-              <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-slate-800 via-blue-700 to-indigo-700 bg-clip-text text-transparent">
+              <h1 className="text-5xl md:text-6xl font-bold text-foreground">
                 Tasks
               </h1>
               <p className="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
