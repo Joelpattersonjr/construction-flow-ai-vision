@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import DOMPurify from 'dompurify';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -350,7 +351,12 @@ const GettingStarted = () => {
         <CardContent className="p-8">
           <div 
             className="prose prose-gray max-w-none"
-            dangerouslySetInnerHTML={{ __html: article.content }}
+            dangerouslySetInnerHTML={{ 
+              __html: DOMPurify.sanitize(article.content, {
+                ALLOWED_TAGS: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'ul', 'ol', 'li', 'strong', 'em', 'br'],
+                ALLOWED_ATTR: []
+              })
+            }}
           />
         </CardContent>
       </Card>

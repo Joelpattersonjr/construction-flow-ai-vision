@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { create, all } from 'mathjs';
 import { useForm, Controller } from 'react-hook-form';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -94,15 +95,42 @@ export const FormRenderer: React.FC<FormRendererProps> = ({
     if (!field.calculation) return undefined;
 
     try {
-      let formula = field.calculation.formula;
-      field.calculation.fields.forEach(fieldId => {
-        const value = Number(watchedValues[fieldId]) || 0;
-        formula = formula.replace(`{${fieldId}}`, value.toString());
+      // Create a safe math evaluator instance
+      const math = create(all, {
+        number: 'BigNumber',
+        precision: 20
       });
 
-      // Simple formula evaluation (for basic math operations)
-      const result = eval(formula);
-      return isNaN(result) ? 0 : result;
+      // Restrict to safe operations only
+      math.import({
+        'import':     function () { throw new Error('Function import is disabled') },
+        'createUnit': function () { throw new Error('Function createUnit is disabled') },
+        'evaluate':   function () { throw new Error('Function evaluate is disabled') },
+        'parse':      function () { throw new Error('Function parse is disabled') },
+        'simplify':   function () { throw new Error('Function simplify is disabled') },
+        'derivative': function () { throw new Error('Function derivative is disabled') }
+      }, { override: true });
+
+      let formula = field.calculation.formula;
+      
+      // Validate that the formula only contains safe characters
+      const safePattern = /^[0-9+\-*/().\s{}a-zA-Z_]+$/;
+      if (!safePattern.test(formula)) {
+        console.error('Formula contains unsafe characters:', formula);
+        return 0;
+      }
+
+      // Replace field references with actual values
+      field.calculation.fields.forEach(fieldId => {
+        const value = Number(watchedValues[fieldId]) || 0;
+        // Use a more specific replacement pattern to avoid partial matches
+        const fieldPattern = new RegExp(`\\{${fieldId}\\}`, 'g');
+        formula = formula.replace(fieldPattern, value.toString());
+      });
+
+      // Evaluate using mathjs (safe math expression evaluator)
+      const result = math.evaluate(formula);
+      return isNaN(Number(result)) ? 0 : Number(result);
     } catch (error) {
       console.error('Formula calculation error:', error);
       return 0;
