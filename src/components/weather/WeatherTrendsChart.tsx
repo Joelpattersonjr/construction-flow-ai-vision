@@ -79,119 +79,148 @@ export const WeatherTrendsChart: React.FC<WeatherTrendsChartProps> = ({
   const avgTemperature = getAverageTemperature();
 
   return (
-    <Card className={className}>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <BarChart3 className="h-5 w-5" />
+    <div className={className}>
+      {/* Compact Header */}
+      <div className="mb-3">
+        <h3 className="text-sm font-medium mb-2 flex items-center gap-1">
+          <BarChart3 className="h-3 w-3" />
           Weather Trends
-        </CardTitle>
-        <div className="flex items-center gap-2">
+        </h3>
+        <div className="flex items-center gap-1">
           <Select value={selectedDays.toString()} onValueChange={(value) => setSelectedDays(parseInt(value))}>
-            <SelectTrigger className="w-32">
+            <SelectTrigger className="w-20 h-7 text-xs">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="7">7 days</SelectItem>
-              <SelectItem value="14">14 days</SelectItem>
-              <SelectItem value="30">30 days</SelectItem>
+              <SelectItem value="7">7d</SelectItem>
+              <SelectItem value="14">14d</SelectItem>
+              <SelectItem value="30">30d</SelectItem>
             </SelectContent>
           </Select>
-          <Button onClick={fetchTrendsData} disabled={loading} variant="outline">
+          <Button onClick={fetchTrendsData} disabled={loading} variant="outline" size="sm" className="text-xs h-7 px-2">
             {loading ? 'Loading...' : 'Refresh'}
           </Button>
         </div>
-      </CardHeader>
-      <CardContent>
-        {loading && (
-          <div className="text-center py-8 text-muted-foreground">
-            Loading weather trends...
+      </div>
+
+      {/* Content */}
+      {loading && (
+        <div className="text-center py-4 text-sm text-muted-foreground">
+          Loading trends...
+        </div>
+      )}
+      
+      {!loading && chartData.length === 0 && (
+        <div className="text-center py-4 text-sm text-muted-foreground">
+          No data available for trends.
+        </div>
+      )}
+
+      {!loading && chartData.length > 0 && (
+        <div className="space-y-3 max-h-80 overflow-y-auto">
+          {/* Compact Summary Stats */}
+          <div className="grid grid-cols-3 gap-2 text-xs">
+            <div className="text-center p-2 bg-muted/50 rounded">
+              <div className="text-sm font-bold">{avgTemperature}°F</div>
+              <div className="text-muted-foreground">Avg Temp</div>
+            </div>
+            <div className="text-center p-2 bg-muted/50 rounded">
+              <div className="text-sm font-bold capitalize">{temperatureTrend}</div>
+              <div className="text-muted-foreground">Trend</div>
+            </div>
+            <div className="text-center p-2 bg-muted/50 rounded">
+              <div className="text-sm font-bold">{chartData.length}</div>
+              <div className="text-muted-foreground">Points</div>
+            </div>
           </div>
-        )}
-        
-        {!loading && chartData.length === 0 && (
-          <div className="text-center py-8 text-muted-foreground">
-            No weather data available for trends analysis.
+
+          {/* Compact Temperature Chart */}
+          <div className="h-32">
+            <h4 className="text-xs font-medium mb-1 text-muted-foreground">Temperature</h4>
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={chartData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted))" />
+                <XAxis 
+                  dataKey="date" 
+                  tick={{ fontSize: 10 }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis 
+                  tick={{ fontSize: 10 }}
+                  axisLine={false}
+                  tickLine={false}
+                  width={25}
+                />
+                <Tooltip 
+                  contentStyle={{ 
+                    fontSize: '11px',
+                    padding: '4px 6px',
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '4px'
+                  }}
+                  formatter={(value) => [`${value}°F`, 'Temp']}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="temperature" 
+                  stroke="hsl(var(--primary))" 
+                  strokeWidth={1.5}
+                  dot={false}
+                />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
-        )}
 
-        {!loading && chartData.length > 0 && (
-          <>
-            {/* Summary Stats */}
-            <div className="grid grid-cols-3 gap-4 mb-6">
-              <div className="text-center p-3 bg-muted rounded-lg">
-                <div className="text-2xl font-bold">{avgTemperature}°F</div>
-                <div className="text-sm text-muted-foreground">Average Temp</div>
-              </div>
-              <div className="text-center p-3 bg-muted rounded-lg">
-                <div className="text-2xl font-bold capitalize">{temperatureTrend}</div>
-                <div className="text-sm text-muted-foreground">Trend</div>
-              </div>
-              <div className="text-center p-3 bg-muted rounded-lg">
-                <div className="text-2xl font-bold">{chartData.length}</div>
-                <div className="text-sm text-muted-foreground">Data Points</div>
-              </div>
-            </div>
-
-            {/* Temperature Chart */}
-            <div className="h-64 mb-6">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
-                  <YAxis />
-                  <Tooltip 
-                    formatter={(value, name) => [
-                      name === 'temperature' ? `${value}°F` : value,
-                      name === 'temperature' ? 'Temperature' : 
-                      name === 'humidity' ? 'Humidity' : 'Wind Speed'
-                    ]}
-                  />
-                  <Legend />
-                  <Line 
-                    type="monotone" 
-                    dataKey="temperature" 
-                    stroke="hsl(var(--primary))" 
-                    strokeWidth={2}
-                    name="Temperature (°F)"
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-
-            {/* Humidity & Wind Chart */}
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
-                  <YAxis />
-                  <Tooltip 
-                    formatter={(value, name) => [
-                      name === 'humidity' ? `${value}%` : `${value} mph`,
-                      name === 'humidity' ? 'Humidity' : 'Wind Speed'
-                    ]}
-                  />
-                  <Legend />
-                  <Line 
-                    type="monotone" 
-                    dataKey="humidity" 
-                    stroke="hsl(var(--chart-2))" 
-                    strokeWidth={2}
-                    name="Humidity (%)"
-                  />
-                  <Line 
-                    type="monotone" 
-                    dataKey="windSpeed" 
-                    stroke="hsl(var(--chart-3))" 
-                    strokeWidth={2}
-                    name="Wind Speed (mph)"
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </>
-        )}
-      </CardContent>
-    </Card>
+          {/* Compact Humidity & Wind Chart */}
+          <div className="h-32">
+            <h4 className="text-xs font-medium mb-1 text-muted-foreground">Humidity & Wind</h4>
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={chartData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted))" />
+                <XAxis 
+                  dataKey="date" 
+                  tick={{ fontSize: 10 }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis 
+                  tick={{ fontSize: 10 }}
+                  axisLine={false}
+                  tickLine={false}
+                  width={25}
+                />
+                <Tooltip 
+                  contentStyle={{ 
+                    fontSize: '11px',
+                    padding: '4px 6px',
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '4px'
+                  }}
+                  formatter={(value, name) => [
+                    name === 'humidity' ? `${value}%` : `${value}mph`,
+                    name === 'humidity' ? 'Humidity' : 'Wind'
+                  ]}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="humidity" 
+                  stroke="hsl(var(--chart-2))" 
+                  strokeWidth={1.5}
+                  dot={false}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="windSpeed" 
+                  stroke="hsl(var(--chart-3))" 
+                  strokeWidth={1.5}
+                  dot={false}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
