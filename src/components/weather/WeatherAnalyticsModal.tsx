@@ -230,16 +230,16 @@ export const WeatherAnalyticsModal: React.FC<WeatherAnalyticsModalProps> = ({
                 <TabsTrigger value="trends">Trends & Analytics</TabsTrigger>
               </TabsList>
 
-              <div className="flex-1 overflow-auto pt-4">
-                <TabsContent value="live" className="mt-0 h-full">
+              <div className="flex-1 overflow-hidden pt-4">
+                <TabsContent value="live" className="mt-0 h-full overflow-auto">
                   {getCurrentWeatherContent()}
                 </TabsContent>
 
-                <TabsContent value="history" className="mt-0 h-full">
+                <TabsContent value="history" className="mt-0 h-full overflow-auto">
                   <WeatherHistoryViewer projectId={projectId} />
                 </TabsContent>
 
-                <TabsContent value="trends" className="mt-0 h-full">
+                <TabsContent value="trends" className="mt-0 h-full overflow-auto">
                   <WeatherTrendsChart projectId={projectId} />
                 </TabsContent>
               </div>
