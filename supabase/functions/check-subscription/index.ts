@@ -196,8 +196,9 @@ serve(async (req) => {
       const features = {
         version_control: hasActiveSub,
         collaboration: hasActiveSub,
-        advanced_analytics: hasActiveSub,
-        time_tracking: subscriptionTier === 'enterprise',
+        advanced_analytics: subscriptionTier === 'pro' || subscriptionTier === 'enterprise',
+        time_tracking: subscriptionTier === 'pro' || subscriptionTier === 'enterprise',
+        scheduling: subscriptionTier === 'pro' || subscriptionTier === 'enterprise',
       };
 
       await supabaseClient
