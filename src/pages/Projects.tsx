@@ -441,7 +441,7 @@ const Projects: React.FC = () => {
         <MobileHeader 
           title="Projects"
           showBack={true}
-          onBack={() => navigate('/dashboard')}
+          onBack={() => navigate(-1)}
         />
         
         <main className="px-4 py-6 pb-20 space-y-6">
@@ -532,11 +532,11 @@ const Projects: React.FC = () => {
         <div className="mb-6">
           <Button 
             variant="outline"
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate(-1)}
             className="flex items-center gap-2"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back to Dashboard
+            Back
           </Button>
         </div>
 
