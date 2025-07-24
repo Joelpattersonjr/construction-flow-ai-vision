@@ -503,7 +503,7 @@ const Tasks = () => {
                   window.history.back();
                 }
               }}
-              className="flex items-center space-x-2 bg-white/30 backdrop-blur-sm hover:bg-white/50 transition-all duration-300 border border-white/20 text-slate-700"
+              className="flex items-center space-x-2 bg-white/30 backdrop-blur-sm hover:bg-white/50 transition-all duration-300 border border-white/20 text-slate-700 shadow-lg hover:shadow-xl"
             >
               <ArrowLeft className="h-4 w-4" />
               <span className="hidden sm:inline">Back</span>
