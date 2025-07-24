@@ -132,11 +132,11 @@ const AdminDashboard = () => {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => navigate('/dashboard')}
+                onClick={() => navigate(-1)}
                 className="flex items-center space-x-2 bg-white/30 backdrop-blur-sm hover:bg-white/50 transition-all duration-300 border border-white/20 text-slate-700"
               >
                 <ArrowLeft className="h-4 w-4" />
-                <span>Back to Dashboard</span>
+                <span>Back</span>
               </Button>
               <div className="flex items-center space-x-3">
                 <div className="p-2 bg-gradient-to-br from-primary/10 to-blue-600/10 rounded-lg">
