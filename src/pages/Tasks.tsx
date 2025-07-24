@@ -579,7 +579,7 @@ const Tasks = () => {
         />
 
         {/* Quick Filters */}
-        <Card className="mb-6 bg-white/70 backdrop-blur-xl border border-white/20 shadow-xl">
+        <Card className="mb-6 bg-white/70 backdrop-blur-xl border border-white/20">
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle>Filters</CardTitle>
