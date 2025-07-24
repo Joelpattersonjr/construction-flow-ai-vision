@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { VisualWorkflowBuilder } from './VisualWorkflowBuilder';
 import { AIWorkflowGenerator } from './AIWorkflowGenerator';
 import { FormTemplateSelector } from './FormTemplateSelector';
+import { WorkflowPreviewDialog } from './WorkflowPreviewDialog';
 
 interface WorkflowTemplate {
   id: string;
@@ -36,6 +37,8 @@ export const WorkflowBuilder: React.FC = () => {
   const [showAIGenerator, setShowAIGenerator] = useState(false);
   const [showTemplateSelector, setShowTemplateSelector] = useState(false);
   const [selectedFormTemplate, setSelectedFormTemplate] = useState<{ id: string; name: string } | null>(null);
+  const [showPreviewDialog, setShowPreviewDialog] = useState(false);
+  const [previewWorkflow, setPreviewWorkflow] = useState<any>(null);
 
   // Fetch available form templates
   const { data: formTemplates } = useQuery({
@@ -229,8 +232,8 @@ export const WorkflowBuilder: React.FC = () => {
                     variant="outline"
                     size="sm"
                     onClick={() => {
-                      // TODO: Implement workflow preview
-                      toast.info('Workflow preview coming soon');
+                      setPreviewWorkflow(workflow);
+                      setShowPreviewDialog(true);
                     }}
                   >
                     <Eye className="h-4 w-4" />
@@ -354,6 +357,16 @@ export const WorkflowBuilder: React.FC = () => {
           setSelectedFormTemplate(template);
           setShowAIGenerator(true);
         }}
+      />
+
+      {/* Workflow Preview Dialog */}
+      <WorkflowPreviewDialog
+        isOpen={showPreviewDialog}
+        onClose={() => {
+          setShowPreviewDialog(false);
+          setPreviewWorkflow(null);
+        }}
+        workflow={previewWorkflow}
       />
     </div>
   );
