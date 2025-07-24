@@ -231,7 +231,11 @@ export const WorkflowBuilder: React.FC = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => {
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      console.log('Preview clicked, workflow data:', workflow);
                       setPreviewWorkflow(workflow);
                       setShowPreviewDialog(true);
                     }}

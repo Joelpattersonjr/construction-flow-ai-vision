@@ -84,12 +84,19 @@ export const WorkflowPreviewDialog: React.FC<WorkflowPreviewDialogProps> = ({
   onClose,
   workflow,
 }) => {
-  if (!workflow) return null;
+  console.log('WorkflowPreviewDialog rendered with:', { isOpen, workflow });
+  
+  if (!workflow) {
+    console.log('No workflow provided, returning null');
+    return null;
+  }
 
   // Add safety checks for workflow properties
   const workflowSteps = workflow.workflow_steps || [];
   const workflowConnections = workflow.workflow_connections || [];
   const sortedSteps = [...workflowSteps].sort((a, b) => a.order - b.order);
+  
+  console.log('Workflow data:', { workflowSteps, workflowConnections, sortedSteps });
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
