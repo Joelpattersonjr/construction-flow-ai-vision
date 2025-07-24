@@ -5,19 +5,21 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 industrial-shadow",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground hover:brightness-90 transition-all",
+        default: "bg-primary text-primary-foreground hover:bg-primary hover:brightness-110 transition-all font-medium tracking-wide",
         destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive hover:text-destructive-foreground hover:brightness-90 transition-all",
+          "bg-destructive text-destructive-foreground hover:brightness-110 transition-all safety-stripe font-medium",
         outline:
-          "border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-all",
+          "border-2 border-construction-steel bg-background text-construction-steel hover:bg-construction-steel hover:text-white transition-all font-medium",
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary hover:text-secondary-foreground hover:brightness-90 transition-all",
+          "bg-secondary text-secondary-foreground hover:brightness-110 transition-all font-medium",
         ghost: "hover:bg-accent hover:text-accent-foreground transition-all",
         link: "text-primary underline-offset-4 hover:underline hover:text-primary transition-all",
+        construction: "steel-gradient text-white hover:brightness-110 transition-all font-medium tracking-wide",
+        safety: "bg-construction-safety text-foreground hover:brightness-110 transition-all font-bold border-2 border-destructive",
       },
       size: {
         default: "h-10 px-4 py-2",

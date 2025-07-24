@@ -18,6 +18,11 @@ export default {
 			}
 		},
 		extend: {
+			fontFamily: {
+				'sans': ['Inter', 'system-ui', 'sans-serif'],
+				'header': ['Roboto Condensed', 'Arial', 'sans-serif'],
+				'mono': ['Roboto Mono', 'monospace'],
+			},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
@@ -61,6 +66,14 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				construction: {
+					concrete: 'hsl(var(--construction-concrete))',
+					steel: 'hsl(var(--construction-steel))',
+					earth: 'hsl(var(--construction-earth))',
+					safety: 'hsl(var(--construction-safety))',
+					success: 'hsl(var(--construction-success))',
+					texture: 'hsl(var(--construction-texture))'
 				}
 			},
 			borderRadius: {

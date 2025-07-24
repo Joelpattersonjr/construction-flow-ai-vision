@@ -14,12 +14,12 @@ const AppHeader: React.FC = () => {
   };
 
   return (
-    <header className="bg-white shadow-sm border-b">
+    <header className="bg-background border-b border-border construction-texture">
       <div className="flex items-center justify-between h-16 px-4 lg:px-6">
         <div className="flex items-center space-x-4">
           <SidebarTrigger />
           <h1 
-            className="text-xl font-semibold text-gray-900 cursor-pointer"
+            className="text-xl font-header font-bold text-foreground cursor-pointer tracking-tight"
             onClick={handleLogoClick}
           >
             ConexusPM
