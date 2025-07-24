@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { CheckCircle, XCircle, Clock, Eye, Calendar, User, FileText } from "lucide-react";
+import { CheckCircle, XCircle, Clock, Eye, Calendar, User, FileText, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 
@@ -44,6 +45,7 @@ interface WorkflowApproval {
 }
 
 export const ApprovalDashboard: React.FC = () => {
+  const navigate = useNavigate();
   const [approvals, setApprovals] = useState<WorkflowApproval[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedApproval, setSelectedApproval] = useState<WorkflowApproval | null>(null);
@@ -170,6 +172,16 @@ export const ApprovalDashboard: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-8 animate-fade-in">
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => navigate(-1)}
+        className="flex items-center gap-2 mb-4"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Back
+      </Button>
+      
       <div className="flex items-center gap-3 mb-8">
         <CheckCircle className="h-8 w-8 text-primary" />
         <div>
