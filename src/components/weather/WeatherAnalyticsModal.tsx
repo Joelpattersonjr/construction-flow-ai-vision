@@ -155,8 +155,16 @@ export const WeatherAnalyticsModal: React.FC<WeatherAnalyticsModalProps> = ({
         <DialogContent className="max-w-4xl max-h-[85vh] overflow-hidden flex flex-col md:p-4 p-0">
           <div className="hidden md:block">
             <DialogHeader className="shrink-0">
-              <DialogTitle className="flex items-center justify-between text-xl">
-                <span>Weather Analytics - {projectName}</span>
+              <DialogTitle className="text-xl">
+                Weather Analytics - {projectName}
+              </DialogTitle>
+              <div className="flex items-center justify-between">
+                {address && (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <MapPin className="h-4 w-4" />
+                    {address}
+                  </div>
+                )}
                 <div className="flex items-center gap-2">
                   <Button 
                     variant="outline" 
@@ -175,13 +183,7 @@ export const WeatherAnalyticsModal: React.FC<WeatherAnalyticsModalProps> = ({
                     Share
                   </Button>
                 </div>
-              </DialogTitle>
-              {address && (
-                <DialogDescription className="flex items-center gap-2 text-sm">
-                  <MapPin className="h-4 w-4" />
-                  {address}
-                </DialogDescription>
-              )}
+              </div>
             </DialogHeader>
           </div>
 
