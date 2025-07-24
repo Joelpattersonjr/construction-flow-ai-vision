@@ -152,7 +152,7 @@ export const WeatherAnalyticsModal: React.FC<WeatherAnalyticsModalProps> = ({
   return (
     <WeatherErrorBoundaryWrapper>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden flex flex-col md:p-6 p-0">
+        <DialogContent className="max-w-6xl max-h-[90vh] flex flex-col md:p-6 p-0">
           <div className="hidden md:block">
             <DialogHeader className="shrink-0">
               <DialogTitle className="flex items-center justify-between text-xl">
