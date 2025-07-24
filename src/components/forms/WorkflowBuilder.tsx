@@ -232,17 +232,10 @@ export const WorkflowBuilder: React.FC = () => {
                     variant="outline"
                     size="sm"
                     type="button"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      console.log('Preview clicked, workflow data:', workflow);
-                      console.log('Setting preview workflow and opening dialog');
+                    onClick={() => {
+                      console.log('🔍 PREVIEW BUTTON CLICKED!', workflow);
                       setPreviewWorkflow(workflow);
                       setShowPreviewDialog(true);
-                    }}
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      console.log('Preview button mouse down');
                     }}
                   >
                     <Eye className="h-4 w-4" />
