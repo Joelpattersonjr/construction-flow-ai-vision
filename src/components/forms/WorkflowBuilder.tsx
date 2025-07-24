@@ -229,10 +229,14 @@ export const WorkflowBuilder: React.FC = () => {
                     Edit
                   </Button>
                   <button
-                    className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3"
+                    className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3 relative z-50"
+                    style={{ position: 'relative', zIndex: 9999 }}
                     type="button"
+                    onMouseDown={() => console.log('🔍 MOUSEDOWN detected!')}
+                    onMouseUp={() => console.log('🔍 MOUSEUP detected!')}
                     onClick={(e) => {
                       console.log('🔍 RAW BUTTON CLICKED!', e);
+                      alert('BUTTON CLICKED! Check console for details.');
                       e.preventDefault();
                       e.stopPropagation();
                       setPreviewWorkflow(workflow);
