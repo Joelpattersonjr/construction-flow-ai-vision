@@ -440,6 +440,8 @@ const Projects: React.FC = () => {
       <div className="min-h-screen bg-background">
         <MobileHeader 
           title="Projects"
+          showBack={true}
+          onBack={() => navigate('/dashboard')}
         />
         
         <main className="px-4 py-6 pb-20 space-y-6">
@@ -526,6 +528,18 @@ const Projects: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20 relative overflow-hidden">
       
       <main className="container mx-auto py-8 px-4 relative z-10">
+        {/* Back Button */}
+        <div className="mb-6">
+          <Button 
+            variant="outline"
+            onClick={() => navigate('/dashboard')}
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Dashboard
+          </Button>
+        </div>
+
         {/* Hero Section */}
         <div className="text-center mb-12">
           <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-lg">
