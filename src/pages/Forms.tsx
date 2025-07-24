@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, ArrowLeft } from "lucide-react";
 
 import { FormTemplatesList } from "@/components/forms/FormTemplatesList";
 import { FormBuilder } from "@/components/forms/FormBuilder";
@@ -10,6 +11,7 @@ import { WorkflowBuilder } from "@/components/forms/WorkflowBuilder";
 import { AIFormTemplateGenerator } from "@/components/forms/AIFormTemplateGenerator";
 
 const Forms: React.FC = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("templates");
   const [showFormBuilder, setShowFormBuilder] = useState(false);
   const [editingFormId, setEditingFormId] = useState<string | null>(null);
@@ -49,6 +51,18 @@ const Forms: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Back Button */}
+      <div className="absolute top-4 left-4 z-10">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => navigate(-1)}
+          className="flex items-center space-x-2"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          <span className="hidden sm:inline">Back</span>
+        </Button>
+      </div>
       
       <div className="p-6 space-y-6">
         <div className="flex items-center justify-between">
