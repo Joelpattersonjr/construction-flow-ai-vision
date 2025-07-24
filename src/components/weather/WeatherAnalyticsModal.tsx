@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, RefreshCw, Download, Share2 } from 'lucide-react';
+import { MapPin, RefreshCw, Download, Share2, ExternalLink } from 'lucide-react';
 import { useWeatherCache } from '@/hooks/useWeatherCache';
 import { useWeatherURL } from '@/hooks/useWeatherURL';
 import { WeatherService } from '@/services/weatherService';
@@ -158,6 +158,14 @@ export const WeatherAnalyticsModal: React.FC<WeatherAnalyticsModalProps> = ({
               <DialogTitle className="flex items-center justify-between text-xl">
                 <span>Weather Analytics - {projectName}</span>
                 <div className="flex items-center gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => window.open(`/projects/${projectId}/weather?tab=${activeTab}`, '_blank')}
+                  >
+                    <ExternalLink className="h-4 w-4 mr-2" />
+                    Full Page
+                  </Button>
                   <Button 
                     variant="outline" 
                     size="sm"
