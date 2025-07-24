@@ -1703,6 +1703,48 @@ export type Database = {
           },
         ]
       }
+      weather_alerts: {
+        Row: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          alert_type: string
+          created_at: string
+          expires_at: string | null
+          id: string
+          is_active: boolean
+          message: string
+          project_id: string
+          severity: string
+          weather_data: Json | null
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          alert_type: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          message: string
+          project_id: string
+          severity?: string
+          weather_data?: Json | null
+        }
+        Update: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          alert_type?: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          message?: string
+          project_id?: string
+          severity?: string
+          weather_data?: Json | null
+        }
+        Relationships: []
+      }
       weather_cache: {
         Row: {
           condition: string | null
@@ -2161,6 +2203,10 @@ export type Database = {
           p_slot_id?: string
         }
         Returns: boolean
+      }
+      check_weather_alerts: {
+        Args: { p_project_id: string; p_weather_data: Json }
+        Returns: undefined
       }
       cleanup_expired_locks: {
         Args: Record<PropertyKey, never>
