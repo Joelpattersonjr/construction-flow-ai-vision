@@ -453,9 +453,6 @@ const Projects: React.FC = () => {
             </div>
           )}
 
-          {/* Usage Dashboard */}
-          <UsageDashboard />
-
           {/* Quick Stats */}
           <div className="grid grid-cols-2 gap-4">
             <Card className="p-4">
@@ -499,6 +496,9 @@ const Projects: React.FC = () => {
               </SelectContent>
             </Select>
           </div>
+
+          {/* Usage Dashboard */}
+          <UsageDashboard />
 
           {/* Projects List */}
           {filteredAndSortedProjects.length === 0 ? (
@@ -553,12 +553,7 @@ const Projects: React.FC = () => {
           </p>
         </div>
 
-        {/* Usage Dashboard */}
-        <div className="mb-8">
-          <UsageDashboard />
-        </div>
-
-        {/* Controls */}
+          {/* Controls */}
         <div className="flex flex-col lg:flex-row gap-4 mb-8">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -724,6 +719,11 @@ const Projects: React.FC = () => {
           )}
 
           <ExportDialog />
+        </div>
+
+        {/* Usage Dashboard */}
+        <div className="mb-8">
+          <UsageDashboard />
         </div>
 
         {/* Projects Grid */}
