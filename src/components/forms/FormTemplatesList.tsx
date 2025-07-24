@@ -111,7 +111,7 @@ export const FormTemplatesList: React.FC<FormTemplatesListProps> = ({
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {[...Array(6)].map((_, i) => (
           <Card key={i} className="animate-pulse">
             <CardHeader>
@@ -128,20 +128,20 @@ export const FormTemplatesList: React.FC<FormTemplatesListProps> = ({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-10">
       {/* Quick Start Templates */}
       {(!templates || templates.length === 0) && (
-        <div className="space-y-4">
+        <div className="space-y-6">
           <h3 className="text-lg font-medium">Quick Start Templates</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {defaultTemplates.map((template) => {
               const IconComponent = template.icon;
               return (
                 <Card key={template.name} className="cursor-pointer hover:shadow-md transition-shadow border-dashed">
-                  <CardContent className="p-6 text-center">
-                    <IconComponent className="h-8 w-8 mx-auto mb-3 text-muted-foreground" />
-                    <h4 className="font-medium mb-2">{template.name}</h4>
-                    <p className="text-sm text-muted-foreground mb-4">
+                  <CardContent className="p-8 text-center">
+                    <IconComponent className="h-8 w-8 mx-auto mb-4 text-muted-foreground" />
+                    <h4 className="font-medium mb-3">{template.name}</h4>
+                    <p className="text-sm text-muted-foreground mb-6">
                       {template.description}
                     </p>
                     <Button 
@@ -163,18 +163,18 @@ export const FormTemplatesList: React.FC<FormTemplatesListProps> = ({
 
       {/* Existing Templates */}
       {templates && templates.length > 0 && (
-        <div className="space-y-4">
+        <div className="space-y-6">
           <h3 className="text-lg font-medium">Your Form Templates</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {templates.map((template) => {
               const IconComponent = categoryIcons[template.category as keyof typeof categoryIcons] || FileText;
               const colorClass = categoryColors[template.category as keyof typeof categoryColors] || categoryColors.general;
 
               return (
                 <Card key={template.id} className="hover:shadow-md transition-shadow">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-2">
+                  <CardHeader className="pb-4">
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex items-center gap-3">
                         <IconComponent className="h-5 w-5 text-muted-foreground" />
                         <CardTitle className="text-lg">{template.name}</CardTitle>
                       </div>
@@ -183,18 +183,18 @@ export const FormTemplatesList: React.FC<FormTemplatesListProps> = ({
                       </Badge>
                     </div>
                     {template.description && (
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-muted-foreground mt-2">
                         {template.description}
                       </p>
                     )}
                   </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="text-xs text-muted-foreground">
+                  <CardContent className="space-y-6">
+                    <div className="text-xs text-muted-foreground space-y-1">
                       <p>Created by {template.profiles?.full_name}</p>
                       <p>Updated {formatDistanceToNow(new Date(template.updated_at))} ago</p>
                     </div>
                     
-                    <div className="flex gap-2">
+                    <div className="flex gap-3">
                       <Button
                         variant="outline"
                         size="sm"
