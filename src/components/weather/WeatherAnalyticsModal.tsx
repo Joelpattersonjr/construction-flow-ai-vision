@@ -152,7 +152,7 @@ export const WeatherAnalyticsModal: React.FC<WeatherAnalyticsModalProps> = ({
   return (
     <WeatherErrorBoundaryWrapper>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-6xl max-h-[90vh] flex flex-col md:p-6 p-0">
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden flex flex-col md:p-6 p-0">
           <div className="hidden md:block">
             <DialogHeader className="shrink-0">
               <DialogTitle className="flex items-center justify-between text-xl">
@@ -230,16 +230,16 @@ export const WeatherAnalyticsModal: React.FC<WeatherAnalyticsModalProps> = ({
                 <TabsTrigger value="trends">Trends & Analytics</TabsTrigger>
               </TabsList>
 
-              <div className="flex-1 min-h-0 pt-4">
-                <TabsContent value="live" className="mt-0 h-full overflow-auto scroll-smooth p-1">
+              <div className="flex-1 min-h-0 pt-4 overflow-hidden">
+                <TabsContent value="live" className="mt-0 h-full overflow-y-auto scroll-smooth p-1">
                   {getCurrentWeatherContent()}
                 </TabsContent>
 
-                <TabsContent value="history" className="mt-0 h-full overflow-auto scroll-smooth p-1">
+                <TabsContent value="history" className="mt-0 h-full overflow-y-auto scroll-smooth p-1">
                   <WeatherHistoryViewer projectId={projectId} />
                 </TabsContent>
 
-                <TabsContent value="trends" className="mt-0 h-full overflow-auto scroll-smooth p-1">
+                <TabsContent value="trends" className="mt-0 h-full overflow-y-auto scroll-smooth p-1">
                   <WeatherTrendsChart projectId={projectId} />
                 </TabsContent>
               </div>
