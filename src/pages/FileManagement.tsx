@@ -146,7 +146,7 @@ const FileManagement = () => {
             </Button>
           </div>
           
-          <div className="relative bg-white/20 backdrop-blur-sm rounded-2xl p-8 shadow-2xl border border-white/30">
+          <div className="relative bg-white/20 backdrop-blur-sm rounded-2xl p-8 border border-white/30">
             <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-2xl backdrop-blur-sm border border-white/20 mb-4 group-hover:scale-110 transition-transform duration-300">
               <FileIcon className="h-10 w-10 text-blue-600 group-hover:rotate-6 transition-transform duration-300" />
             </div>
