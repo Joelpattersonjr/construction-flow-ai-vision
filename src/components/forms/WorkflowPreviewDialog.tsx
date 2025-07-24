@@ -86,7 +86,10 @@ export const WorkflowPreviewDialog: React.FC<WorkflowPreviewDialogProps> = ({
 }) => {
   if (!workflow) return null;
 
-  const sortedSteps = [...workflow.workflow_steps].sort((a, b) => a.order - b.order);
+  // Add safety checks for workflow properties
+  const workflowSteps = workflow.workflow_steps || [];
+  const workflowConnections = workflow.workflow_connections || [];
+  const sortedSteps = [...workflowSteps].sort((a, b) => a.order - b.order);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -102,8 +105,8 @@ export const WorkflowPreviewDialog: React.FC<WorkflowPreviewDialogProps> = ({
           {/* Workflow Visualization */}
           <div className="flex-1 p-4">
             <WorkflowVisualization 
-              steps={workflow.workflow_steps}
-              connections={workflow.workflow_connections}
+              steps={workflowSteps}
+              connections={workflowConnections}
             />
           </div>
 
@@ -196,16 +199,16 @@ export const WorkflowPreviewDialog: React.FC<WorkflowPreviewDialogProps> = ({
               </Card>
 
               {/* Workflow Connections */}
-              {workflow.workflow_connections.length > 0 && (
+              {workflowConnections.length > 0 && (
                 <Card>
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm">
-                      Connections ({workflow.workflow_connections.length})
+                      Connections ({workflowConnections.length})
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
-                      {workflow.workflow_connections.map((connection, index) => (
+                      {workflowConnections.map((connection, index) => (
                         <div key={index} className="text-xs">
                           <div className="flex items-center gap-2 text-muted-foreground">
                             <span>Step {connection.source}</span>
