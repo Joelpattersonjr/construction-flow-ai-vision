@@ -5,10 +5,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Plus, GitBranch, Settings, Eye, Trash2, FileText } from "lucide-react";
+import { Plus, GitBranch, Settings, Eye, Trash2, FileText, Sparkles } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
 import { VisualWorkflowBuilder } from './VisualWorkflowBuilder';
+import { AIWorkflowGenerator } from './AIWorkflowGenerator';
+import { FormTemplateSelector } from './FormTemplateSelector';
 
 interface WorkflowTemplate {
   id: string;
@@ -31,6 +33,24 @@ interface WorkflowTemplate {
 export const WorkflowBuilder: React.FC = () => {
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [editingWorkflow, setEditingWorkflow] = useState<string | null>(null);
+  const [showAIGenerator, setShowAIGenerator] = useState(false);
+  const [showTemplateSelector, setShowTemplateSelector] = useState(false);
+  const [selectedFormTemplate, setSelectedFormTemplate] = useState<{ id: string; name: string } | null>(null);
+
+  // Fetch available form templates
+  const { data: formTemplates } = useQuery({
+    queryKey: ['form-templates-for-workflows'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('form_templates')
+        .select('id, name, category')
+        .eq('is_active', true)
+        .order('name');
+      
+      if (error) throw error;
+      return data;
+    },
+  });
 
   const { data: workflows, isLoading, refetch } = useQuery({
     queryKey: ['workflow-templates'],
@@ -120,13 +140,29 @@ export const WorkflowBuilder: React.FC = () => {
             Create automated approval processes for your form submissions
           </p>
         </div>
-        <Button 
-          onClick={() => setShowCreateDialog(true)}
-          className="flex items-center gap-2"
-        >
-          <Plus className="h-4 w-4" />
-          Create Workflow
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline"
+            onClick={() => {
+              if (!formTemplates || formTemplates.length === 0) {
+                toast.error('No form templates available. Create a form template first.');
+                return;
+              }
+              setShowTemplateSelector(true);
+            }}
+            className="flex items-center gap-2"
+          >
+            <Sparkles className="h-4 w-4" />
+            AI Generate
+          </Button>
+          <Button 
+            onClick={() => setShowCreateDialog(true)}
+            className="flex items-center gap-2"
+          >
+            <Plus className="h-4 w-4" />
+            Create Workflow
+          </Button>
+        </div>
       </div>
 
       {!workflows || workflows.length === 0 ? (
@@ -264,6 +300,61 @@ export const WorkflowBuilder: React.FC = () => {
           />
         </DialogContent>
       </Dialog>
+
+      {/* AI Workflow Generator */}
+      {selectedFormTemplate && (
+        <AIWorkflowGenerator
+          formTemplateId={selectedFormTemplate.id}
+          formTemplateName={selectedFormTemplate.name}
+          isOpen={showAIGenerator}
+          onClose={() => {
+            setShowAIGenerator(false);
+            setSelectedFormTemplate(null);
+          }}
+          onWorkflowGenerated={async (workflow) => {
+            try {
+              // Get current user's company ID
+              const { data: profile } = await supabase
+                .from('profiles')
+                .select('company_id')
+                .eq('id', (await supabase.auth.getUser()).data.user?.id)
+                .single();
+
+              const { error } = await supabase
+                .from('workflow_templates')
+                .insert({
+                  form_template_id: selectedFormTemplate.id,
+                  name: workflow.name,
+                  description: workflow.description,
+                  workflow_steps: workflow.workflow_steps as any,
+                  is_active: true,
+                  created_by: (await supabase.auth.getUser()).data.user?.id,
+                });
+
+              if (error) throw error;
+              
+              toast.success('AI-generated workflow created successfully!');
+              refetch();
+              setShowAIGenerator(false);
+              setSelectedFormTemplate(null);
+            } catch (error) {
+              console.error('Error saving AI workflow:', error);
+              toast.error('Failed to save AI-generated workflow');
+            }
+          }}
+        />
+      )}
+
+      {/* Form Template Selector */}
+      <FormTemplateSelector
+        isOpen={showTemplateSelector}
+        onClose={() => setShowTemplateSelector(false)}
+        formTemplates={formTemplates || []}
+        onSelectTemplate={(template) => {
+          setSelectedFormTemplate(template);
+          setShowAIGenerator(true);
+        }}
+      />
     </div>
   );
 };
