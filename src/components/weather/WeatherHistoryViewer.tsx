@@ -69,24 +69,26 @@ export const WeatherHistoryViewer: React.FC<WeatherHistoryViewerProps> = ({
   }, [projectId, startDate, endDate]);
 
   return (
-    <Card className={className}>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <TrendingUp className="h-5 w-5" />
+    <div className={className}>
+      {/* Compact Header */}
+      <div className="mb-3">
+        <h3 className="text-sm font-medium mb-2 flex items-center gap-1">
+          <TrendingUp className="h-3 w-3" />
           Weather History
-        </CardTitle>
-        <div className="flex items-center gap-2 flex-wrap">
+        </h3>
+        <div className="flex items-center gap-1 flex-wrap">
           <Popover>
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
+                size="sm"
                 className={cn(
-                  "justify-start text-left font-normal",
+                  "text-xs h-7 px-2",
                   !startDate && "text-muted-foreground"
                 )}
               >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {startDate ? format(startDate, "PPP") : <span>Start date</span>}
+                <CalendarIcon className="mr-1 h-3 w-3" />
+                {startDate ? format(startDate, "MM/dd") : "Start"}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
@@ -104,13 +106,14 @@ export const WeatherHistoryViewer: React.FC<WeatherHistoryViewerProps> = ({
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
+                size="sm"
                 className={cn(
-                  "justify-start text-left font-normal",
+                  "text-xs h-7 px-2",
                   !endDate && "text-muted-foreground"
                 )}
               >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {endDate ? format(endDate, "PPP") : <span>End date</span>}
+                <CalendarIcon className="mr-1 h-3 w-3" />
+                {endDate ? format(endDate, "MM/dd") : "End"}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
@@ -124,64 +127,64 @@ export const WeatherHistoryViewer: React.FC<WeatherHistoryViewerProps> = ({
             </PopoverContent>
           </Popover>
 
-          <Button onClick={fetchHistoricalData} disabled={loading}>
+          <Button onClick={fetchHistoricalData} disabled={loading} size="sm" className="text-xs h-7 px-2">
             {loading ? 'Loading...' : 'Refresh'}
           </Button>
 
           {historicalData.length > 0 && (
-            <Button onClick={exportData} variant="outline">
-              <Download className="mr-2 h-4 w-4" />
-              Export CSV
+            <Button onClick={exportData} variant="outline" size="sm" className="text-xs h-7 px-2">
+              <Download className="mr-1 h-3 w-3" />
+              CSV
             </Button>
           )}
         </div>
-      </CardHeader>
-      <CardContent>
-        {loading && (
-          <div className="text-center py-8 text-muted-foreground">
-            Loading historical weather data...
-          </div>
-        )}
-        
-        {!loading && historicalData.length === 0 && (
-          <div className="text-center py-8 text-muted-foreground">
-            No historical weather data found for the selected date range.
-          </div>
-        )}
+      </div>
 
-        {!loading && historicalData.length > 0 && (
-          <div className="space-y-2">
-            {historicalData.map((item, index) => (
-              <div
-                key={index}
-                className="flex items-center justify-between p-3 border rounded-lg"
-              >
-                <div className="flex items-center gap-3">
-                  <span className="text-lg">
-                    {WeatherService.getWeatherIcon(item.condition)}
-                  </span>
-                  <div>
-                    <div className="font-medium">
-                      {format(new Date(item.last_updated!), 'MMM dd, yyyy HH:mm')}
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      {item.condition}
-                    </div>
+      {/* Content */}
+      {loading && (
+        <div className="text-center py-4 text-sm text-muted-foreground">
+          Loading...
+        </div>
+      )}
+      
+      {!loading && historicalData.length === 0 && (
+        <div className="text-center py-4 text-sm text-muted-foreground">
+          No data found for selected range.
+        </div>
+      )}
+
+      {!loading && historicalData.length > 0 && (
+        <div className="space-y-1 max-h-64 overflow-y-auto">
+          {historicalData.map((item, index) => (
+            <div
+              key={index}
+              className="flex items-center justify-between py-1.5 px-2 border-b last:border-b-0 text-xs"
+            >
+              <div className="flex items-center gap-2 flex-1 min-w-0">
+                <span className="text-sm">
+                  {WeatherService.getWeatherIcon(item.condition)}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="font-medium truncate">
+                    {format(new Date(item.last_updated!), 'MM/dd HH:mm')}
                   </div>
-                </div>
-                <div className="text-right">
-                  <div className="font-semibold">
-                    {WeatherService.formatTemperature(item.temperature_current)}
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    Humidity: {item.humidity}% • Wind: {item.wind_speed} mph
+                  <div className="text-muted-foreground truncate">
+                    {item.condition}
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
-        )}
-      </CardContent>
-    </Card>
+              <div className="text-right shrink-0 ml-2">
+                <div className="font-semibold">
+                  {WeatherService.formatTemperature(item.temperature_current)}
+                </div>
+                <div className="text-muted-foreground">
+                  {item.humidity}% • {item.wind_speed}mph
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 };
