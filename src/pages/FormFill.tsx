@@ -29,6 +29,21 @@ export const FormFill: React.FC = () => {
     enabled: !!formId,
   });
 
+  // Get a default project for task fetching (in a real app, this would be passed from context or URL)
+  const { data: defaultProject } = useQuery({
+    queryKey: ['default-project'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('projects')
+        .select('id, name')
+        .limit(1)
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -83,6 +98,7 @@ export const FormFill: React.FC = () => {
             form_schema: formTemplate.form_schema as any,
             category: formTemplate.category,
           }}
+          projectId={defaultProject?.id}
           onSubmit={(data) => {
             console.log('Form submitted:', data);
             navigate('/forms?tab=submissions');
