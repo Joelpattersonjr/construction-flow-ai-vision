@@ -149,7 +149,7 @@ export const FormTemplatesList: React.FC<FormTemplatesListProps> = ({
                       <IconComponent className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                       <CardTitle className="text-base truncate">{template.name}</CardTitle>
                     </div>
-                    <Badge variant="secondary" className={`${colorClass} text-xs px-2 py-1 w-fit max-w-[100px] truncate`}>
+                    <Badge variant="secondary" className={`${colorClass} text-xs px-2 py-1 w-fit`}>
                       {template.category.replace('_', ' ')}
                     </Badge>
                     {template.description && <p className="text-sm text-muted-foreground line-clamp-2">
