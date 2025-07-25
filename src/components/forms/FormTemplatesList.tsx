@@ -168,41 +168,41 @@ export const FormTemplatesList: React.FC<FormTemplatesListProps> = ({
       {templates && templates.length > 0 && (
         <div className="space-y-6">
           <h3 className="text-lg font-medium">Your Form Templates</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {templates.map((template) => {
               const IconComponent = categoryIcons[template.category as keyof typeof categoryIcons] || FileText;
               const colorClass = categoryColors[template.category as keyof typeof categoryColors] || categoryColors.general;
 
               return (
-                <Card key={template.id} className="hover:shadow-md transition-shadow">
-                  <CardHeader className="pb-4">
-                    <div className="flex items-start justify-between mb-2">
-                      <div className="flex items-center gap-3">
-                        <IconComponent className="h-5 w-5 text-muted-foreground" />
-                        <CardTitle className="text-lg">{template.name}</CardTitle>
+                <Card key={template.id} className="hover:shadow-md transition-shadow h-full flex flex-col">
+                  <CardHeader className="pb-4 flex-shrink-0">
+                    <div className="flex items-start justify-between mb-2 gap-2">
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <IconComponent className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                        <CardTitle className="text-lg truncate">{template.name}</CardTitle>
                       </div>
-                      <Badge variant="secondary" className={colorClass}>
+                      <Badge variant="secondary" className={`${colorClass} flex-shrink-0 text-xs`}>
                         {template.category.replace('_', ' ')}
                       </Badge>
                     </div>
                     {template.description && (
-                      <p className="text-sm text-muted-foreground mt-2">
+                      <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
                         {template.description}
                       </p>
                     )}
                   </CardHeader>
-                  <CardContent className="space-y-6">
+                  <CardContent className="space-y-4 flex-1 flex flex-col justify-between">
                     <div className="text-xs text-muted-foreground space-y-1">
-                      <p>Created by {template.profiles?.full_name}</p>
+                      <p className="truncate">Created by {template.profiles?.full_name}</p>
                       <p>Updated {formatDistanceToNow(new Date(template.updated_at))} ago</p>
                     </div>
                     
-                    <div className="flex gap-2">
+                    <div className="grid grid-cols-2 gap-2">
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => onEditForm(template.id)}
-                        className="flex-1"
+                        className="w-full"
                       >
                         <Edit className="h-4 w-4 mr-2" />
                         Edit
@@ -214,8 +214,10 @@ export const FormTemplatesList: React.FC<FormTemplatesListProps> = ({
                           // Navigate to form fill page
                           window.location.href = `/forms/fill/${template.id}`;
                         }}
+                        className="w-full"
                       >
-                        <Eye className="h-4 w-4" />
+                        <Eye className="h-4 w-4 mr-2" />
+                        View
                       </Button>
                       <Button
                         variant="outline"
@@ -224,16 +226,19 @@ export const FormTemplatesList: React.FC<FormTemplatesListProps> = ({
                           setSharingFormId(template.id);
                           setSharingFormName(template.name);
                         }}
+                        className="w-full"
                       >
-                        <Share className="h-4 w-4" />
+                        <Share className="h-4 w-4 mr-2" />
+                        Share
                       </Button>
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => handleDeleteTemplate(template.id)}
-                        className="text-destructive hover:text-destructive"
+                        className="text-destructive hover:text-destructive w-full"
                       >
-                        <Trash2 className="h-4 w-4" />
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Delete
                       </Button>
                     </div>
                   </CardContent>
