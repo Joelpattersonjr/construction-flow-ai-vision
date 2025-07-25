@@ -173,7 +173,7 @@ const RecentFormsHistory: React.FC = () => {
       <CardContent className="px-6">
         <div className="space-y-4">
           {allActivities.map((activity) => (
-            <div key={`${activity.type}-${activity.id}`} className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors">
+            <div key={`${activity.type}-${activity.id}`} className="flex items-center justify-start p-3 border rounded-lg hover:bg-muted/50 transition-colors gap-4">
               <div className="flex items-center space-x-3">
                 <div className="flex-shrink-0">
                   {getActivityIcon(activity.type)}
