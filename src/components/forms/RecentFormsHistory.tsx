@@ -170,7 +170,7 @@ const RecentFormsHistory: React.FC = () => {
         </CardTitle>
         <CardDescription>Your latest form interactions and submissions</CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="px-6">
         <div className="space-y-4">
           {allActivities.map((activity) => (
             <div key={`${activity.type}-${activity.id}`} className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors">
