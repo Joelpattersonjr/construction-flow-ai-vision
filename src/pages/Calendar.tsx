@@ -185,8 +185,7 @@ export default function CalendarView() {
             <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-2xl backdrop-blur-sm border border-white/20 mb-4 group-hover:scale-110 transition-transform duration-300">
               <Calendar className="h-10 w-10 text-blue-600 group-hover:rotate-6 transition-transform duration-300" />
             </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-4">
-              Task
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-black leading-tight mb-4">
               <span className="block bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
                 Calendar
               </span>
