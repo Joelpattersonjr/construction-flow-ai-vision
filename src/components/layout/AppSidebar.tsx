@@ -36,7 +36,7 @@ export const AppSidebar: React.FC = () => {
     { path: '/projects', label: 'Projects', icon: Folder },
     { path: '/tasks', label: 'Tasks', icon: CheckSquare },
     { path: '/calendar', label: 'Calendar', icon: Calendar },
-    { path: '/files', label: 'Files', icon: Files },
+    { path: '/files', label: 'Documents', icon: Files },
     { path: '/forms', label: 'Forms', icon: FileText },
     { path: '/approvals', label: 'Approvals', icon: CheckCircle },
     ...(profile?.company_role === 'company_admin' ? [
