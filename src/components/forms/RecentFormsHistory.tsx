@@ -203,23 +203,22 @@ const RecentFormsHistory: React.FC = () => {
                </div>
                
                <div className="flex items-center space-x-2 flex-shrink-0">
-                 {activity.type === 'submission' ? (
-                   <Button
-                     size="sm"
-                     variant="ghost"
-                     onClick={() => handleViewForm(activity.form_template_id)}
-                   >
-                     <Eye className="h-4 w-4" />
-                   </Button>
-                 ) : (
-                   <Button
-                     size="sm"
-                     variant="ghost"
-                     onClick={() => handleEditForm(activity.form_template_id)}
-                   >
-                     <Edit className="h-4 w-4" />
-                   </Button>
-                 )}
+                 <Button
+                   size="sm"
+                   variant="ghost"
+                   onClick={() => handleViewForm(activity.form_template_id)}
+                   title="View Form"
+                 >
+                   <Eye className="h-4 w-4" />
+                 </Button>
+                 <Button
+                   size="sm"
+                   variant="ghost"
+                   onClick={() => handleEditForm(activity.form_template_id)}
+                   title="Edit Form"
+                 >
+                   <Edit className="h-4 w-4" />
+                 </Button>
                </div>
              </div>
           ))}
