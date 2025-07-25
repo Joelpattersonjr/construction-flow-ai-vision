@@ -151,7 +151,7 @@ const FileManagement = () => {
               <FileIcon className="h-10 w-10 text-blue-600 group-hover:rotate-6 transition-transform duration-300" />
             </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-4">
-              File
+              Document
               <span className="block bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
                 Management
               </span>
