@@ -211,7 +211,7 @@ export const CustomizableDashboard: React.FC = () => {
                     Add Widget
                   </Button>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
                   <DialogHeader>
                     <DialogTitle>Add Widget</DialogTitle>
                   </DialogHeader>
@@ -226,7 +226,7 @@ export const CustomizableDashboard: React.FC = () => {
                     Settings
                   </Button>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                   <DialogHeader>
                     <DialogTitle>Dashboard Settings</DialogTitle>
                   </DialogHeader>
