@@ -41,8 +41,9 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   }
 
   // Check if user needs to set up their company (first-time admin users)
+  // Skip company setup check for form fill routes
   console.log('ProtectedRoute profile data:', profile);
-  if (profile && !profile.company_id && location.pathname !== '/company-setup') {
+  if (profile && !profile.company_id && location.pathname !== '/company-setup' && !location.pathname.startsWith('/forms/fill/')) {
     console.log('ProtectedRoute: user needs company setup - company_id:', profile.company_id);
     return <CompanySetup />;
   }

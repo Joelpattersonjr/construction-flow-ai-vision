@@ -175,7 +175,9 @@ const App: React.FC = () => {
                      path="/forms/fill/:formId" 
                      element={
                        <ProtectedRoute>
-                         <FormFill />
+                         <AppLayout>
+                           <FormFill />
+                         </AppLayout>
                        </ProtectedRoute>
                      } 
                     />
