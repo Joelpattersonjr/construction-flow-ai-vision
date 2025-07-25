@@ -173,55 +173,55 @@ const RecentFormsHistory: React.FC = () => {
       <CardContent className="px-6">
         <div className="space-y-4">
           {allActivities.map((activity) => (
-            <div key={`${activity.type}-${activity.id}`} className="flex items-center justify-start p-3 border rounded-lg hover:bg-muted/50 transition-colors gap-4">
-              <div className="flex items-center space-x-3">
-                <div className="flex-shrink-0">
-                  {getActivityIcon(activity.type)}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center space-x-2">
-                    <p className="text-sm font-medium truncate">
-                      {activity.form_name}
-                    </p>
-                    <Badge variant="outline" className="text-xs">
-                      {getActivityLabel(activity.type)}
-                    </Badge>
-                    {activity.status && (
-                      <Badge variant={getStatusColor(activity.status) as any} className="text-xs">
-                        {activity.status}
-                      </Badge>
-                    )}
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    {new Date(activity.activity_date).toLocaleDateString()} at{' '}
-                    {new Date(activity.activity_date).toLocaleTimeString([], { 
-                      hour: '2-digit', 
-                      minute: '2-digit' 
-                    })}
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                {activity.type === 'submission' ? (
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => handleViewForm(activity.form_template_id)}
-                  >
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                ) : (
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => handleEditForm(activity.form_template_id)}
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
-            </div>
+             <div key={`${activity.type}-${activity.id}`} className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors">
+               <div className="flex items-center space-x-3 flex-1 min-w-0">
+                 <div className="flex-shrink-0">
+                   {getActivityIcon(activity.type)}
+                 </div>
+                 <div className="flex-1 min-w-0">
+                   <div className="flex items-center space-x-2 flex-wrap">
+                     <p className="text-sm font-medium truncate">
+                       {activity.form_name}
+                     </p>
+                     <Badge variant="outline" className="text-xs whitespace-nowrap">
+                       {getActivityLabel(activity.type)}
+                     </Badge>
+                     {activity.status && (
+                       <Badge variant={getStatusColor(activity.status) as any} className="text-xs whitespace-nowrap">
+                         {activity.status}
+                       </Badge>
+                     )}
+                   </div>
+                   <p className="text-xs text-muted-foreground">
+                     {new Date(activity.activity_date).toLocaleDateString()} at{' '}
+                     {new Date(activity.activity_date).toLocaleTimeString([], { 
+                       hour: '2-digit', 
+                       minute: '2-digit' 
+                     })}
+                   </p>
+                 </div>
+               </div>
+               
+               <div className="flex items-center space-x-2 flex-shrink-0">
+                 {activity.type === 'submission' ? (
+                   <Button
+                     size="sm"
+                     variant="ghost"
+                     onClick={() => handleViewForm(activity.form_template_id)}
+                   >
+                     <Eye className="h-4 w-4" />
+                   </Button>
+                 ) : (
+                   <Button
+                     size="sm"
+                     variant="ghost"
+                     onClick={() => handleEditForm(activity.form_template_id)}
+                   >
+                     <Edit className="h-4 w-4" />
+                   </Button>
+                 )}
+               </div>
+             </div>
           ))}
         </div>
         
