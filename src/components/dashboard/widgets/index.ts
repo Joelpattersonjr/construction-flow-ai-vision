@@ -4,11 +4,13 @@ import React from 'react';
 export { FormsSubmissionsSummaryWidget } from './FormsSubmissionsSummaryWidget';
 export { PendingApprovalsWidget } from './PendingApprovalsWidget';
 export { PopularFormsWidget } from './PopularFormsWidget';
+export { WeatherWidget } from './WeatherWidget';
 
 // Widget registry for dynamic loading
 import { FormsSubmissionsSummaryWidget } from './FormsSubmissionsSummaryWidget';
 import { PendingApprovalsWidget } from './PendingApprovalsWidget';
 import { PopularFormsWidget } from './PopularFormsWidget';
+import { WeatherWidget } from './WeatherWidget';
 import { WidgetType, WidgetConfig } from '@/types/dashboard';
 
 const ComingSoonWidget: React.FC<{ title: string }> = ({ title }) => {
@@ -38,7 +40,7 @@ export const WIDGET_REGISTRY: Record<WidgetType, React.ComponentType> = {
   'forms-approvals-calendar': () => React.createElement(ComingSoonWidget, { title: 'Forms & Approvals Calendar Widget' }),
   'project-stats': () => React.createElement(ComingSoonWidget, { title: 'Project Stats Widget' }),
   'task-summary': () => React.createElement(ComingSoonWidget, { title: 'Task Summary Widget' }),
-  'weather-widget': () => React.createElement(ComingSoonWidget, { title: 'Weather Widget' }),
+  'weather-widget': WeatherWidget,
   'calendar-preview': () => React.createElement(ComingSoonWidget, { title: 'Calendar Preview Widget' }),
   'file-overview': () => React.createElement(ComingSoonWidget, { title: 'File Overview Widget' }),
 };
