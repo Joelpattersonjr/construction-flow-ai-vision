@@ -145,15 +145,13 @@ export const FormTemplatesList: React.FC<FormTemplatesListProps> = ({
           const colorClass = categoryColors[template.category as keyof typeof categoryColors] || categoryColors.general;
           return <Card key={template.id} className="hover:shadow-md transition-shadow flex flex-col h-full">
                   <CardHeader className="pb-3 flex-shrink-0">
-                    <div className="flex items-start justify-between gap-2 mb-2">
-                      <div className="flex items-center gap-2 min-w-0 flex-1">
-                        <IconComponent className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                        <CardTitle className="text-base truncate">{template.name}</CardTitle>
-                      </div>
-                      <Badge variant="secondary" className={`${colorClass} text-xs px-2 py-1 flex-shrink-0 max-w-[100px] truncate`}>
-                        {template.category.replace('_', ' ')}
-                      </Badge>
+                    <div className="flex items-center gap-2 mb-2">
+                      <IconComponent className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                      <CardTitle className="text-base truncate">{template.name}</CardTitle>
                     </div>
+                    <Badge variant="secondary" className={`${colorClass} text-xs px-2 py-1 w-fit max-w-[100px] truncate`}>
+                      {template.category.replace('_', ' ')}
+                    </Badge>
                     {template.description && <p className="text-sm text-muted-foreground line-clamp-2">
                         {template.description}
                       </p>}
