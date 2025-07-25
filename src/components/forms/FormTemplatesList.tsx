@@ -168,8 +168,8 @@ export const FormTemplatesList: React.FC<FormTemplatesListProps> = ({
                         Edit
                       </Button>
                       <Button variant="outline" size="sm" onClick={() => {
-                  // Open the form renderer in preview mode
-                  window.open(`/forms/fill/${template.id}`, '_blank');
+                  // Navigate to the form fill page in the same tab
+                  window.location.href = `/forms/fill/${template.id}`;
                 }} className="text-xs">
                         <Eye className="h-3 w-3 mr-1" />
                         View
