@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import UserProfilePopover from './UserProfilePopover';
 import { useAuth } from '@/contexts/AuthContext';
-import QuickAccessFormsMenu from '@/components/forms/QuickAccessFormsMenu';
 
 const AppHeader: React.FC = () => {
   const navigate = useNavigate();
@@ -28,7 +27,6 @@ const AppHeader: React.FC = () => {
         </div>
         
         <div className="flex items-center space-x-4">
-          <QuickAccessFormsMenu />
           <UserProfilePopover />
         </div>
       </div>
