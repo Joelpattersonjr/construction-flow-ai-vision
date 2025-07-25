@@ -319,7 +319,7 @@ const Help = () => {
               size="lg"
               variant="outline"
               onClick={() => navigate('/signup')}
-              className="border-white text-white hover:bg-white hover:text-gray-900 px-8 py-4 text-lg font-semibold"
+              className="border-white text-foreground hover:bg-white hover:text-gray-900 px-8 py-4 text-lg font-semibold"
             >
               Start Free Trial
             </Button>
