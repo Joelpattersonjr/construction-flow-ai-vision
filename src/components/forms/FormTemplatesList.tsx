@@ -139,44 +139,46 @@ export const FormTemplatesList: React.FC<FormTemplatesListProps> = ({
       {/* Existing Templates */}
       {templates && templates.length > 0 && <div className="space-y-6">
           <h3 className="text-lg font-medium">Your Form Templates</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {templates.map(template => {
           const IconComponent = categoryIcons[template.category as keyof typeof categoryIcons] || FileText;
           const colorClass = categoryColors[template.category as keyof typeof categoryColors] || categoryColors.general;
-          return <Card key={template.id} className="hover:shadow-md transition-shadow">
-                  <CardHeader className="pb-4">
-                    <div className="flex items-start justify-between mb-2">
-                      <div className="flex items-center gap-3 px-0">
-                        <IconComponent className="h-5 w-5 text-muted-foreground" />
-                        <CardTitle className="text-lg">{template.name}</CardTitle>
+          return <Card key={template.id} className="hover:shadow-md transition-shadow flex flex-col h-full">
+                  <CardHeader className="pb-3 flex-shrink-0">
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                      <div className="flex items-center gap-2 min-w-0 flex-1">
+                        <IconComponent className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                        <CardTitle className="text-base truncate">{template.name}</CardTitle>
                       </div>
-                      <Badge variant="secondary" className={colorClass}>
+                      <Badge variant="secondary" className={`${colorClass} text-xs px-2 py-1 flex-shrink-0 max-w-[100px] truncate`}>
                         {template.category.replace('_', ' ')}
                       </Badge>
                     </div>
-                    {template.description && <p className="text-sm text-muted-foreground mt-2">
+                    {template.description && <p className="text-sm text-muted-foreground line-clamp-2">
                         {template.description}
                       </p>}
                   </CardHeader>
-                  <CardContent className="space-y-6">
+                  <CardContent className="flex-1 flex flex-col justify-between pt-0 space-y-3">
                     <div className="text-xs text-muted-foreground space-y-1">
-                      <p>Created by {template.profiles?.full_name}</p>
+                      <p className="truncate">Created by {template.profiles?.full_name}</p>
                       <p>Updated {formatDistanceToNow(new Date(template.updated_at))} ago</p>
                     </div>
                     
-                    <div className="flex gap-3">
-                      <Button variant="outline" size="sm" onClick={() => onEditForm(template.id)} className="flex-1">
-                        <Edit className="h-4 w-4 mr-2" />
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button variant="outline" size="sm" onClick={() => onEditForm(template.id)} className="text-xs">
+                        <Edit className="h-3 w-3 mr-1" />
                         Edit
                       </Button>
                       <Button variant="outline" size="sm" onClick={() => {
                   // Open the form renderer in preview mode
                   window.open(`/forms/fill/${template.id}`, '_blank');
-                }}>
-                        <Eye className="h-4 w-4" />
+                }} className="text-xs">
+                        <Eye className="h-3 w-3 mr-1" />
+                        View
                       </Button>
-                      <Button variant="outline" size="sm" onClick={() => handleDeleteTemplate(template.id)} className="text-destructive hover:text-destructive">
-                        <Trash2 className="h-4 w-4" />
+                      <Button variant="outline" size="sm" onClick={() => handleDeleteTemplate(template.id)} className="text-destructive hover:text-destructive text-xs col-span-2">
+                        <Trash2 className="h-3 w-3 mr-1" />
+                        Delete
                       </Button>
                     </div>
                   </CardContent>
