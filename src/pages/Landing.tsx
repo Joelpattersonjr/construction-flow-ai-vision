@@ -469,7 +469,7 @@ const Landing = () => {
             <div>
               <h3 className="font-semibold mb-4">Support</h3>
               <ul className="space-y-2 text-gray-400">
-                <li><button onClick={() => navigate('/help')} className="hover:text-white text-left">Help Center</button></li>
+                <li><button onClick={() => { navigate('/help'); window.scrollTo(0, 0); }} className="hover:text-white text-left">Help Center</button></li>
                 <li><button onClick={() => navigate('/documentation')} className="hover:text-white text-left">Documentation</button></li>
                 <li><button onClick={() => navigate('/privacy')} className="hover:text-white text-left">Privacy Policy</button></li>
                 <li><button onClick={() => navigate('/terms')} className="hover:text-white text-left">Terms of Service</button></li>
