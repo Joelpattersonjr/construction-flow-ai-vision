@@ -82,11 +82,11 @@ export const FormFill: React.FC = () => {
         <div className="mb-6">
           <Button
             variant="outline"
-            onClick={() => navigate('/forms')}
+            onClick={() => navigate(-1)}
             className="mb-4"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Forms
+            Back
           </Button>
         </div>
 
