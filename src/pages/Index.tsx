@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-
 import { TrialBanner } from '@/components/subscription/TrialBanner';
 import { SubscriptionService, SubscriptionInfo } from '@/services/subscriptionService';
 import { useAuthState } from '@/hooks/useAuthState';
@@ -157,10 +156,7 @@ const Index = () => {
               
               {/* Quick Stats or Actions */}
               <div className="flex flex-col sm:flex-row gap-4">
-                <div className="text-center p-4 bg-white/30 backdrop-blur-sm rounded-xl border border-white/20">
-                  <div className="text-2xl font-bold text-primary">4</div>
-                  <div className="text-sm text-gray-600">Active Tools</div>
-                </div>
+                
                 <div className="text-center p-4 bg-white/30 backdrop-blur-sm rounded-xl border border-white/20">
                   <div className="text-2xl font-bold text-green-600">Ready</div>
                   <div className="text-sm text-gray-600">System Status</div>
