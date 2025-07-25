@@ -14,11 +14,30 @@ import { DashboardWidget as WidgetType, WidgetType as WidgetTypeEnum } from '@/t
 import { toast } from 'sonner';
 
 export const CustomizableDashboard: React.FC = () => {
-  const { preferences, updatePreferences } = useUserPreferences();
+  const { preferences, updatePreferences, loading } = useUserPreferences();
   const [isEditing, setIsEditing] = useState(false);
   const [activeWidget, setActiveWidget] = useState<WidgetType | null>(null);
   const [showWidgetSelector, setShowWidgetSelector] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+
+  // Show loading state while preferences are being loaded
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="h-8 bg-muted rounded w-48 mb-2 animate-pulse"></div>
+            <div className="h-4 bg-muted rounded w-64 animate-pulse"></div>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="h-64 bg-muted rounded animate-pulse"></div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   // Get dashboard preferences or use defaults
   const dashboardConfig = preferences.dashboard || {
