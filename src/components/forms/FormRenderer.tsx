@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { create, all } from 'mathjs';
 import { useForm, Controller } from 'react-hook-form';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,6 +14,7 @@ import { Progress } from "@/components/ui/progress";
 import { Upload, MapPin, PenTool, Save, Send } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 
 interface FormField {
   id: string;
@@ -63,6 +64,23 @@ export const FormRenderer: React.FC<FormRendererProps> = ({
   const [signatures, setSignatures] = useState<{ [key: string]: string }>({});
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [uploadedFiles, setUploadedFiles] = useState<{ [key: string]: File[] }>({});
+
+  // Fetch tasks for task selection fields
+  const { data: tasks = [] } = useQuery({
+    queryKey: ['project-tasks', projectId],
+    queryFn: async () => {
+      if (!projectId) return [];
+      const { data, error } = await supabase
+        .from('tasks')
+        .select('id, title, description, status')
+        .eq('project_id', projectId)
+        .order('title');
+      
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!projectId,
+  });
 
   const { control, handleSubmit, watch, setValue, formState: { errors } } = useForm();
 
@@ -285,9 +303,46 @@ export const FormRenderer: React.FC<FormRendererProps> = ({
                     <SelectValue placeholder={field.placeholder || 'Select an option'} />
                   </SelectTrigger>
                   <SelectContent>
-                    {field.options?.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
+                    {field.options?.map((option, index) => {
+                      // Handle both string array and object array formats
+                      const optionValue = typeof option === 'string' ? option : option.value;
+                      const optionLabel = typeof option === 'string' ? option : option.label;
+                      return (
+                        <SelectItem key={`${field.id}-${optionValue}-${index}`} value={optionValue}>
+                          {optionLabel}
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+            {errors[field.id] && (
+              <p className="text-sm text-destructive">{errors[field.id]?.message as string}</p>
+            )}
+          </div>
+        );
+
+      case 'tasks_select':
+        return (
+          <div key={field.id} className="space-y-2">
+            <Label htmlFor={field.id}>
+              {field.label}
+              {field.required && <span className="text-destructive"> *</span>}
+            </Label>
+            <Controller
+              name={field.id}
+              control={control}
+              rules={{ required: field.required ? `${field.label} is required` : false }}
+              render={({ field: formField }) => (
+                <Select onValueChange={formField.onChange} value={formField.value}>
+                  <SelectTrigger className={errors[field.id] ? 'border-destructive' : ''}>
+                    <SelectValue placeholder={field.placeholder || 'Select tasks'} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {tasks.map((task) => (
+                      <SelectItem key={task.id} value={task.title}>
+                        {task.title} {task.status && `(${task.status})`}
                       </SelectItem>
                     ))}
                   </SelectContent>
