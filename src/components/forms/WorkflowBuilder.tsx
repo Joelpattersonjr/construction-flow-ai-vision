@@ -11,7 +11,6 @@ import { toast } from "sonner";
 import { VisualWorkflowBuilder } from './VisualWorkflowBuilder';
 import { AIWorkflowGenerator } from './AIWorkflowGenerator';
 import { FormTemplateSelector } from './FormTemplateSelector';
-import { WorkflowPreviewDialog } from './WorkflowPreviewDialog';
 
 interface WorkflowTemplate {
   id: string;
@@ -37,8 +36,6 @@ export const WorkflowBuilder: React.FC = () => {
   const [showAIGenerator, setShowAIGenerator] = useState(false);
   const [showTemplateSelector, setShowTemplateSelector] = useState(false);
   const [selectedFormTemplate, setSelectedFormTemplate] = useState<{ id: string; name: string } | null>(null);
-  const [showPreviewDialog, setShowPreviewDialog] = useState(false);
-  const [previewWorkflow, setPreviewWorkflow] = useState<any>(null);
 
   // Fetch available form templates
   const { data: formTemplates } = useQuery({
@@ -135,17 +132,6 @@ export const WorkflowBuilder: React.FC = () => {
   }
 
   return (
-    <>
-      {/* TEST BUTTON TO ISOLATE ISSUE */}
-      <button
-        className="bg-red-500 text-white px-4 py-2 rounded mb-4"
-        onClick={() => {
-          console.log('🔍 EXTERNAL TEST BUTTON CLICKED!');
-          alert('External test button works!');
-        }}
-      >
-        TEST BUTTON (External)
-      </button>
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
@@ -239,23 +225,16 @@ export const WorkflowBuilder: React.FC = () => {
                     <Settings className="h-4 w-4 mr-2" />
                     Edit
                   </Button>
-                  <button
-                    className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3 relative z-50"
-                    style={{ position: 'relative', zIndex: 9999 }}
-                    type="button"
-                    onMouseDown={() => console.log('🔍 MOUSEDOWN detected!')}
-                    onMouseUp={() => console.log('🔍 MOUSEUP detected!')}
-                    onClick={(e) => {
-                      console.log('🔍 RAW BUTTON CLICKED!', e);
-                      alert('BUTTON CLICKED! Check console for details.');
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setPreviewWorkflow(workflow);
-                      setShowPreviewDialog(true);
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      // TODO: Implement workflow preview
+                      toast.info('Workflow preview coming soon');
                     }}
                   >
                     <Eye className="h-4 w-4" />
-                  </button>
+                  </Button>
                   <Button
                     variant="outline"
                     size="sm"
@@ -376,17 +355,6 @@ export const WorkflowBuilder: React.FC = () => {
           setShowAIGenerator(true);
         }}
       />
-
-      {/* Workflow Preview Dialog */}
-      <WorkflowPreviewDialog
-        isOpen={showPreviewDialog}
-        onClose={() => {
-          setShowPreviewDialog(false);
-          setPreviewWorkflow(null);
-        }}
-        workflow={previewWorkflow}
-      />
     </div>
-    </>
   );
 };
