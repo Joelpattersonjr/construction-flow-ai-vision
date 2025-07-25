@@ -9,6 +9,8 @@ import { FormBuilder } from "@/components/forms/FormBuilder";
 import { FormSubmissions } from "@/components/forms/FormSubmissions";
 import { WorkflowBuilder } from "@/components/forms/WorkflowBuilder";
 import { AIFormTemplateGenerator } from "@/components/forms/AIFormTemplateGenerator";
+import FormsAnalyticsDashboard from "@/components/forms/FormsAnalyticsDashboard";
+import RecentFormsHistory from "@/components/forms/RecentFormsHistory";
 
 const Forms: React.FC = () => {
   const navigate = useNavigate();
@@ -100,10 +102,17 @@ const Forms: React.FC = () => {
           </TabsList>
 
           <TabsContent value="templates" className="space-y-4">
-            <FormTemplatesList 
-              onEditForm={handleEditForm}
-              onCreateForm={handleCreateNewForm}
-            />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2">
+                <FormTemplatesList 
+                  onEditForm={handleEditForm}
+                  onCreateForm={handleCreateNewForm}
+                />
+              </div>
+              <div>
+                <RecentFormsHistory />
+              </div>
+            </div>
           </TabsContent>
 
           <TabsContent value="submissions" className="space-y-4">
@@ -115,12 +124,7 @@ const Forms: React.FC = () => {
           </TabsContent>
 
           <TabsContent value="analytics" className="space-y-4">
-            <div className="text-center py-12">
-              <h3 className="text-lg font-medium mb-2">Analytics Coming Soon</h3>
-              <p className="text-muted-foreground">
-                Form submission analytics and reporting will be available in the next update.
-              </p>
-            </div>
+            <FormsAnalyticsDashboard />
           </TabsContent>
         </Tabs>
       </div>

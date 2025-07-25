@@ -29,6 +29,8 @@ import DailyReports from "./pages/DailyReports";
 import Forms from "./pages/Forms";
 import { FormFill } from "./pages/FormFill";
 import { PublicFormFill } from "./pages/PublicFormFill";
+import FormsGallery from "./pages/FormsGallery";
+import FormsDirectory from "./pages/FormsDirectory";
 import { ApprovalDashboard } from "./pages/ApprovalDashboard";
 import Profile from "./pages/Profile";
 import Subscription from "./pages/Subscription";
@@ -232,9 +234,20 @@ const App: React.FC = () => {
                   <Route path="/success" element={<PaymentSuccess />} />
                   <Route path="/cancel" element={<PaymentCancel />} />
                   <Route path="/test" element={<div>TEST ROUTE WORKS</div>} />
-                  <Route path="/invite/:token" element={<InviteAcceptance />} />
-                  <Route path="/public/forms/:formId" element={<PublicFormFill />} />
-                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                   <Route path="/invite/:token" element={<InviteAcceptance />} />
+                   <Route path="/public/forms/:formId" element={<PublicFormFill />} />
+                   <Route 
+                     path="/forms/gallery" 
+                     element={
+                       <ProtectedRoute>
+                         <AppLayout>
+                           <FormsGallery />
+                         </AppLayout>
+                       </ProtectedRoute>
+                     } 
+                   />
+                   <Route path="/forms/directory" element={<FormsDirectory />} />
+                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </BrowserRouter>
