@@ -13,6 +13,7 @@ import FileManager from '@/components/file-management/FileManager';
 import TeamManagementPanel from '@/components/projects/TeamManagementPanel';
 import { ContractCountdown } from '@/components/project/ContractCountdown';
 import { ContractSetupForm } from '@/components/project/ContractSetupForm';
+import { MilestoneManager } from '@/components/milestones';
 
 interface Project {
   id: string;
@@ -235,6 +236,7 @@ const ProjectDetails: React.FC = () => {
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="files">Files</TabsTrigger>
             <TabsTrigger value="team">Team</TabsTrigger>
+            <TabsTrigger value="milestones">Milestones</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview">
@@ -327,6 +329,13 @@ const ProjectDetails: React.FC = () => {
               projectId={project.id}
               projectName={project.name || 'Untitled Project'}
               hasWritePermission={project.hasWritePermission || false}
+            />
+          </TabsContent>
+
+          <TabsContent value="milestones">
+            <MilestoneManager 
+              projectId={project.id} 
+              projectName={project.name || 'Untitled Project'}
             />
           </TabsContent>
         </Tabs>
