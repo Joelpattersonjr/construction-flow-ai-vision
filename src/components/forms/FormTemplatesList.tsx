@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Edit, Eye, Trash2, Plus, FileText, Calendar, Shield, AlertTriangle } from "lucide-react";
+import { Edit, Eye, Trash2, Plus, FileText, Calendar, Shield, AlertTriangle, Share } from "lucide-react";
+import { FormSharingDialog } from './FormSharingDialog';
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
 
@@ -48,6 +49,8 @@ export const FormTemplatesList: React.FC<FormTemplatesListProps> = ({
   onEditForm,
   onCreateForm,
 }) => {
+  const [sharingFormId, setSharingFormId] = useState<string | null>(null);
+  const [sharingFormName, setSharingFormName] = useState<string>('');
   const { data: templates, isLoading, refetch } = useQuery({
     queryKey: ['form-templates'],
     queryFn: async () => {
@@ -194,7 +197,7 @@ export const FormTemplatesList: React.FC<FormTemplatesListProps> = ({
                       <p>Updated {formatDistanceToNow(new Date(template.updated_at))} ago</p>
                     </div>
                     
-                    <div className="flex gap-3">
+                    <div className="flex gap-2">
                       <Button
                         variant="outline"
                         size="sm"
@@ -217,6 +220,16 @@ export const FormTemplatesList: React.FC<FormTemplatesListProps> = ({
                       <Button
                         variant="outline"
                         size="sm"
+                        onClick={() => {
+                          setSharingFormId(template.id);
+                          setSharingFormName(template.name);
+                        }}
+                      >
+                        <Share className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
                         onClick={() => handleDeleteTemplate(template.id)}
                         className="text-destructive hover:text-destructive"
                       >
@@ -230,6 +243,18 @@ export const FormTemplatesList: React.FC<FormTemplatesListProps> = ({
           </div>
         </div>
       )}
+      
+      <FormSharingDialog
+        open={!!sharingFormId}
+        onOpenChange={(open) => {
+          if (!open) {
+            setSharingFormId(null);
+            setSharingFormName('');
+          }
+        }}
+        formId={sharingFormId || ''}
+        formName={sharingFormName}
+      />
     </div>
   );
 };

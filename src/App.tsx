@@ -28,6 +28,7 @@ import ScheduleBuilder from "./pages/ScheduleBuilder";
 import DailyReports from "./pages/DailyReports";
 import Forms from "./pages/Forms";
 import { FormFill } from "./pages/FormFill";
+import { PublicFormFill } from "./pages/PublicFormFill";
 import { ApprovalDashboard } from "./pages/ApprovalDashboard";
 import Profile from "./pages/Profile";
 import Subscription from "./pages/Subscription";
@@ -232,6 +233,7 @@ const App: React.FC = () => {
                   <Route path="/cancel" element={<PaymentCancel />} />
                   <Route path="/test" element={<div>TEST ROUTE WORKS</div>} />
                   <Route path="/invite/:token" element={<InviteAcceptance />} />
+                  <Route path="/public/forms/:formId" element={<PublicFormFill />} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
