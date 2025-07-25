@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { VisualWorkflowBuilder } from './VisualWorkflowBuilder';
 import { AIWorkflowGenerator } from './AIWorkflowGenerator';
 import { FormTemplateSelector } from './FormTemplateSelector';
+import { WorkflowPreview } from './WorkflowPreview';
 
 interface WorkflowTemplate {
   id: string;
@@ -36,6 +37,7 @@ export const WorkflowBuilder: React.FC = () => {
   const [showAIGenerator, setShowAIGenerator] = useState(false);
   const [showTemplateSelector, setShowTemplateSelector] = useState(false);
   const [selectedFormTemplate, setSelectedFormTemplate] = useState<{ id: string; name: string } | null>(null);
+  const [previewWorkflow, setPreviewWorkflow] = useState<WorkflowTemplate | null>(null);
 
   // Fetch available form templates
   const { data: formTemplates } = useQuery({
@@ -228,10 +230,7 @@ export const WorkflowBuilder: React.FC = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => {
-                      // TODO: Implement workflow preview
-                      toast.info('Workflow preview coming soon');
-                    }}
+                    onClick={() => setPreviewWorkflow(workflow)}
                   >
                     <Eye className="h-4 w-4" />
                   </Button>
@@ -355,6 +354,31 @@ export const WorkflowBuilder: React.FC = () => {
           setShowAIGenerator(true);
         }}
       />
+
+      {/* Workflow Preview Dialog */}
+      <Dialog open={!!previewWorkflow} onOpenChange={(open) => {
+        if (!open) setPreviewWorkflow(null);
+      }}>
+        <DialogContent className="max-w-4xl h-[80vh]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <GitBranch className="h-5 w-5 text-primary" />
+              {previewWorkflow?.name} - Preview
+            </DialogTitle>
+            {previewWorkflow?.description && (
+              <p className="text-sm text-muted-foreground">
+                {previewWorkflow.description}
+              </p>
+            )}
+          </DialogHeader>
+          {previewWorkflow && (
+            <WorkflowPreview
+              workflowSteps={previewWorkflow.workflow_steps || []}
+              className="flex-1"
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
