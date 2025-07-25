@@ -808,6 +808,97 @@ export type Database = {
         }
         Relationships: []
       }
+      milestone_alerts: {
+        Row: {
+          alert_data: Json | null
+          alert_type: string
+          id: string
+          message: string
+          milestone_id: string
+          notified_users: string[] | null
+          resolved_at: string | null
+          severity: string
+          triggered_at: string
+        }
+        Insert: {
+          alert_data?: Json | null
+          alert_type: string
+          id?: string
+          message: string
+          milestone_id: string
+          notified_users?: string[] | null
+          resolved_at?: string | null
+          severity?: string
+          triggered_at?: string
+        }
+        Update: {
+          alert_data?: Json | null
+          alert_type?: string
+          id?: string
+          message?: string
+          milestone_id?: string
+          notified_users?: string[] | null
+          resolved_at?: string | null
+          severity?: string
+          triggered_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_alert_milestone"
+            columns: ["milestone_id"]
+            isOneToOne: false
+            referencedRelation: "project_milestones"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      milestone_templates: {
+        Row: {
+          company_id: number
+          created_at: string
+          created_by: string
+          description: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          project_type: string
+          template_data: Json
+          updated_at: string
+        }
+        Insert: {
+          company_id: number
+          created_at?: string
+          created_by: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          project_type?: string
+          template_data?: Json
+          updated_at?: string
+        }
+        Update: {
+          company_id?: number
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          project_type?: string
+          template_data?: Json
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_template_company"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       permission_templates: {
         Row: {
           company_id: number
@@ -989,6 +1080,92 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_milestones: {
+        Row: {
+          actual_date: string | null
+          approval_required: boolean | null
+          approval_status: string | null
+          approved_at: string | null
+          approved_by: string | null
+          buffer_days: number | null
+          compliance_requirements: Json | null
+          created_at: string
+          created_by: string
+          dependencies: Json | null
+          description: string | null
+          evidence_attachments: Json | null
+          evidence_required: boolean | null
+          id: string
+          importance_level: string
+          metadata: Json | null
+          milestone_type: string
+          project_id: string
+          status: string
+          target_date: string
+          title: string
+          updated_at: string
+          weather_sensitive: boolean | null
+        }
+        Insert: {
+          actual_date?: string | null
+          approval_required?: boolean | null
+          approval_status?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
+          buffer_days?: number | null
+          compliance_requirements?: Json | null
+          created_at?: string
+          created_by: string
+          dependencies?: Json | null
+          description?: string | null
+          evidence_attachments?: Json | null
+          evidence_required?: boolean | null
+          id?: string
+          importance_level?: string
+          metadata?: Json | null
+          milestone_type?: string
+          project_id: string
+          status?: string
+          target_date: string
+          title: string
+          updated_at?: string
+          weather_sensitive?: boolean | null
+        }
+        Update: {
+          actual_date?: string | null
+          approval_required?: boolean | null
+          approval_status?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
+          buffer_days?: number | null
+          compliance_requirements?: Json | null
+          created_at?: string
+          created_by?: string
+          dependencies?: Json | null
+          description?: string | null
+          evidence_attachments?: Json | null
+          evidence_required?: boolean | null
+          id?: string
+          importance_level?: string
+          metadata?: Json | null
+          milestone_type?: string
+          project_id?: string
+          status?: string
+          target_date?: string
+          title?: string
+          updated_at?: string
+          weather_sensitive?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_milestone_project"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
             referencedColumns: ["id"]
           },
         ]
@@ -1521,6 +1698,8 @@ export type Database = {
           description: string | null
           end_date: string | null
           id: number
+          is_milestone_task: boolean | null
+          milestone_id: string | null
           priority: string | null
           project_id: string | null
           start_date: string | null
@@ -1536,6 +1715,8 @@ export type Database = {
           description?: string | null
           end_date?: string | null
           id?: number
+          is_milestone_task?: boolean | null
+          milestone_id?: string | null
           priority?: string | null
           project_id?: string | null
           start_date?: string | null
@@ -1551,6 +1732,8 @@ export type Database = {
           description?: string | null
           end_date?: string | null
           id?: number
+          is_milestone_task?: boolean | null
+          milestone_id?: string | null
           priority?: string | null
           project_id?: string | null
           start_date?: string | null
@@ -2182,6 +2365,10 @@ export type Database = {
         Args: { lockout_count: number }
         Returns: unknown
       }
+      calculate_milestone_health: {
+        Args: { milestone_id_param: string }
+        Returns: number
+      }
       calculate_schedule_efficiency: {
         Args: { p_user_id: string; p_date: string }
         Returns: number
@@ -2192,6 +2379,10 @@ export type Database = {
       }
       can_create_project: {
         Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      check_milestone_dependencies: {
+        Args: { milestone_id_param: string }
         Returns: boolean
       }
       check_schedule_overlap: {
