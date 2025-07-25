@@ -289,7 +289,19 @@ const Help = () => {
                   <CardDescription className="text-gray-600">
                     {resource.description}
                   </CardDescription>
-                  <Button variant="outline" className="w-full">
+                  <Button 
+                    variant="outline" 
+                    className="w-full"
+                    onClick={() => {
+                      if (resource.title === "Documentation") {
+                        navigate('/documentation');
+                      } else if (resource.title === "Video Tutorials") {
+                        window.open('https://www.youtube.com/playlist?list=PLbVHz4urQBZkJiAWdG8HWoJTdgEysigIO', '_blank');
+                      } else if (resource.title === "Community Forum") {
+                        window.open('https://discord.com/channels/1119885301872070706/1280461670979993613', '_blank');
+                      }
+                    }}
+                  >
                     Explore
                   </Button>
                 </CardContent>
