@@ -11,6 +11,19 @@ export interface UserPreferences {
   };
   language: string;
   timezone: string;
+  dashboard?: {
+    widgets: Array<{
+      id: string;
+      type: string;
+      title: string;
+      position: { x: number; y: number };
+      size: { width: number; height: number };
+      settings?: Record<string, any>;
+      isVisible: boolean;
+    }>;
+    layout: 'grid' | 'list';
+    columns: number;
+  };
 }
 
 export interface ProfileUpdate {

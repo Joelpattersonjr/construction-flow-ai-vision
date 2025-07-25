@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { TrialBanner } from '@/components/subscription/TrialBanner';
 import { SubscriptionService, SubscriptionInfo } from '@/services/subscriptionService';
 import { useAuthState } from '@/hooks/useAuthState';
+import { CustomizableDashboard } from '@/components/dashboard/CustomizableDashboard';
 import { Star, Sparkles, Building2, Calendar, FileText, CheckCircle2, ArrowRight, BarChart3, Users, Clock } from 'lucide-react';
 const Index = () => {
   const navigate = useNavigate();
@@ -170,58 +171,8 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Enhanced Dashboard Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8" data-animate>
-          {dashboardCards.map((card, index) => {
-          const IconComponent = card.icon;
-          return <Card key={index} className="group relative border-0 bg-white/50 backdrop-blur-sm shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-4 hover:scale-105 overflow-hidden cursor-pointer" data-stagger onClick={() => navigate(card.path)}>
-                {/* Gradient overlay that appears on hover */}
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-blue-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                
-                {/* Glow effect */}
-                <div className={`absolute inset-0 rounded-lg bg-gradient-to-br ${card.gradient} opacity-0 group-hover:opacity-10 blur-xl transition-all duration-500 -z-10`}></div>
-                
-                <CardHeader className="relative z-10 pb-4 space-y-6">
-                  <div className="relative">
-                    <div className={`relative p-3 rounded-xl bg-gradient-to-br ${card.gradient} bg-opacity-10 group-hover:bg-opacity-20 transition-all duration-300 w-fit`}>
-                      <IconComponent className={`h-14 w-14 text-white transition-all duration-300 group-hover:scale-110 group-hover:rotate-6`} style={{
-                    filter: 'drop-shadow(0 0 8px rgba(59, 130, 246, 0.5))'
-                  }} />
-                    </div>
-                    <div className={`absolute inset-0 bg-gradient-to-br ${card.gradient} rounded-full blur-xl opacity-0 group-hover:opacity-50 transition-opacity duration-500`}></div>
-                  </div>
-                  <div className="space-y-2">
-                    <CardTitle className="text-2xl font-semibold group-hover:text-primary transition-colors duration-300 leading-tight">
-                      {card.title}
-                    </CardTitle>
-                    <CardDescription className="text-gray-500 font-medium">
-                      {card.description}
-                    </CardDescription>
-                  </div>
-                </CardHeader>
-                
-                <CardContent className="relative z-10 pt-0 space-y-6">
-                  <p className="text-gray-600 text-sm group-hover:text-gray-700 transition-colors duration-300 leading-relaxed">
-                    {card.details}
-                  </p>
-                  
-                  <Button className="w-full group/btn relative overflow-hidden bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary text-white transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl font-semibold">
-                    <span className="relative z-10 flex items-center justify-center">
-                      {card.cta}
-                      <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-300 group-hover/btn:translate-x-1" />
-                    </span>
-                    <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-500 skew-x-12"></div>
-                  </Button>
-                </CardContent>
-                
-                {/* Animated border effect */}
-                <div className="absolute inset-0 border-2 border-transparent group-hover:border-primary/30 rounded-lg transition-all duration-500"></div>
-                
-                {/* Subtle shine effect */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-              </Card>;
-        })}
-        </div>
+        {/* Customizable Dashboard */}
+        <CustomizableDashboard />
 
 
         {/* Additional CTA Section */}
