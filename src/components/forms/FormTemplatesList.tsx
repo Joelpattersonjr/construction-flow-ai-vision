@@ -139,7 +139,7 @@ export const FormTemplatesList: React.FC<FormTemplatesListProps> = ({
       {/* Existing Templates */}
       {templates && templates.length > 0 && <div className="space-y-6">
           <h3 className="text-lg font-medium">Your Form Templates</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {templates.map(template => {
           const IconComponent = categoryIcons[template.category as keyof typeof categoryIcons] || FileText;
           const colorClass = categoryColors[template.category as keyof typeof categoryColors] || categoryColors.general;
