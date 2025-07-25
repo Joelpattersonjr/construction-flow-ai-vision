@@ -67,11 +67,11 @@ export const PublicFormFill: React.FC = () => {
         <div className="mb-6">
           <Button
             variant="outline"
-            onClick={() => navigate('/')}
+            onClick={() => window.history.back()}
             className="mb-4"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Home
+            Back
           </Button>
         </div>
 
