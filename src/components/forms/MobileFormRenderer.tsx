@@ -1,17 +1,32 @@
 import React from 'react';
 import { Capacitor } from '@capacitor/core';
-import { FormRenderer, FormRendererProps } from './FormRenderer';
+import { FormRenderer } from './FormRenderer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Smartphone } from 'lucide-react';
 
-interface MobileFormRendererProps extends FormRendererProps {
+interface FormTemplate {
+  id: string;
+  name: string;
+  description?: string;
+  form_schema: any;
+  category?: string;
+}
+
+interface MobileFormRendererProps {
+  formTemplate: FormTemplate;
+  projectId?: string;
+  onSubmit: (data: any) => void;
+  onSaveDraft?: (data: any) => void;
   showMobileBadge?: boolean;
 }
 
 export const MobileFormRenderer: React.FC<MobileFormRendererProps> = ({
   showMobileBadge = true,
-  ...props
+  formTemplate,
+  projectId,
+  onSubmit,
+  onSaveDraft,
 }) => {
   const isNativeMobile = Capacitor.isNativePlatform();
 
@@ -35,8 +50,13 @@ export const MobileFormRenderer: React.FC<MobileFormRendererProps> = ({
       
       <div className="p-4">
         <FormRenderer
-          {...props}
-          // Mobile-specific optimizations can be added here
+          formTemplate={{
+            ...formTemplate,
+            category: formTemplate.category || 'general'
+          }}
+          projectId={projectId}
+          onSubmit={onSubmit}
+          onSaveDraft={onSaveDraft}
         />
       </div>
     </div>

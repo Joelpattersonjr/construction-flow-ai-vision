@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Copy, Download, Mail, Share2, QrCode, Code } from 'lucide-react';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 interface FormSharingDialogProps {
   open: boolean;
@@ -77,8 +78,22 @@ export const FormSharingDialog: React.FC<FormSharingDialogProps> = ({
     }
 
     try {
-      // This would typically call an edge function to send email
-      // For now, we'll open the default email client
+      const { data, error } = await supabase.functions.invoke('send-form-invitation', {
+        body: {
+          recipientEmail: emailRecipient,
+          formId: formId,
+          formName: formName,
+          message: `You've been invited to fill out the form: "${formName}"`
+        }
+      });
+
+      if (error) throw error;
+
+      toast.success('Form invitation sent successfully!');
+      setEmailRecipient('');
+    } catch (error) {
+      console.error('Error sending email:', error);
+      // Fallback to default email client
       const subject = encodeURIComponent(`Form: ${formName}`);
       const body = encodeURIComponent(`
 Hello,
@@ -95,9 +110,6 @@ Best regards
       
       window.open(`mailto:${emailRecipient}?subject=${subject}&body=${body}`);
       toast.success('Email client opened with form link');
-    } catch (error) {
-      console.error('Error sending email:', error);
-      toast.error('Failed to send email');
     }
   };
 
